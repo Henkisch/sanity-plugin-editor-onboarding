@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.settings",
+  "compilerOptions": {
+    // @sanity/pkg-utils v12 reads JSX config from this tsconfig and emits it
+    // verbatim, so `preserve` would ship raw JSX in dist/ that a consuming
+    // Studio's bundler refuses to parse. Published Sanity plugins ship JSX
+    // already compiled to `react/jsx-runtime` calls; this does the same.
+    //
+    // `@sanity/plugin-kit verify-package` still expects `preserve`, so its
+    // tsconfig check is disabled in package.json under `sanityPlugin`.
+    "jsx": "react-jsx"
+  },
+  "include": ["./src"],
+  "exclude": [
+    "./src/**/__fixtures__",
+    "./src/**/__mocks__",
+    "./src/**/*.test.ts",
+    "./src/**/*.test.tsx"
+  ]
+}
