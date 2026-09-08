@@ -3,8 +3,8 @@
 Short, unobtrusive guided tours for Sanity Studio editors — with a library of
 core Sanity concepts that works with **zero configuration**.
 
-Install it and your editors get quiet, in-Studio answers to the questions they
-always ask: what the draft/published distinction means, what publishing actually
+Install it and your editors get in-Studio answers to the questions they
+often ask: what the draft/published distinction means, what publishing actually
 does, where document history lives.
 
 ![A guide running in Sanity Studio: a soft ring on a control in the navbar, with a small popup beside it stepping through five points](docs/tour.gif)
