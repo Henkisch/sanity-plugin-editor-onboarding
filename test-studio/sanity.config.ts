@@ -1,3 +1,4 @@
+import {svSELocale} from '@sanity/locale-sv-se'
 import {visionTool} from '@sanity/vision'
 import {defineConfig} from 'sanity'
 import {coreConcepts, onboardingTool} from 'sanity-plugin-onboarding'
@@ -15,6 +16,8 @@ export default defineConfig({
   plugins: [
     structureTool(),
     visionTool(),
+    // Installed so the plugin's Swedish bundle can be verified end to end.
+    svSELocale(),
     // The whole Phase 1 surface: no project-specific configuration.
     onboardingTool({tours: coreConcepts()}),
   ],

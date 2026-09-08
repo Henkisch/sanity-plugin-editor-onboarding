@@ -1,6 +1,7 @@
 import {definePlugin, type LayoutProps, type NavbarProps} from 'sanity'
 
 import {OnboardingProvider} from './core/OnboardingProvider'
+import {onboardingLocaleBundles} from './i18n/bundles'
 import {type OnboardingConfig} from './core/types'
 import {HelpMenuButton} from './ui/HelpMenuButton'
 
@@ -37,6 +38,12 @@ export const onboardingTool = definePlugin<OnboardingConfig>((config) => {
 
   return {
     name: 'sanity-plugin-onboarding',
+
+    // Registers this plugin's strings. A Studio can override any of them, or
+    // add a language we don't ship, by passing a bundle with the same
+    // namespace to `i18n.bundles` in sanity.config.ts.
+    i18n: {bundles: onboardingLocaleBundles},
+
     studio: {
       components: {
         // The provider wraps the whole Studio but renders none of its layout —

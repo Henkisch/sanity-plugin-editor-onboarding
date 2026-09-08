@@ -1,3 +1,5 @@
+import {type LocalizedText} from '../i18n/useLocalizedText'
+
 /**
  * Public types for sanity-plugin-onboarding.
  *
@@ -64,9 +66,9 @@ export interface OnboardingStep {
    */
   target?: string
   /** Short heading. One line. */
-  title: string
+  title: LocalizedText
   /** The explanation. One to three sentences — link out for anything longer. */
-  content: string
+  content: LocalizedText
   /** Optional "read more" link rendered under the content. */
   learnMoreUrl?: string
   /** Where to put the popup relative to the target. Defaults to `'bottom'`. */
@@ -82,9 +84,9 @@ export interface OnboardingTour {
   /** Stable id. Used as the persistence key — changing it resets progress. */
   id: string
   /** Shown in the help menu. */
-  title: string
+  title: LocalizedText
   /** Optional one-liner shown under the title in the help menu. */
-  description?: string
+  description?: LocalizedText
   /** Defaults to `'manual'`. */
   autoStart?: AutoStart
   /**
@@ -94,7 +96,7 @@ export interface OnboardingTour {
    *
    * Without this, starting such a tour would appear to do nothing at all.
    */
-  unavailableMessage?: string
+  unavailableMessage?: LocalizedText
   steps: OnboardingStep[]
 }
 

@@ -27,8 +27,9 @@ export default defineConfig({
 That's the whole setup. Start your Studio and you get:
 
 - A short **Studio essentials** tour that starts once, on first login.
-- A **?** help button in the navbar listing every guide, so a tour is never lost
-  to someone who dismissed it.
+- A **Guides** button in the navbar listing every guide, so a tour is never lost
+  to someone who dismissed it. It carries a small dot until opened once, and the
+  last step of the first tour points at it.
 - Steps that point at features your project doesn't have (Content Releases, say)
   quietly drop out — no configuration needed.
 
@@ -124,6 +125,73 @@ function HelpButton() {
 ```
 
 Turn the built-in one off with `onboardingTool({tours, navbarButton: false})`.
+
+## Languages
+
+Every string the plugin shows — its own buttons and menu, and all of the
+built-in guide content — is translatable. English is the base; Swedish ships
+too. Studio UI language is followed automatically, so if your editors run
+Sanity in Swedish, the guides are in Swedish with no extra setup.
+
+### Adding a language
+
+Translations are plain locale bundles in the `onboarding` namespace. Nothing
+needs to be forked:
+
+```ts
+// sanity.config.ts
+import {defineConfig, defineLocaleResourceBundle} from 'sanity'
+import {deDELocale} from '@sanity/locale-de-de'
+
+const onboardingDeDE = defineLocaleResourceBundle({
+  locale: 'de-DE',
+  namespace: 'onboarding',
+  resources: {
+    'action.next': 'Weiter',
+    'tour.essentials.title': 'Studio-Grundlagen',
+    // ...
+  },
+})
+
+export default defineConfig({
+  // ...
+  plugins: [deDELocale(), onboardingTool({tours: coreConcepts()})],
+  i18n: {bundles: [onboardingDeDE]},
+})
+```
+
+Any key you leave out falls back to English, so a partial translation is
+perfectly usable. The full key list lives in `src/i18n/locales/en-US.ts`, and
+the exported `OnboardingResourceKey` type will tell you if you miss one.
+
+The same mechanism overrides individual strings — handy if "Guides" should read
+as something more specific in your Studio:
+
+```ts
+defineLocaleResourceBundle({
+  locale: 'en-US',
+  namespace: 'onboarding',
+  resources: {'menu.title': 'Editorial guides'},
+})
+```
+
+Translations for more languages are very welcome as pull requests.
+
+### Localizing your own tours
+
+Step text takes either a plain string or an i18n key, so you only opt in where
+you need it:
+
+```ts
+{
+  // plain string — nothing to configure
+  title: 'Your articles live here',
+
+  // or a key from any namespace you've registered
+  title: {key: 'tour.posts.title', ns: 'my-studio'},
+  content: {key: 'tour.posts.body', ns: 'my-studio'},
+}
+```
 
 ## Skip, dismiss, complete
 

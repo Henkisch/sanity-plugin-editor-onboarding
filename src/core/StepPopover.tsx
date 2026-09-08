@@ -1,7 +1,10 @@
 import {Box, Button, Card, Flex, Portal, Stack, Text} from '@sanity/ui'
 import {Popover} from '@sanity/ui/popover'
+import {useTranslation} from 'sanity'
 import {styled} from 'styled-components'
 
+import {ONBOARDING_NAMESPACE} from '../i18n/index'
+import {useLocalizedText} from '../i18n/useLocalizedText'
 import {type OnboardingStep} from './types'
 
 /** Narrow enough to stay a tooltip rather than a panel. */
@@ -28,30 +31,32 @@ export interface StepPopoverProps {
 
 function StepBody(props: StepPopoverProps): React.JSX.Element {
   const {step, index, total, onNext, onSkip, onDismissForever} = props
+  const {t} = useTranslation(ONBOARDING_NAMESPACE)
+  const localize = useLocalizedText()
   const isLast = index === total - 1
 
   return (
     <Card padding={3} radius={3} style={{width: POPOVER_WIDTH}}>
       <Stack gap={3}>
         <Text size={1} weight="semibold">
-          {step.title}
+          {localize(step.title)}
         </Text>
 
         <Text size={1} muted>
-          {step.content}
+          {localize(step.content)}
         </Text>
 
         {step.learnMoreUrl && (
           <Text size={1}>
             <a href={step.learnMoreUrl} rel="noopener noreferrer" target="_blank">
-              Learn more
+              {t('action.learn-more')}
             </a>
           </Text>
         )}
 
         <Flex align="center" gap={2} justify="space-between">
           <Text muted size={0}>
-            {index + 1} / {total}
+            {t('progress', {current: index + 1, total})}
           </Text>
 
           <Flex gap={2}>
@@ -60,14 +65,14 @@ function StepBody(props: StepPopoverProps): React.JSX.Element {
               mode="bleed"
               onClick={onSkip}
               padding={2}
-              text="Skip"
+              text={t('action.skip')}
               tone="default"
             />
             <Button
               fontSize={1}
               onClick={onNext}
               padding={2}
-              text={isLast ? 'Done' : 'Next'}
+              text={isLast ? t('action.done') : t('action.next')}
               tone="primary"
             />
           </Flex>
@@ -85,7 +90,7 @@ function StepBody(props: StepPopoverProps): React.JSX.Element {
               mode="bleed"
               onClick={onDismissForever}
               padding={1}
-              text="Don't show this again"
+              text={t('action.dont-show-again')}
               tone="default"
             />
           </Box>

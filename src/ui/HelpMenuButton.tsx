@@ -4,8 +4,11 @@ import {BookIcon} from '@sanity/icons/Book'
 import {Box, Button, Text} from '@sanity/ui'
 import {Menu, MenuButton, MenuDivider, MenuItem} from '@sanity/ui/menu'
 import {useCallback} from 'react'
+import {useTranslation} from 'sanity'
 import {styled} from 'styled-components'
 
+import {ONBOARDING_NAMESPACE} from '../i18n/index'
+import {useLocalizedText} from '../i18n/useLocalizedText'
 import {useOnboarding} from '../core/OnboardingProvider'
 import {type TourStatus} from '../core/types'
 
@@ -55,6 +58,8 @@ function statusIcon(status: TourStatus | null): typeof CheckmarkIcon | undefined
  */
 export function HelpMenuButton(): React.JSX.Element | null {
   const {tours, startTour, statuses, showMenuHint, markMenuOpened} = useOnboarding()
+  const {t} = useTranslation(ONBOARDING_NAMESPACE)
+  const localize = useLocalizedText()
 
   const handleOpen = useCallback(() => {
     // Opening it once is the whole point of the dot, so retire it immediately.
@@ -67,7 +72,7 @@ export function HelpMenuButton(): React.JSX.Element | null {
     <MenuButton
       button={
         <DottedButton
-          aria-label="Guides"
+          aria-label={t('menu.button-label')}
           // Not HelpCircleIcon: Sanity's own Resources button in this same
           // navbar uses it, and two near-identical "?" circles side by side is
           // a coin flip for the user. A book reads as "guides" and has a
@@ -76,7 +81,7 @@ export function HelpMenuButton(): React.JSX.Element | null {
           data-testid="onboarding-guides-button"
           icon={BookIcon}
           mode="bleed"
-          title="Guides"
+          title={t('menu.button-label')}
           tone="default"
         />
       }
@@ -85,7 +90,7 @@ export function HelpMenuButton(): React.JSX.Element | null {
         <Menu>
           <Box padding={3} paddingBottom={2}>
             <Text muted size={1} weight="medium">
-              Guides
+              {t('menu.title')}
             </Text>
           </Box>
           <MenuDivider />
@@ -94,7 +99,7 @@ export function HelpMenuButton(): React.JSX.Element | null {
               key={tour.id}
               iconRight={statusIcon(statuses[tour.id] ?? null)}
               onClick={() => startTour(tour.id)}
-              text={tour.title}
+              text={localize(tour.title)}
             />
           ))}
         </Menu>

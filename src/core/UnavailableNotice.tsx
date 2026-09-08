@@ -1,6 +1,9 @@
 import {Button, Card, Flex, Portal, Stack, Text} from '@sanity/ui'
+import {useTranslation} from 'sanity'
 import {styled} from 'styled-components'
 
+import {ONBOARDING_NAMESPACE} from '../i18n/index'
+import {useLocalizedText} from '../i18n/useLocalizedText'
 import {type OnboardingTour} from './types'
 
 const Root = styled.div`
@@ -11,9 +14,6 @@ const Root = styled.div`
   transform: translateX(-50%);
   width: 320px;
 `
-
-const DEFAULT_MESSAGE =
-  'This guide points at parts of the Studio that aren’t open right now. Open a document and try again.'
 
 /**
  * Shown when a tour was started but every step's target was absent.
@@ -26,6 +26,8 @@ export function UnavailableNotice(props: {
   onClose: () => void
 }): React.JSX.Element {
   const {tour, onClose} = props
+  const {t} = useTranslation(ONBOARDING_NAMESPACE)
+  const localize = useLocalizedText()
 
   return (
     <Portal>
@@ -33,13 +35,15 @@ export function UnavailableNotice(props: {
         <Card padding={3} radius={3} shadow={2}>
           <Stack gap={3}>
             <Text size={1} weight="semibold">
-              {tour.title}
+              {localize(tour.title)}
             </Text>
             <Text muted size={1}>
-              {tour.unavailableMessage ?? DEFAULT_MESSAGE}
+              {tour.unavailableMessage
+                ? localize(tour.unavailableMessage)
+                : t('menu.unavailable')}
             </Text>
             <Flex justify="flex-end">
-              <Button fontSize={1} mode="bleed" onClick={onClose} padding={2} text="Close" />
+              <Button fontSize={1} mode="bleed" onClick={onClose} padding={2} text={t('action.close')} />
             </Flex>
           </Stack>
         </Card>

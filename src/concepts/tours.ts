@@ -18,6 +18,9 @@ import {
  * an auto-starting tour at document-only UI would silently drop most of it.
  */
 import {type OnboardingTour} from '../core/types'
+import {ONBOARDING_NAMESPACE} from '../i18n/index'
+import {type OnboardingResourceKey} from '../i18n/locales/en-US'
+import {type LocalizedText} from '../i18n/useLocalizedText'
 
 /**
  * The concepts covered by {@link coreConcepts}.
@@ -27,6 +30,14 @@ import {type OnboardingTour} from '../core/types'
 export type CoreConceptId = 'essentials' | 'publishing' | 'collaboration' | 'releases' | 'media'
 
 const DOCS = 'https://www.sanity.io/docs'
+
+/**
+ * Marks a string as a key in this plugin's own locale namespace.
+ *
+ * The built-in tours are fully translated, so none of their text is written
+ * inline here — it lives in `src/i18n/locales/` where it can be localized.
+ */
+const k = (key: OnboardingResourceKey): LocalizedText => ({key, ns: ONBOARDING_NAMESPACE})
 
 /**
  * Content is written for editors, not developers: what the thing does and why
@@ -44,65 +55,58 @@ const ALL_CONCEPTS: CoreConceptId[] = [
 const tours: Record<CoreConceptId, OnboardingTour> = {
   essentials: {
     id: 'essentials',
-    title: 'Studio essentials',
-    description: 'Drafts, published content, and finding your way around',
+    title: k('tour.essentials.title'),
+    description: k('tour.essentials.description'),
     autoStart: 'first-login',
     steps: [
       {
         target: targetPerspectiveMenu(),
-        title: 'Drafts and published content',
-        content:
-          'Every document has a draft you edit and a published version your site reads. This switches the whole Studio between the two, so you can see exactly what is live.',
+        title: k('tour.essentials.drafts.title'),
+        content: k('tour.essentials.drafts.content'),
         learnMoreUrl: `${DOCS}/studio/drafts-and-published-documents`,
       },
       {
         target: targetNewDocument(),
-        title: 'Start something new',
-        content: 'Create a document of any type from here, wherever you are in the Studio.',
+        title: k('tour.essentials.new.title'),
+        content: k('tour.essentials.new.content'),
       },
       {
         target: targetSearch(),
-        title: 'Find anything',
-        content:
-          'Search across every document type at once — useful when you know the headline but not where it lives.',
+        title: k('tour.essentials.search.title'),
+        content: k('tour.essentials.search.content'),
       },
       {
         // The handoff. Everything else in this library is opt-in from the menu,
         // so this is the one moment where we can reliably show people where it
         // lives — while their attention is already on the tour.
         target: targetGuidesButton(),
-        title: 'More guides live here',
-        content:
-          'Short guides on publishing, comments and tasks, releases, and images are all in this menu. Open it any time — including to run this one again.',
+        title: k('tour.essentials.guides.title'),
+        content: k('tour.essentials.guides.content'),
       },
     ],
   },
 
   publishing: {
     id: 'publishing',
-    title: 'Editing and publishing',
-    description: 'What happens to your changes, and how to undo them',
-    unavailableMessage:
-      'This guide points at the document editor. Open any document, then start it again.',
+    title: k('tour.publishing.title'),
+    description: k('tour.publishing.description'),
+    unavailableMessage: k('tour.publishing.unavailable'),
     steps: [
       {
         target: targetDocumentStatus(),
-        title: 'Your changes are already saved',
-        content:
-          'Edits save as you type — there is no save button. These chips switch between the draft you are working on and the version that is currently live.',
+        title: k('tour.publishing.autosave.title'),
+        content: k('tour.publishing.autosave.content'),
       },
       {
         target: targetPublishButton(),
-        title: 'Publishing makes it live',
-        content:
-          'Your edits stay in the draft until you publish. Publishing copies the draft over the published version your site reads.',
+        title: k('tour.publishing.publish.title'),
+        content: k('tour.publishing.publish.content'),
         placement: 'top',
       },
       {
         target: targetDocumentHistory(),
-        title: 'Every change is kept',
-        content:
-          'This menu holds the document’s history. Compare an earlier version side by side with the current one, and restore it if something went wrong.',
+        title: k('tour.publishing.history.title'),
+        content: k('tour.publishing.history.content'),
         learnMoreUrl: `${DOCS}/studio/document-history`,
       },
     ],
@@ -110,20 +114,18 @@ const tours: Record<CoreConceptId, OnboardingTour> = {
 
   collaboration: {
     id: 'collaboration',
-    title: 'Working with your team',
-    description: 'Presence, comments, and tasks',
+    title: k('tour.collaboration.title'),
+    description: k('tour.collaboration.description'),
     steps: [
       {
         target: targetNavbar(),
-        title: 'You are not editing alone',
-        content:
-          'When a colleague opens the same document their avatar appears here, and their cursor shows in the field they are working on. Edits from both of you merge as you type.',
+        title: k('tour.collaboration.presence.title'),
+        content: k('tour.collaboration.presence.content'),
       },
       {
         target: targetToolMenu(),
-        title: 'Comments and tasks live with the content',
-        content:
-          'Leave a comment on a specific field, mention a colleague to notify them, or assign a task — all attached to the document rather than buried in a chat thread.',
+        title: k('tour.collaboration.comments.title'),
+        content: k('tour.collaboration.comments.content'),
         learnMoreUrl: `${DOCS}/studio/commenting`,
       },
     ],
@@ -131,35 +133,32 @@ const tours: Record<CoreConceptId, OnboardingTour> = {
 
   releases: {
     id: 'releases',
-    title: 'Scheduling with releases',
-    description: 'Publish a set of documents together, at a chosen time',
+    title: k('tour.releases.title'),
+    description: k('tour.releases.description'),
     steps: [
       {
         target: targetReleases(),
-        title: 'Bundle changes into a release',
-        content:
-          'A release groups documents that should go live together — a campaign, a product launch — so they publish in one go instead of one at a time.',
+        title: k('tour.releases.bundle.title'),
+        content: k('tour.releases.bundle.content'),
         learnMoreUrl: `${DOCS}/content-lake/content-releases`,
       },
       {
         target: targetPerspectiveMenu(),
-        title: 'Preview a release before it ships',
-        content:
-          'Switch the Studio to a release to see the site exactly as it will read once that release is published.',
+        title: k('tour.releases.preview.title'),
+        content: k('tour.releases.preview.content'),
       },
     ],
   },
 
   media: {
     id: 'media',
-    title: 'Images and files',
-    description: 'How assets are stored and reused',
+    title: k('tour.media.title'),
+    description: k('tour.media.description'),
     steps: [
       {
         target: targetNavbar(),
-        title: 'Upload once, use anywhere',
-        content:
-          'Images and files live in a shared library rather than inside the document you uploaded them to, so the same asset can be reused across the site without a second copy.',
+        title: k('tour.media.assets.title'),
+        content: k('tour.media.assets.content'),
         learnMoreUrl: `${DOCS}/studio/assets`,
       },
     ],
