@@ -195,6 +195,26 @@ export interface OnboardingConfig {
    */
   fieldGuides?: FieldGuide[]
   /**
+   * Keep each editor's progress in the project, so "seen it" follows them
+   * between browsers and machines.
+   *
+   * Off by default, and deliberately so: turning it on writes one small
+   * document per editor into your dataset, and a plugin should not start
+   * putting things in someone's content lake without being asked. The document
+   * uses an unregistered type, so it never appears in the structure tool or in
+   * search.
+   *
+   * Best-effort in every direction. An editor without write access, or without
+   * a network, keeps working against this browser's own store — the plugin
+   * warns the developer once and never the editor.
+   *
+   * Progress is per dataset. A Studio with several workspaces tracks each
+   * separately.
+   *
+   * @defaultValue false
+   */
+  syncProgress?: boolean
+  /**
    * Show the built-in help button in the Studio navbar.
    *
    * This is how a user gets back to a tour they dismissed, so it is on by

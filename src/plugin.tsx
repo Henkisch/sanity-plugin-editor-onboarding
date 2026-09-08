@@ -53,6 +53,7 @@ export const onboardingTool = definePlugin<OnboardingConfig>((config) => {
   const tours = config?.tours ?? []
   const fieldGuides = config?.fieldGuides ?? []
   const showNavbarButton = config?.navbarButton !== false
+  const syncProgress = config?.syncProgress === true
 
   // Only touch Sanity's unstable field-action API when something would
   // actually appear there. A Studio that declares no field help never
@@ -95,7 +96,11 @@ export const onboardingTool = definePlugin<OnboardingConfig>((config) => {
         // `renderDefault` is always called, so other plugins' layout
         // customisations still apply.
         layout: (props: LayoutProps) => (
-          <OnboardingProvider fieldGuides={fieldGuides} tours={tours}>
+          <OnboardingProvider
+            fieldGuides={fieldGuides}
+            syncProgress={syncProgress}
+            tours={tours}
+          >
             {props.renderDefault(props)}
           </OnboardingProvider>
         ),

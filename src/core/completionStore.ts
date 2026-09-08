@@ -1,3 +1,4 @@
+import {type UserProgress} from './progressSync'
 import {type TourStatus} from './types'
 
 const STORAGE_KEY = 'sanity-plugin-editor-onboarding:v1'
@@ -129,6 +130,50 @@ export function setMenuOpened(userId: string | null): void {
     ...state.menuOpened,
     [userId ?? 'anonymous']: new Date().toISOString(),
   }
+  write(state)
+}
+
+/**
+ * This user's progress, in the shape the project-side store uses.
+ *
+ * The local store keys every user's tours in one map; a synced document holds
+ * one user. This is the seam between the two.
+ *
+ * @internal
+ */
+export function getUserProgress(userId: string | null): UserProgress {
+  const state = read()
+  const prefix = `${userId ?? 'anonymous'}:`
+
+  const tours: UserProgress['tours'] = {}
+  for (const [key, record] of Object.entries(state.tours)) {
+    if (key.startsWith(prefix)) tours[key.slice(prefix.length)] = record
+  }
+
+  const menuOpenedAt = state.menuOpened?.[userId ?? 'anonymous']
+  return menuOpenedAt ? {tours, menuOpenedAt} : {tours}
+}
+
+/**
+ * Write a merged view of this user's progress back to the browser.
+ *
+ * Other users' records in the same browser are left untouched: a shared machine
+ * must not have one person's sync wipe another's state.
+ *
+ * @internal
+ */
+export function setUserProgress(userId: string | null, progress: UserProgress): void {
+  const state = read()
+  const owner = userId ?? 'anonymous'
+
+  for (const [tourId, record] of Object.entries(progress.tours)) {
+    state.tours[keyFor(userId, tourId)] = record
+  }
+
+  if (progress.menuOpenedAt) {
+    state.menuOpened = {...state.menuOpened, [owner]: progress.menuOpenedAt}
+  }
+
   write(state)
 }
 

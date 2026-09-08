@@ -300,6 +300,31 @@ you need it:
 }
 ```
 
+## Syncing progress across devices
+
+```ts
+onboardingTool({tours: coreConcepts(), syncProgress: true})
+```
+
+Off by default. Turning it on stores one small document per editor in your
+dataset, so "seen it" follows them between browsers and machines. The document
+uses an unregistered type, so it never shows up in the structure tool or in
+search — but it is still your dataset, which is why this is opt-in rather than
+assumed.
+
+It is best-effort in both directions. An editor without write access, or without
+a network, keeps working against their browser's own store; the developer gets
+one console warning and the editor gets none. Local and project state are merged
+per guide, newest wins, so two machines that each finished a different guide end
+up with both — and a guide someone switched off is never resurrected by an older
+record.
+
+Auto-start waits for the project's copy to arrive before offering anything,
+since starting early is the exact bug this fixes.
+
+Progress is per dataset, so a Studio with several workspaces tracks each
+separately.
+
 ## Skip, dismiss, complete
 
 These are three different intentions and the plugin stores them separately:
@@ -350,9 +375,9 @@ while a guide is open, which is why `aria-modal` is `false`.
 
 ## Known limitations
 
-- **Completion state is per browser.** It lives in `localStorage`, keyed by
-  Sanity user id, so a user who switches browser or machine is offered the
-  auto-starting tour again. Server-synced state is planned; see below.
+- **Completion state is per browser unless you turn on syncing.** By default it
+  lives in `localStorage`, so an editor who switches browser or machine is
+  offered the auto-starting tour once more. See below to sync it.
 - **Some Studio test ids contain translated text.** Sanity builds a few of them
   from the label shown to the user, so `action-publish` is `action-publicera` in
   a Swedish Studio and `document-header-Draft-chip` is

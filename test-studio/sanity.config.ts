@@ -76,7 +76,9 @@ export default defineConfig({
     // Installed so the plugin's Swedish bundle can be verified end to end.
     svSELocale(),
     // Phase 1's zero-config library, plus a Phase 2 tour of local components.
-    onboardingTool({fieldGuides, tours: [...coreConcepts(), seoTour]}),
+    // Progress is synced here so the dataset-backed path gets exercised, not
+    // just the localStorage one.
+    onboardingTool({fieldGuides, syncProgress: true, tours: [...coreConcepts(), seoTour]}),
   ],
 
   schema: {types: schemaTypes},

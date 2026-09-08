@@ -1,8 +1,10 @@
 import {createContext, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react'
-import {useCurrentUser} from 'sanity'
+import {useClient, useCurrentUser} from 'sanity'
 
 import {
   getTourStatus,
+  getUserProgress,
+  setUserProgress,
   hasOpenedMenu,
   mayAutoStart,
   setMenuOpened,
@@ -11,6 +13,8 @@ import {
 import {Spotlight} from './Spotlight'
 import {StepPopover} from './StepPopover'
 import {TourErrorBoundary} from './TourErrorBoundary'
+import {mergeProgress, progressDiffers} from './progressSync'
+import {fetchProgress, saveProgress, PROGRESS_API_VERSION} from './remoteProgress'
 import {type FieldGuide, type OnboardingTour, type TourStatus} from './types'
 import {UnavailableNotice} from './UnavailableNotice'
 import {collectFieldHelp, findFieldHelp, stepTarget, type FieldHelp} from './fieldHelp'
@@ -210,11 +214,13 @@ function FieldHelpRunner(props: {help: FieldHelp; onClose: () => void}): React.J
 export function OnboardingProvider(props: {
   tours: OnboardingTour[]
   fieldGuides: FieldGuide[]
+  syncProgress: boolean
   children: React.ReactNode
 }): React.JSX.Element {
-  const {tours, fieldGuides, children} = props
+  const {tours, fieldGuides, syncProgress, children} = props
   const currentUser = useCurrentUser()
   const userId = currentUser?.id ?? null
+  const client = useClient({apiVersion: PROGRESS_API_VERSION})
 
   const [activeTourId, setActiveTourId] = useState<string | null>(null)
   const [stepIndex, setStepIndex] = useState(0)
@@ -251,6 +257,15 @@ export function OnboardingProvider(props: {
   const handledSkip = useRef<string | null>(null)
   // Bumped whenever a tour ends, to re-read statuses for the help menu.
   const [statusVersion, setStatusVersion] = useState(0)
+  /**
+   * Whether project-side progress has been read yet.
+   *
+   * Auto-start waits on this, because starting before it lands is exactly
+   * the bug syncing exists to fix: an editor on a new machine being shown a
+   * guide they switched off somewhere else. Starts settled when syncing is
+   * off, so nothing waits on a request that will never be made.
+   */
+  const [remoteLoaded, setRemoteLoaded] = useState(!syncProgress)
   // Bumped when the menu is opened, to re-read the stored flag.
   const [menuVersion, setMenuVersion] = useState(0)
 
@@ -329,14 +344,17 @@ export function OnboardingProvider(props: {
 
   const endTour = useCallback(
     (status: TourStatus) => {
-      if (activeTourId) setTourStatus(userId, activeTourId, status, stepIndex)
+      if (activeTourId) {
+        setTourStatus(userId, activeTourId, status, stepIndex)
+        if (syncProgress && userId) void saveProgress(client, userId, getUserProgress(userId))
+      }
       restoreFocus(focusBeforeTour)
       setActiveTourId(null)
       setStepIndex(0)
       setSkippedCount(0)
       setStatusVersion((version) => version + 1)
     },
-    [activeTourId, userId, stepIndex, restoreFocus],
+    [activeTourId, userId, stepIndex, restoreFocus, syncProgress, client],
   )
 
   const stopTour = useCallback(() => endTour('skipped'), [endTour])
@@ -382,9 +400,40 @@ export function OnboardingProvider(props: {
     [activeTour, skippedCount],
   )
 
+  // Pull the project's copy of this user's progress in, once.
+  useEffect(() => {
+    if (!syncProgress || !userId) return undefined
+
+    let cancelled = false
+
+    void (async () => {
+      const remote = await fetchProgress(client, userId)
+      if (cancelled) return
+
+      const local = getUserProgress(userId)
+      const merged = mergeProgress(local, remote)
+
+      setUserProgress(userId, merged)
+      // Re-read statuses: the menu may now need to show a guide as finished
+      // that this browser had never seen finished.
+      setStatusVersion((version) => version + 1)
+      setMenuVersion((version) => version + 1)
+      setRemoteLoaded(true)
+
+      // Only write when this browser knew something the project did not.
+      // Onboarding state changes a handful of times per user, ever, and this
+      // runs in someone else's dataset.
+      if (progressDiffers(remote, merged)) void saveProgress(client, userId, merged)
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [syncProgress, userId, client])
+
   // Auto-start, once, and never over the top of someone's typing.
   useEffect(() => {
-    if (activeTourId || !currentUser) return undefined
+    if (activeTourId || !currentUser || !remoteLoaded) return undefined
 
     const candidate = tours.find((tour) => {
       const autoStart = tour.autoStart ?? 'manual'
@@ -425,7 +474,7 @@ export function OnboardingProvider(props: {
       window.clearTimeout(settleId)
       window.clearInterval(intervalId)
     }
-  }, [tours, activeTourId, currentUser, userId, beginTour])
+  }, [tours, activeTourId, currentUser, userId, beginTour, remoteLoaded])
 
   /**
    * Every field that should carry a book icon, from tour steps and standalone
@@ -452,7 +501,8 @@ export function OnboardingProvider(props: {
   const markMenuOpened = useCallback(() => {
     setMenuOpened(userId)
     setMenuVersion((version) => version + 1)
-  }, [userId])
+    if (syncProgress && userId) void saveProgress(client, userId, getUserProgress(userId))
+  }, [userId, syncProgress, client])
 
   const contextValue = useMemo<OnboardingContextValue>(
     () => ({
