@@ -1,5 +1,5 @@
 import {createContext, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react'
-import {useClient, useCurrentUser} from 'sanity'
+import {SANITY_VERSION, useClient, useCurrentUser} from 'sanity'
 
 import {
   getTourStatus,
@@ -14,6 +14,7 @@ import {
 import {Spotlight} from './Spotlight'
 import {StepPopover} from './StepPopover'
 import {TourErrorBoundary} from './TourErrorBoundary'
+import {checkTargets, formatReport, isDevelopment} from './healthCheck'
 import {mergeProgress, progressDiffers} from './progressSync'
 import {fetchProgress, saveProgress, PROGRESS_API_VERSION} from './remoteProgress'
 import {type FieldGuide, type OnboardingTour, type TourStatus} from './types'
@@ -90,6 +91,7 @@ function isUserBusyEditing(): boolean {
  * as the tour decides whether they are busy.
  */
 const AUTO_START_SETTLE_MS = 1500
+
 
 /** How long auto-start waits for a quiet moment before giving up entirely. */
 const AUTO_START_GIVE_UP_MS = 30_000
@@ -402,6 +404,22 @@ export function OnboardingProvider(props: {
     },
     [activeTour, skippedCount],
   )
+
+  // Once per session, in development, say which targets resolved. A step whose
+  // selector Sanity has renamed skips itself in silence, which is right for an
+  // editor and useless for the developer who needs to fix it.
+  useEffect(() => {
+    if (!isDevelopment() || tours.length === 0) return undefined
+
+    // Late enough that the Studio has rendered something worth checking.
+    const timeoutId = window.setTimeout(() => {
+      // `warn` rather than `info`: Studio consoles are busy, and this is the
+      // one message a developer needs to see when a guide has gone quiet.
+      console.warn(formatReport(checkTargets(tours), SANITY_VERSION))
+    }, AUTO_START_SETTLE_MS)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [tours])
 
   // Pull the project's copy of this user's progress in, once.
   useEffect(() => {

@@ -403,6 +403,24 @@ Verified against `sanity@6.12.0`. On a newer Studio major the plugin logs one
 console warning to the developer; nothing is shown to editors, and steps whose
 targets have moved skip themselves as usual.
 
+### Checking your guides still point at something
+
+Because a step that cannot find its target is skipped rather than shown, a
+selector Sanity has renamed looks exactly like a feature you do not have — your
+editors are simply shown less than you think.
+
+So in development, once per session, the plugin reports what it found:
+
+```
+[sanity-plugin-editor-onboarding] 14 of 18 anchored steps found their target on
+this view (Sanity 6.12.0).
+```
+
+Misses are listed, separated into selectors that can never match — invalid CSS —
+and ones that are merely not on this view, which is expected for any step
+describing a document that is not open. Open a document and reload to check
+those. The report is development-only and never reaches an editor.
+
 ### Where the guides get their facts
 
 Each built-in guide cites the Sanity documentation page it summarises, shown once
