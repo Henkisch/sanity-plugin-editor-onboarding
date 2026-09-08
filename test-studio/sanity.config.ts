@@ -1,10 +1,45 @@
-import {svSELocale} from '@sanity/locale-sv-se'
 import {visionTool} from '@sanity/vision'
 import {defineConfig} from 'sanity'
-import {coreConcepts, onboardingTool} from 'sanity-plugin-editor-onboarding'
+import {
+  coreConcepts,
+  onboardingTool,
+  targetCustom,
+  type OnboardingTour,
+} from 'sanity-plugin-editor-onboarding'
 import {structureTool} from 'sanity/structure'
 
 import {schemaTypes} from './schemaTypes'
+
+/**
+ * A developer-defined tour pointing at this Studio's own components — the
+ * Phase 2 surface. Nothing here is a Sanity `data-testid`; both steps resolve
+ * through ids registered in `components/SeoPanel.tsx`.
+ *
+ * Manual by design: the panel only exists inside an open document, so an
+ * auto-starting version would find nothing on most views.
+ */
+const seoTour: OnboardingTour = {
+  id: 'seo-panel',
+  title: 'The SEO panel',
+  description: "A tour of this Studio's own UI, not Sanity's.",
+  unavailableMessage: 'Open a blog post first — the SEO panel is part of the document form.',
+  steps: [
+    {
+      target: targetCustom('seo-panel'),
+      title: 'Search appearance',
+      content:
+        'This panel is a custom input component belonging to this Studio. It marks itself with the useOnboardingTarget() hook, so a step can point at it without a fragile CSS selector.',
+      placement: 'top',
+    },
+    {
+      target: targetCustom('seo-score'),
+      title: 'How the title scores',
+      content:
+        'The badge is marked from the outside with <OnboardingTarget>, which adds no wrapper element and leaves the component untouched.',
+      placement: 'bottom',
+    },
+  ],
+}
 
 export default defineConfig({
   name: 'default',
@@ -16,10 +51,11 @@ export default defineConfig({
   plugins: [
     structureTool(),
     visionTool(),
-    // Installed so the plugin's Swedish bundle can be verified end to end.
-    svSELocale(),
-    // The whole Phase 1 surface: no project-specific configuration.
-    onboardingTool({tours: coreConcepts()}),
+    // Swedish is installed but left out while we work in English. Re-add
+    // `svSELocale()` (imported from '@sanity/locale-sv-se') to check the
+    // plugin's sv-SE bundle end to end.
+    // Phase 1's zero-config library, plus a Phase 2 tour of local components.
+    onboardingTool({tours: [...coreConcepts(), seoTour]}),
   ],
 
   schema: {types: schemaTypes},

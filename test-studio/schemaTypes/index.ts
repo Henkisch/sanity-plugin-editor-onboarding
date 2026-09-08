@@ -1,8 +1,13 @@
 import {defineField, defineType} from 'sanity'
 
+import {SeoPanel} from '../components/SeoPanel'
+
 /**
  * Two document types with a handful of fields — enough to exercise
  * `targetDocumentType()` (which keys off the title) and `targetField()`.
+ *
+ * `seoTitle` renders through a Studio-owned input component, so `targetCustom()`
+ * has something to point at that no `data-testid` reaches.
  */
 export const post = defineType({
   name: 'post',
@@ -14,6 +19,12 @@ export const post = defineType({
     defineField({name: 'publishedAt', title: 'Published at', type: 'datetime'}),
     defineField({name: 'coverImage', title: 'Cover image', type: 'image'}),
     defineField({name: 'body', title: 'Body', type: 'text'}),
+    defineField({
+      name: 'seoTitle',
+      title: 'SEO title',
+      type: 'string',
+      components: {input: SeoPanel},
+    }),
   ],
 })
 

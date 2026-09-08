@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@sanity/locale-sv-se": "^1.2.38",
+    "@sanity/ui": "^4.1.1",
     "@sanity/vision": "^6.12.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

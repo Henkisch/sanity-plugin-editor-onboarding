@@ -1,14 +1,50 @@
 /**
- * Selectors for Sanity Studio's own UI.
+ * Selectors for a tour step to point at.
  *
- * These resolve against `data-testid` attributes present in Sanity Studio.
- * Sanity does not publish these as a stable public API, so they are verified
- * against a specific Studio version (see README) and every one of them degrades
- * gracefully: a selector that stops matching skips its step and logs a warning
- * rather than breaking the tour.
+ * Two tiers. {@link targetCustom} points at your own components, marked with
+ * {@link useOnboardingTarget} — stable, because you own that markup. Everything
+ * else here resolves against `data-testid` attributes present in Sanity Studio.
+ * Sanity does not publish those as a stable public API, so they are verified
+ * against a specific Studio version (see README).
+ *
+ * Either way a selector degrades gracefully: one that stops matching skips its
+ * step and logs a warning rather than breaking the tour.
  *
  * @module
  */
+
+/**
+ * The attribute {@link useOnboardingTarget} stamps onto an element, and that
+ * {@link targetCustom} looks it up by.
+ *
+ * Internal: the pair of functions is the supported way in and out.
+ */
+export const ONBOARDING_TARGET_ATTRIBUTE = 'data-onboarding-target'
+
+/**
+ * One of your own elements, marked with {@link useOnboardingTarget} or
+ * {@link OnboardingTarget}.
+ *
+ * Prefer this over a CSS selector for anything you control. A selector written
+ * against your own class names or DOM shape breaks the next time you touch that
+ * component, silently and at a distance; an id you registered explicitly does
+ * not.
+ *
+ * ```tsx
+ * function SeoPanel() {
+ *   const ref = useOnboardingTarget('seo-panel')
+ *   return <div ref={ref}>...</div>
+ * }
+ *
+ * // ...then, in a step:
+ * {target: targetCustom('seo-panel'), title: 'SEO', content: '...'}
+ * ```
+ *
+ * @param id - The same id you passed to {@link useOnboardingTarget}.
+ * @public
+ */
+export const targetCustom = (id: string): string =>
+  `[${ONBOARDING_TARGET_ATTRIBUTE}="${escapeAttributeValue(id)}"]`
 
 /** The Studio's top navigation bar. @public */
 export const targetNavbar = (): string => '[data-testid="studio-navbar"]'
@@ -87,6 +123,6 @@ export const targetField = (name: string): string =>
  * Escape a value for use inside a `[attr="..."]` selector, so that titles
  * containing quotes or backslashes can't produce an invalid selector.
  */
-function escapeAttributeValue(value: string): string {
+export function escapeAttributeValue(value: string): string {
   return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
 }
