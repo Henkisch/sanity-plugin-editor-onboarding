@@ -1,4 +1,4 @@
-# sanity-plugin-onboarding
+# sanity-plugin-editor-onboarding
 
 Short, unobtrusive guided tours for Sanity Studio editors — with a library of
 core Sanity concepts that works with **zero configuration**.
@@ -10,13 +10,13 @@ does, where document history lives.
 ## Quickstart
 
 ```sh
-npm install sanity-plugin-onboarding
+npm install sanity-plugin-editor-onboarding
 ```
 
 ```ts
 // sanity.config.ts
 import {defineConfig} from 'sanity'
-import {coreConcepts, onboardingTool} from 'sanity-plugin-onboarding'
+import {coreConcepts, onboardingTool} from 'sanity-plugin-editor-onboarding'
 
 export default defineConfig({
   // ...
@@ -27,7 +27,7 @@ export default defineConfig({
 That's the whole setup. Start your Studio and you get:
 
 - A short **Studio essentials** tour that starts once, on first login.
-- A **Guides** button in the navbar listing every guide, so a tour is never lost
+- An **Editorial guides** button in the navbar listing every guide, so a tour is never lost
   to someone who dismissed it. It carries a small dot until opened once, and the
   last step of the first tour points at it.
 - Steps that point at features your project doesn't have (Content Releases, say)
@@ -55,7 +55,7 @@ coreConcepts({include: ['essentials', 'publishing']})
 ## Your own tours
 
 ```ts
-import {onboardingTool, coreConcepts, targetDocumentType} from 'sanity-plugin-onboarding'
+import {onboardingTool, coreConcepts, targetDocumentType} from 'sanity-plugin-editor-onboarding'
 
 onboardingTool({
   tours: [
@@ -116,7 +116,7 @@ the step and the selector that missed.
 The navbar help button is there by default. If you'd rather use your own:
 
 ```tsx
-import {useStartTour} from 'sanity-plugin-onboarding'
+import {useStartTour} from 'sanity-plugin-editor-onboarding'
 
 function HelpButton() {
   const startTour = useStartTour('essentials')
@@ -164,14 +164,14 @@ Any key you leave out falls back to English, so a partial translation is
 perfectly usable. The full key list lives in `src/i18n/locales/en-US.ts`, and
 the exported `OnboardingResourceKey` type will tell you if you miss one.
 
-The same mechanism overrides individual strings — handy if "Guides" should read
-as something more specific in your Studio:
+The same mechanism overrides individual strings — handy if "Editorial guides"
+should read as something else in your Studio:
 
 ```ts
 defineLocaleResourceBundle({
   locale: 'en-US',
   namespace: 'onboarding',
-  resources: {'menu.title': 'Editorial guides'},
+  resources: {'menu.title': 'Guides', 'menu.button-label': 'Guides'},
 })
 ```
 

@@ -1,6 +1,6 @@
 import {type TourStatus} from './types'
 
-const STORAGE_KEY = 'sanity-plugin-onboarding:v1'
+const STORAGE_KEY = 'sanity-plugin-editor-onboarding:v1'
 const SCHEMA_VERSION = 1
 
 interface TourRecord {

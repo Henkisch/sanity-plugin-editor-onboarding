@@ -17,8 +17,8 @@ const enUS = {
   'progress': '{{current}} / {{total}}',
 
   // — Guides menu —
-  'menu.title': 'Guides',
-  'menu.button-label': 'Guides',
+  'menu.title': 'Editorial guides',
+  'menu.button-label': 'Editorial guides',
   'menu.status.completed': 'Completed',
   'menu.status.dismissed': 'Hidden',
   'menu.unavailable':

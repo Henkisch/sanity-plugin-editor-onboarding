@@ -10,7 +10,7 @@ import {HelpMenuButton} from './ui/HelpMenuButton'
  *
  * ```ts
  * import {defineConfig} from 'sanity'
- * import {onboardingTool, coreConcepts} from 'sanity-plugin-onboarding'
+ * import {onboardingTool, coreConcepts} from 'sanity-plugin-editor-onboarding'
  *
  * export default defineConfig({
  *   // ...
@@ -30,14 +30,14 @@ export const onboardingTool = definePlugin<OnboardingConfig>((config) => {
 
   if (duplicateId) {
     console.warn(
-      `[sanity-plugin-onboarding] Two tours share the id "${duplicateId}". Ids are used as ` +
+      `[sanity-plugin-editor-onboarding] Two tours share the id "${duplicateId}". Ids are used as ` +
         `the persistence key, so their completion state will be shared. Give each tour a ` +
         `unique id.`,
     )
   }
 
   return {
-    name: 'sanity-plugin-onboarding',
+    name: 'sanity-plugin-editor-onboarding',
 
     // Registers this plugin's strings. A Studio can override any of them, or
     // add a language we don't ship, by passing a bundle with the same
@@ -64,7 +64,7 @@ export const onboardingTool = definePlugin<OnboardingConfig>((config) => {
                 __internal_actions: [
                   ...(props.__internal_actions ?? []),
                   {
-                    name: 'sanity-plugin-onboarding/guides',
+                    name: 'sanity-plugin-editor-onboarding/guides',
                     location: 'topbar',
                     render: () => <HelpMenuButton />,
                   },

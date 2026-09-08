@@ -50,7 +50,7 @@ function resolveNow(selector: string | undefined): Resolution {
 
 function warnMissing(selector: string, tourId: string, stepIndex: number, reason: string): void {
   console.warn(
-    `[sanity-plugin-onboarding] Skipping step ${stepIndex + 1} of tour "${tourId}": ${reason} ` +
+    `[sanity-plugin-editor-onboarding] Skipping step ${stepIndex + 1} of tour "${tourId}": ${reason} ` +
       `Selector: \`${selector}\`. The tour continues without this step. If it targets an ` +
       `optional Studio feature this is expected; otherwise check that the selector is still ` +
       `correct for your Sanity version.`,

@@ -26,7 +26,7 @@ export class TourErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, info: ErrorInfo): void {
     console.error(
-      `[sanity-plugin-onboarding] Tour "${this.props.tourId}" crashed and has been closed. ` +
+      `[sanity-plugin-editor-onboarding] Tour "${this.props.tourId}" crashed and has been closed. ` +
         `The Studio is unaffected.`,
       error,
       info.componentStack,

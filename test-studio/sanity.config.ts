@@ -1,7 +1,7 @@
 import {svSELocale} from '@sanity/locale-sv-se'
 import {visionTool} from '@sanity/vision'
 import {defineConfig} from 'sanity'
-import {coreConcepts, onboardingTool} from 'sanity-plugin-onboarding'
+import {coreConcepts, onboardingTool} from 'sanity-plugin-editor-onboarding'
 import {structureTool} from 'sanity/structure'
 
 import {schemaTypes} from './schemaTypes'

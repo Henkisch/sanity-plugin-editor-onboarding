@@ -1,7 +1,7 @@
 import {type LocalizedText} from '../i18n/useLocalizedText'
 
 /**
- * Public types for sanity-plugin-onboarding.
+ * Public types for sanity-plugin-editor-onboarding.
  *
  * @module
  */

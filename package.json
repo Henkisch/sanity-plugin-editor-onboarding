@@ -1,5 +1,5 @@
 {
-  "name": "sanity-plugin-onboarding",
+  "name": "sanity-plugin-editor-onboarding",
   "version": "1.0.0",
   "description": "Interactive, unobtrusive onboarding tours for Sanity Studio editors — with a zero-config library of core Sanity concepts.",
   "keywords": [
@@ -11,13 +11,13 @@
     "guide",
     "studio"
   ],
-  "homepage": "https://github.com/Henkisch/sanity-plugin-onboarding#readme",
+  "homepage": "https://github.com/Henkisch/sanity-plugin-editor-onboarding#readme",
   "bugs": {
-    "url": "https://github.com/Henkisch/sanity-plugin-onboarding/issues"
+    "url": "https://github.com/Henkisch/sanity-plugin-editor-onboarding/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Henkisch/sanity-plugin-onboarding.git"
+    "url": "git+https://github.com/Henkisch/sanity-plugin-editor-onboarding.git"
   },
   "license": "MIT",
   "author": "Henrik Larsson <henrik@kodamera.se>",

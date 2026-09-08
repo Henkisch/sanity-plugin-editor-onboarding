@@ -13,7 +13,7 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "sanity": "^6.12.0",
-    "sanity-plugin-onboarding": "file:..",
+    "sanity-plugin-editor-onboarding": "file:..",
     "styled-components": "^6.5.3"
   }
 }

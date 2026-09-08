@@ -198,7 +198,7 @@ export function coreConcepts(options: CoreConceptsOptions = {}): OnboardingTour[
     const tour = tours[id]
     if (!tour) {
       console.warn(
-        `[sanity-plugin-onboarding] coreConcepts(): unknown concept "${id}". ` +
+        `[sanity-plugin-editor-onboarding] coreConcepts(): unknown concept "${id}". ` +
           `Available: ${ALL_CONCEPTS.join(', ')}.`,
       )
       return []

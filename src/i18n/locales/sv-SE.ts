@@ -19,8 +19,8 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'progress': '{{current}} / {{total}}',
 
   // — Guides menu —
-  'menu.title': 'Guider',
-  'menu.button-label': 'Guider',
+  'menu.title': 'Redaktionella guider',
+  'menu.button-label': 'Redaktionella guider',
   'menu.status.completed': 'Genomförd',
   'menu.status.dismissed': 'Dold',
   'menu.unavailable':

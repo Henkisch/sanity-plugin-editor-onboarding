@@ -24,7 +24,7 @@ export function useStartTour(tourId: string): () => void {
   return useCallback(() => {
     if (!tours.some((tour) => tour.id === tourId)) {
       console.warn(
-        `[sanity-plugin-onboarding] useStartTour("${tourId}") — no tour with that id is ` +
+        `[sanity-plugin-editor-onboarding] useStartTour("${tourId}") — no tour with that id is ` +
           `registered. Registered tours: ${tours.map((tour) => tour.id).join(', ') || '(none)'}.`,
       )
       return
