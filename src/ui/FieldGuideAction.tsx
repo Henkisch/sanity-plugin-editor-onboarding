@@ -1,9 +1,15 @@
 import {BookIcon} from '@sanity/icons/Book'
 import {useCallback, useMemo} from 'react'
-import {defineDocumentFieldAction, useTranslation, type DocumentFieldAction} from 'sanity'
+import {
+  defineDocumentFieldAction,
+  useTranslation,
+  useValidationStatus,
+  type DocumentFieldAction,
+} from 'sanity'
 
 import {ONBOARDING_NAMESPACE} from '../i18n/index'
 import {pathToFieldName} from '../core/fieldHelp'
+import {hasBlockingError} from '../core/validation'
 import {useOnboardingOptional} from '../core/OnboardingProvider'
 
 /**
@@ -44,7 +50,7 @@ export function fieldGuideActionFor(documentType: string): DocumentFieldAction {
 
   const action = defineDocumentFieldAction({
     name: 'sanity-plugin-editor-onboarding/field-guide',
-    useAction({path}) {
+    useAction({path, documentId}) {
       // Never `useOnboarding()`: this renders inside Sanity's own field
       // machinery, where a throw crashes the structure tool rather than just
       // this icon. No provider simply means no help to offer.
@@ -55,6 +61,16 @@ export function fieldGuideActionFor(documentType: string): DocumentFieldAction {
       const title = t('field.help')
 
       const help = onboarding?.fieldHelpFor(pathToFieldName(path), documentType)
+
+      // An editor staring at a disabled Publish button is asking a question
+      // with nowhere to ask it. When this field is the one blocking them and it
+      // has help, the icon stops being quiet — same affordance, same content,
+      // just findable at the moment it is wanted.
+      // The third argument asks whether references must resolve to published
+      // documents. False: that is a publish-time concern of the Studio's own,
+      // and this only decides whether an icon changes colour.
+      const {validation} = useValidationStatus(documentId, documentType, false)
+      const blocking = Boolean(help) && hasBlockingError(validation, path)
 
       const onAction = useCallback(() => {
         if (help) onboarding?.showFieldHelp(help)
@@ -72,10 +88,14 @@ export function fieldGuideActionFor(documentType: string): DocumentFieldAction {
           // Every other field renders nothing at all, so this costs the fields
           // with no guide one hidden node each.
           hidden: !help,
+          // Only ever a tone change. Nothing moves, nothing opens, and the
+          // editor is not interrupted mid-sentence — the ceiling this plugin
+          // sets for itself applies here too.
+          tone: blocking ? ('caution' as const) : undefined,
           onAction,
           title,
         }),
-        [help, onAction, title],
+        [help, onAction, title, blocking],
       )
     },
   })

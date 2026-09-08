@@ -4,6 +4,7 @@ import {useClient, useCurrentUser} from 'sanity'
 import {
   getTourStatus,
   getUserProgress,
+  resetTourStatus,
   setUserProgress,
   hasOpenedMenu,
   mayAutoStart,
@@ -32,6 +33,8 @@ interface OnboardingContextValue {
   showMenuHint: boolean
   /** Retires the dot permanently for this user. */
   markMenuOpened: () => void
+  /** Forget every guide's status, so they behave as never seen. */
+  resetAll: () => void
   /** The help for one field, if any is declared. Drives the field's book icon. */
   fieldHelpFor: (fieldName: string, documentType: string | undefined) => FieldHelp | undefined
   /** Show one field's help on its own, outside any tour. */
@@ -501,6 +504,22 @@ export function OnboardingProvider(props: {
     [fieldHelp],
   )
 
+  /**
+   * Start over: forget every guide's status for this user.
+   *
+   * Local first so the menu updates immediately, then mirrored if syncing is on.
+   * Deliberately not a confirmation dialog — nothing here is content, and the
+   * worst outcome is being offered a guide again.
+   */
+  const resetAll = useCallback(() => {
+    for (const tour of tours) resetTourStatus(userId, tour.id)
+
+    offeredThisSession.current.clear()
+    setStatusVersion((version) => version + 1)
+
+    if (syncProgress && userId) void saveProgress(client, userId, getUserProgress(userId))
+  }, [tours, userId, syncProgress, client])
+
   const markMenuOpened = useCallback(() => {
     setMenuOpened(userId)
     setMenuVersion((version) => version + 1)
@@ -518,6 +537,7 @@ export function OnboardingProvider(props: {
       // nothing to point at.
       showMenuHint: !menuOpened && tours.length > 0,
       markMenuOpened,
+      resetAll,
       fieldHelpFor,
       showFieldHelp,
     }),
@@ -529,6 +549,7 @@ export function OnboardingProvider(props: {
       statuses,
       menuOpened,
       markMenuOpened,
+      resetAll,
       fieldHelpFor,
       showFieldHelp,
     ],

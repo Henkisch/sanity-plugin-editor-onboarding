@@ -213,6 +213,11 @@ publishing guide and the help on the field itself, written once:
 Nested fields take a dotted path (`'seo.title'`). Fields with no guide show no
 icon at all, so this costs nothing on the other twenty fields in a document.
 
+When a field is the reason an editor cannot publish — it has a validation error,
+not just a warning — its book icon takes on a caution tone. Nothing moves and
+nothing opens: an editor staring at a disabled Publish button is asking a
+question with nowhere to ask it, and this only makes the answer easier to spot.
+
 This is the one part of the plugin built on a Sanity API marked unstable
 (`unstable_fieldActions`) — there is no other way into that row. It is only
 registered when you declare field help, and if Sanity changes the API the icons

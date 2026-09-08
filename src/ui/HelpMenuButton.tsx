@@ -1,4 +1,5 @@
 import {CheckmarkIcon} from '@sanity/icons/Checkmark'
+import {RestoreIcon} from '@sanity/icons/Restore'
 import {EyeClosedIcon} from '@sanity/icons/EyeClosed'
 import {BookIcon} from '@sanity/icons/Book'
 import {Box, Button, Text} from '@sanity/ui'
@@ -57,7 +58,7 @@ function statusIcon(status: TourStatus | null): typeof CheckmarkIcon | undefined
  * plugins' navbar customisations.
  */
 export function HelpMenuButton(): React.JSX.Element | null {
-  const {tours, startTour, statuses, showMenuHint, markMenuOpened} = useOnboarding()
+  const {tours, startTour, statuses, showMenuHint, markMenuOpened, resetAll} = useOnboarding()
   const {t} = useTranslation(ONBOARDING_NAMESPACE)
   const localize = useLocalizedText()
 
@@ -65,6 +66,8 @@ export function HelpMenuButton(): React.JSX.Element | null {
     // Opening it once is the whole point of the dot, so retire it immediately.
     if (showMenuHint) markMenuOpened()
   }, [showMenuHint, markMenuOpened])
+
+  const hasProgress = tours.some((tour) => statuses[tour.id])
 
   if (tours.length === 0) return null
 
@@ -103,6 +106,22 @@ export function HelpMenuButton(): React.JSX.Element | null {
               text={localize(tour.title)}
             />
           ))}
+          {/*
+            Only offered once there is something to undo. A menu that opens with
+            "Start over" above a list nobody has read yet is offering to undo
+            nothing.
+          */}
+          {hasProgress && (
+            <>
+              <MenuDivider />
+              <MenuItem
+                icon={RestoreIcon}
+                onClick={resetAll}
+                text={t('menu.start-over')}
+                tone="default"
+              />
+            </>
+          )}
         </Menu>
       }
       onOpen={handleOpen}

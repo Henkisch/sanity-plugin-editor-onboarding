@@ -25,6 +25,7 @@ const svSE: Record<OnboardingResourceKey, string> = {
 
   'menu.title': 'Redaktionella guider',
   'menu.button-label': 'Redaktionella guider',
+  'menu.start-over': 'Börja om',
   'menu.status.completed': 'Genomförd',
   'menu.status.dismissed': 'Dold',
   'menu.unavailable':
