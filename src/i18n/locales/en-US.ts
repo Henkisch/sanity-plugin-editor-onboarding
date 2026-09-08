@@ -23,7 +23,7 @@ const enUS = {
   // — Guides menu —
   'menu.title': 'Editorial guides',
   'menu.button-label': 'Editorial guides',
-  'menu.start-over': 'Start over',
+  'menu.show-all-again': 'Show all guides again',
   'menu.status.completed': 'Completed',
   'menu.status.dismissed': 'Hidden',
   'menu.unavailable':

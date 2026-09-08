@@ -117,7 +117,7 @@ export function HelpMenuButton(): React.JSX.Element | null {
               <MenuItem
                 icon={RestoreIcon}
                 onClick={resetAll}
-                text={t('menu.start-over')}
+                text={t('menu.show-all-again')}
                 tone="default"
               />
             </>
