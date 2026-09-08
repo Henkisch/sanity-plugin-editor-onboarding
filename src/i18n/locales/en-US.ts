@@ -14,6 +14,7 @@ const enUS = {
   'action.close': 'Close',
   'action.dont-show-again': "Don't show this again",
   'action.learn-more': 'Learn more',
+  'action.source': 'Source: Sanity docs',
   'progress': '{{current}} / {{total}}',
 
   // — Guides menu —
@@ -27,6 +28,10 @@ const enUS = {
   // — Core concepts: essentials —
   'tour.essentials.title': 'Studio essentials',
   'tour.essentials.description': 'Drafts, published content, and finding your way around',
+  'tour.essentials.intro.title': 'Getting around Sanity Studio',
+  'tour.essentials.intro.content':
+    'Four quick steps, and you can leave whenever you like. Everything here stays available '
+    + 'under the book icon in the top bar.',
   'tour.essentials.drafts.title': 'Drafts and published content',
   'tour.essentials.drafts.content':
     'Every document has a draft you edit and a published version your site reads. This switches the whole Studio between the two, so you can see exactly what is live.',
@@ -48,6 +53,11 @@ const enUS = {
   'tour.publishing.autosave.title': 'Your changes are already saved',
   'tour.publishing.autosave.content':
     'Edits save as you type — there is no save button. These chips switch between the draft you are working on and the version that is currently live.',
+  'tour.publishing.slug.title': 'The slug is this page’s address',
+  'tour.publishing.slug.content':
+    'A slug is the last part of a web address — everything after your domain name. It is '
+    + 'usually built from the title, so you rarely need to write one yourself. Changing it '
+    + 'later changes the link, and anything already pointing at the old address stops working.',
   'tour.publishing.publish.title': 'Publishing makes it live',
   'tour.publishing.publish.content':
     'Your edits stay in the draft until you publish. Publishing copies the draft over the published version your site reads.',

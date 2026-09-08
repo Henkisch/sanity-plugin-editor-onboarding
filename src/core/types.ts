@@ -1,3 +1,5 @@
+import {type ElementType} from 'react'
+
 import {type LocalizedText} from '../i18n/useLocalizedText'
 
 /**
@@ -69,8 +71,14 @@ export interface OnboardingStep {
   title: LocalizedText
   /** The explanation. One to three sentences — link out for anything longer. */
   content: LocalizedText
-  /** Optional "read more" link rendered under the content. */
-  learnMoreUrl?: string
+  /**
+   * Optional "read more" link rendered under the content.
+   *
+   * Localized like every other string here, which is what makes it
+   * overridable: a Studio can point this at its own internal handbook by
+   * redefining the key in a bundle, without redeclaring the tour.
+   */
+  learnMoreUrl?: LocalizedText
   /** Where to put the popup relative to the target. Defaults to `'bottom'`. */
   placement?: 'top' | 'bottom' | 'left' | 'right'
 }
@@ -87,6 +95,22 @@ export interface OnboardingTour {
   title: LocalizedText
   /** Optional one-liner shown under the title in the help menu. */
   description?: LocalizedText
+  /**
+   * Icon shown beside this tour's title in the guides menu.
+   *
+   * Defaults to a book. There is deliberately no "no icon" option: a menu where
+   * some items have one and some don't reads as broken, and your tours sit in
+   * the same list as the built-in ones.
+   */
+  icon?: ElementType
+  /**
+   * Where this guide's content comes from — shown once, on the last step.
+   *
+   * A tour is a summary written for editors; this is the authority it
+   * summarises, so someone who wants the full account knows where to go and
+   * can see the plugin is not inventing its own version of Sanity.
+   */
+  sourceUrl?: LocalizedText
   /** Defaults to `'manual'`. */
   autoStart?: AutoStart
   /**

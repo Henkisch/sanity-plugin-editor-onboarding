@@ -16,6 +16,7 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'action.close': 'Stäng',
   'action.dont-show-again': 'Visa inte det här igen',
   'action.learn-more': 'Läs mer',
+  'action.source': 'Källa: Sanitys dokumentation',
   'progress': '{{current}} / {{total}}',
 
   // — Guides menu —
@@ -29,6 +30,10 @@ const svSE: Record<OnboardingResourceKey, string> = {
   // — Core concepts: essentials —
   'tour.essentials.title': 'Kom igång med Studio',
   'tour.essentials.description': 'Utkast, publicerat innehåll och hur du hittar runt',
+  'tour.essentials.intro.title': 'Hitta runt i Sanity Studio',
+  'tour.essentials.intro.content':
+    'Fyra snabba steg, och du kan avsluta när du vill. Allt ligger kvar under bok-ikonen '
+    + 'uppe i menyraden.',
   'tour.essentials.drafts.title': 'Utkast och publicerat innehåll',
   'tour.essentials.drafts.content':
     'Varje dokument har ett utkast som du redigerar och en publicerad version som din webbplats läser. Här växlar du hela Studio mellan de två, så att du ser exakt vad som är live.',
@@ -50,6 +55,11 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'tour.publishing.autosave.title': 'Dina ändringar är redan sparade',
   'tour.publishing.autosave.content':
     'Ändringar sparas medan du skriver — det finns ingen spara-knapp. Här växlar du mellan utkastet du arbetar med och den version som är publicerad just nu.',
+  'tour.publishing.slug.title': 'Sluggen är sidans adress',
+  'tour.publishing.slug.content':
+    'En slug är sista delen av en webbadress — allt som kommer efter ditt domännamn. Den '
+    + 'skapas oftast från titeln, så du behöver sällan skriva den själv. Ändrar du den senare '
+    + 'ändras länken, och allt som redan pekar på den gamla adressen slutar fungera.',
   'tour.publishing.publish.title': 'Publicering gör innehållet live',
   'tour.publishing.publish.content':
     'Dina ändringar stannar i utkastet tills du publicerar. När du publicerar ersätter utkastet den publicerade version som din webbplats läser.',

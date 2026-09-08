@@ -1,0 +1,24 @@
+# Sanity moves docs paths without redirects, and a dead "Learn more" link fails
+# silently — the editor just lands on a 404. Weekly, so rot surfaces within days
+# rather than when someone reports it.
+name: Docs links
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'scripts/check-docs-links.mjs'
+      - '.github/workflows/docs-links.yml'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/check-docs-links.mjs

@@ -1,7 +1,7 @@
 {
   "name": "sanity-plugin-editor-onboarding",
   "version": "1.0.0",
-  "description": "Interactive, unobtrusive onboarding tours for Sanity Studio editors — with a zero-config library of core Sanity concepts.",
+  "description": "Interactive, unobtrusive onboarding tours for Sanity Studio editors \u2014 with a zero-config library of core Sanity concepts.",
   "keywords": [
     "sanity",
     "sanity-plugin",
@@ -36,12 +36,13 @@
   ],
   "scripts": {
     "build": "plugin-kit verify-package --silent && pkg-utils build --strict --check --clean",
+    "check:links": "node scripts/check-docs-links.mjs",
+    "dev": "npm run dev --workspace test-studio",
     "format": "oxfmt",
     "link-watch": "plugin-kit link-watch",
     "lint": "oxlint src",
     "prepublishOnly": "npm run build",
-    "watch": "pkg-utils watch --strict",
-    "dev": "npm run dev --workspace test-studio"
+    "watch": "pkg-utils watch --strict"
   },
   "dependencies": {
     "@sanity/icons": "^5.2.1",

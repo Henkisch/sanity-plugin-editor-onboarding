@@ -97,6 +97,7 @@ export function HelpMenuButton(): React.JSX.Element | null {
           {tours.map((tour) => (
             <MenuItem
               key={tour.id}
+              icon={tour.icon ?? BookIcon}
               iconRight={statusIcon(statuses[tour.id] ?? null)}
               onClick={() => startTour(tour.id)}
               text={localize(tour.title)}

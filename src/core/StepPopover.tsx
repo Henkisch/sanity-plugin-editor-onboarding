@@ -5,6 +5,7 @@ import {styled} from 'styled-components'
 
 import {ONBOARDING_NAMESPACE} from '../i18n/index'
 import {useLocalizedText} from '../i18n/useLocalizedText'
+import {type LocalizedText} from '../i18n/useLocalizedText'
 import {type OnboardingStep} from './types'
 
 /** Narrow enough to stay a tooltip rather than a panel. */
@@ -24,19 +25,35 @@ export interface StepPopoverProps {
   index: number
   total: number
   referenceElement: HTMLElement | null
+  /** The guide's source, from the tour. Rendered on its last step only. */
+  sourceUrl?: LocalizedText
   onNext: () => void
   onSkip: () => void
   onDismissForever: () => void
 }
 
-function StepBody(props: StepPopoverProps): React.JSX.Element {
-  const {step, index, total, onNext, onSkip, onDismissForever} = props
+/**
+ * `elevated` draws the surface an anchored step gets for free from `Popover`:
+ * a border and a shadow. A centred step has no anchor and no arrow, so without
+ * them it floats edgeless against a Studio of the same colour — which in a dark
+ * theme means no visible edge at all.
+ */
+function StepBody(props: StepPopoverProps & {elevated: boolean}): React.JSX.Element {
+  const {step, index, total, onNext, onSkip, onDismissForever, elevated, sourceUrl} = props
   const {t} = useTranslation(ONBOARDING_NAMESPACE)
   const localize = useLocalizedText()
   const isLast = index === total - 1
+  const learnMoreUrl = localize(step.learnMoreUrl)
+  const source = localize(sourceUrl)
 
   return (
-    <Card padding={3} radius={3} style={{width: POPOVER_WIDTH}}>
+    <Card
+      border={elevated}
+      padding={3}
+      radius={3}
+      shadow={elevated ? 3 : undefined}
+      style={{width: POPOVER_WIDTH}}
+    >
       <Stack gap={3}>
         <Text size={1} weight="semibold">
           {localize(step.title)}
@@ -46,10 +63,25 @@ function StepBody(props: StepPopoverProps): React.JSX.Element {
           {localize(step.content)}
         </Text>
 
-        {step.learnMoreUrl && (
+        {learnMoreUrl && (
           <Text size={1}>
-            <a href={step.learnMoreUrl} rel="noopener noreferrer" target="_blank">
+            <a href={learnMoreUrl} rel="noopener noreferrer" target="_blank">
               {t('action.learn-more')}
+            </a>
+          </Text>
+        )}
+
+        {/*
+          Where the guide's content comes from. Shown once, at the end, rather
+          than on every step: it is attribution and a way through to the full
+          account, not a call to action. Suppressed when this step's own "learn
+          more" already points at the same page — two links to one destination
+          reads as a mistake.
+        */}
+        {isLast && source && source !== learnMoreUrl && (
+          <Text muted size={0}>
+            <a href={source} rel="noopener noreferrer" target="_blank">
+              {t('action.source')}
             </a>
           </Text>
         )}
@@ -114,7 +146,7 @@ export function StepPopover(props: StepPopoverProps): React.JSX.Element {
     return (
       <Portal>
         <CenteredRoot>
-          <StepBody {...props} />
+          <StepBody {...props} elevated />
         </CenteredRoot>
       </Portal>
     )
@@ -122,7 +154,7 @@ export function StepPopover(props: StepPopoverProps): React.JSX.Element {
 
   return (
     <Popover
-      content={<StepBody {...props} />}
+      content={<StepBody {...props} elevated={false} />}
       fallbackPlacements={['top', 'right', 'left', 'bottom']}
       open
       placement={step.placement ?? 'bottom'}

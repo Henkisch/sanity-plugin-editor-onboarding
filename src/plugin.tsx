@@ -1,4 +1,4 @@
-import {definePlugin, type LayoutProps, type NavbarProps} from 'sanity'
+import {definePlugin, SANITY_VERSION, type LayoutProps, type NavbarProps} from 'sanity'
 
 import {OnboardingProvider} from './core/OnboardingProvider'
 import {onboardingLocaleBundles} from './i18n/bundles'
@@ -20,7 +20,35 @@ import {HelpMenuButton} from './ui/HelpMenuButton'
  *
  * @public
  */
+/**
+ * The Studio major this plugin's `data-testid` selectors and docs links were
+ * last walked against by hand. See the README.
+ */
+const VERIFIED_STUDIO_MAJOR = 6
+
+/**
+ * Tell the developer — never the editor — when the Studio is newer than
+ * anything this plugin has been checked against.
+ *
+ * Nothing breaks when it is: a selector that stops matching skips its step and
+ * warns. But the failure mode of a silently thinned-out tour is an editor being
+ * shown less than you think, which is worth one line in a console.
+ */
+function warnOnUnverifiedStudio(): void {
+  const major = Number.parseInt(SANITY_VERSION, 10)
+  if (!Number.isFinite(major) || major <= VERIFIED_STUDIO_MAJOR) return
+
+  console.warn(
+    `[sanity-plugin-editor-onboarding] Verified against Sanity Studio ` +
+      `${VERIFIED_STUDIO_MAJOR}.x; this Studio is ${SANITY_VERSION}. Steps whose targets have ` +
+      `moved will skip themselves rather than break, so walk the built-in guides once to ` +
+      `check they still point at the right things.`,
+  )
+}
+
 export const onboardingTool = definePlugin<OnboardingConfig>((config) => {
+  warnOnUnverifiedStudio()
+
   const tours = config?.tours ?? []
   const showNavbarButton = config?.navbarButton !== false
 

@@ -41,7 +41,7 @@ the rest wait in the help menu.
 | Tour | Covers |
 | --- | --- |
 | `essentials` | Drafts vs. published, creating documents, search |
-| `publishing` | Autosave, publishing, document history |
+| `publishing` | Autosave, what a slug is, publishing, document history |
 | `collaboration` | Presence, comments and tasks |
 | `releases` | Bundling and scheduling content releases |
 | `media` | How assets are stored and reused |
@@ -52,10 +52,28 @@ Pick a subset if you want:
 coreConcepts({include: ['essentials', 'publishing']})
 ```
 
+The `publishing` tour explains what a slug is — the term editors ask about most
+and understand least, and the one field where a careless edit quietly breaks
+every existing link. It targets the field by schema name, defaulting to `slug`.
+If yours is called something else, say so:
+
+```ts
+coreConcepts({slugField: 'permalink'})
+```
+
+Point it at a name that isn't in your schema, or leave it out of a project with
+no slug at all, and the step drops out with a console warning like any other
+missing target.
+
 ## Your own tours
 
 ```ts
-import {onboardingTool, coreConcepts, targetDocumentType} from 'sanity-plugin-editor-onboarding'
+import {
+  onboardingTool,
+  coreConcepts,
+  targetCustom,
+  targetDocumentType,
+} from 'sanity-plugin-editor-onboarding'
 
 onboardingTool({
   tours: [
@@ -71,7 +89,7 @@ onboardingTool({
           content: 'Every published and draft post, in one place.',
         },
         {
-          target: '.my-custom-widget', // any CSS selector works
+          target: targetCustom('team-activity'), // one of your own components
           title: 'Team activity',
           content: 'What everyone has been working on this week.',
         },
@@ -104,8 +122,41 @@ internals:
 | `targetDocumentType(title)` | A type in the structure list — by **title**, not schema name |
 | `targetField(name)` | A field in the open document, by schema name |
 
-**Any CSS selector** works too, which is how you point at your own components:
-`target: '.my-widget'` or `target: '[data-my-thing]'`.
+**Your own components** are marked explicitly, with an id you choose. Attach the
+ref from `useOnboardingTarget()` to any element:
+
+```tsx
+import {useOnboardingTarget} from 'sanity-plugin-editor-onboarding'
+
+function TeamActivity() {
+  const ref = useOnboardingTarget('team-activity')
+  return <div ref={ref}>...</div>
+}
+```
+
+...then point a step at the same id with `targetCustom('team-activity')`.
+
+If you'd rather not edit the component, mark it from the outside:
+
+```tsx
+import {OnboardingTarget} from 'sanity-plugin-editor-onboarding'
+
+<OnboardingTarget id="team-activity">
+  <TeamActivity />
+</OnboardingTarget>
+```
+
+This adds no element to the DOM — the child is cloned with a ref, so it is safe
+inside flex and grid parents. The child does have to accept a `ref` and pass it
+to a DOM node, which host elements do for free and your own components do as
+long as they hand `ref` along. When one doesn't, use the hook inside it instead.
+
+Prefer either of these over a CSS selector for anything you own. A selector
+written against your own class names breaks the next time you touch that
+component, silently and at a distance; a registered id doesn't.
+
+**Any CSS selector** still works, and is the escape hatch for markup you can
+reach but can't change: `target: '.some-widget'` or `target: '[data-thing]'`.
 
 A target that can't be found is not a crash and not a silent failure: the step
 is skipped, the tour carries on, and you get a console warning naming the tour,
@@ -238,15 +289,46 @@ hand-rolled.
   rather than breaking anything — and helper fixes ship as patch releases.
 - **`targetDocumentType()` keys off the title** shown in the structure list, not
   the schema name, because that is what Studio puts in the DOM.
+- **Docs links rot.** Sanity moves documentation paths without leaving redirects,
+  and every "Learn more" this plugin originally shipped had gone 404 before
+  anyone clicked one. Every URL now lives in `src/concepts/docs.ts` and is
+  checked weekly in CI (`npm run check:links`), but a link can still be dead for
+  up to a week. Point them at your own documentation instead — see below.
 
-Verified against `sanity@6.12.0`.
+Verified against `sanity@6.12.0`. On a newer Studio major the plugin logs one
+console warning to the developer; nothing is shown to editors, and steps whose
+targets have moved skip themselves as usual.
+
+### Where the guides get their facts
+
+Each built-in guide cites the Sanity documentation page it summarises, shown once
+on its last step. Nothing here paraphrases Sanity as an authority of its own.
+
+Both that citation and any step's `learnMoreUrl` are localized values, which is
+what makes them overridable: point either at your own handbook by redefining the
+key in a bundle, without redeclaring the tour.
+
+```ts
+// sanity.config.ts
+i18n: {
+  bundles: [
+    defineLocaleResourceBundle({
+      locale: 'en-US',
+      namespace: 'onboarding',
+      resources: {'tour.publishing.history.url': 'https://handbook.acme.com/versions'},
+    }),
+  ],
+}
+```
+
+...given a tour that declares `learnMoreUrl: {key: 'tour.publishing.history.url'}`.
 
 ## What's next
 
 - Server-synced completion state, so "seen it" follows a user across devices.
 - Tour engagement data (where people drop off).
-- Ref-based `<OnboardingTarget>` wrappers, for targeting your own components
-  without depending on class names.
+- A JSON Schema for the config, and an `init` command that reads your schema and
+  drafts tours from it.
 
 ## License
 

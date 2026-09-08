@@ -1,6 +1,13 @@
+import {CalendarIcon} from '@sanity/icons/Calendar'
+import {ImagesIcon} from '@sanity/icons/Images'
+import {PublishIcon} from '@sanity/icons/Publish'
+import {RocketIcon} from '@sanity/icons/Rocket'
+import {UsersIcon} from '@sanity/icons/Users'
+
 import {
   targetDocumentHistory,
   targetDocumentStatus,
+  targetField,
   targetGuidesButton,
   targetNavbar,
   targetNewDocument,
@@ -17,6 +24,7 @@ import {
  * points exclusively at navbar chrome that is present on every view — pointing
  * an auto-starting tour at document-only UI would silently drop most of it.
  */
+import {docs} from './docs'
 import {type OnboardingTour} from '../core/types'
 import {ONBOARDING_NAMESPACE} from '../i18n/index'
 import {type OnboardingResourceKey} from '../i18n/locales/en-US'
@@ -28,8 +36,6 @@ import {type LocalizedText} from '../i18n/useLocalizedText'
  * @public
  */
 export type CoreConceptId = 'essentials' | 'publishing' | 'collaboration' | 'releases' | 'media'
-
-const DOCS = 'https://www.sanity.io/docs'
 
 /**
  * Marks a string as a key in this plugin's own locale namespace.
@@ -52,18 +58,36 @@ const ALL_CONCEPTS: CoreConceptId[] = [
   'media',
 ]
 
-const tours: Record<CoreConceptId, OnboardingTour> = {
+function buildTours(options: CoreConceptsOptions): Record<CoreConceptId, OnboardingTour> {
+  const slugField = options.slugField ?? 'slug'
+
+  return {
   essentials: {
     id: 'essentials',
     title: k('tour.essentials.title'),
+    sourceUrl: docs.contentOperations,
     description: k('tour.essentials.description'),
     autoStart: 'first-login',
+    icon: RocketIcon,
     steps: [
+      {
+        // No target: this one is centred, and is the only step that explains
+        // what is happening. It is the first thing a new editor ever sees of
+        // the Studio, so it says how long this takes, that leaving is fine,
+        // and where everything lives afterwards — before any ring appears on
+        // a control they haven't met yet.
+        //
+        // Only `essentials` may open this way. A tour whose steps are all
+        // unanchored can never report itself unavailable, and this one is safe
+        // because its remaining targets are navbar chrome present on every view.
+        title: k('tour.essentials.intro.title'),
+        content: k('tour.essentials.intro.content'),
+      },
       {
         target: targetPerspectiveMenu(),
         title: k('tour.essentials.drafts.title'),
         content: k('tour.essentials.drafts.content'),
-        learnMoreUrl: `${DOCS}/studio/drafts-and-published-documents`,
+        learnMoreUrl: docs.contentOperations,
       },
       {
         target: targetNewDocument(),
@@ -89,13 +113,23 @@ const tours: Record<CoreConceptId, OnboardingTour> = {
   publishing: {
     id: 'publishing',
     title: k('tour.publishing.title'),
+    sourceUrl: docs.contentOperations,
     description: k('tour.publishing.description'),
+    icon: PublishIcon,
     unavailableMessage: k('tour.publishing.unavailable'),
     steps: [
       {
         target: targetDocumentStatus(),
         title: k('tour.publishing.autosave.title'),
         content: k('tour.publishing.autosave.content'),
+      },
+      {
+        // Deliberately has no `learnMoreUrl`: Sanity documents slugs only for
+        // developers, and sending an editor to a page about form paths is
+        // worse than sending them nowhere.
+        target: targetField(slugField),
+        title: k('tour.publishing.slug.title'),
+        content: k('tour.publishing.slug.content'),
       },
       {
         target: targetPublishButton(),
@@ -107,7 +141,7 @@ const tours: Record<CoreConceptId, OnboardingTour> = {
         target: targetDocumentHistory(),
         title: k('tour.publishing.history.title'),
         content: k('tour.publishing.history.content'),
-        learnMoreUrl: `${DOCS}/studio/document-history`,
+        learnMoreUrl: docs.compareVersions,
       },
     ],
   },
@@ -115,7 +149,9 @@ const tours: Record<CoreConceptId, OnboardingTour> = {
   collaboration: {
     id: 'collaboration',
     title: k('tour.collaboration.title'),
+    sourceUrl: docs.comments,
     description: k('tour.collaboration.description'),
+    icon: UsersIcon,
     steps: [
       {
         target: targetNavbar(),
@@ -126,7 +162,7 @@ const tours: Record<CoreConceptId, OnboardingTour> = {
         target: targetToolMenu(),
         title: k('tour.collaboration.comments.title'),
         content: k('tour.collaboration.comments.content'),
-        learnMoreUrl: `${DOCS}/studio/commenting`,
+        learnMoreUrl: docs.comments,
       },
     ],
   },
@@ -134,13 +170,15 @@ const tours: Record<CoreConceptId, OnboardingTour> = {
   releases: {
     id: 'releases',
     title: k('tour.releases.title'),
+    sourceUrl: docs.contentReleases,
     description: k('tour.releases.description'),
+    icon: CalendarIcon,
     steps: [
       {
         target: targetReleases(),
         title: k('tour.releases.bundle.title'),
         content: k('tour.releases.bundle.content'),
-        learnMoreUrl: `${DOCS}/content-lake/content-releases`,
+        learnMoreUrl: docs.contentReleases,
       },
       {
         target: targetPerspectiveMenu(),
@@ -153,16 +191,19 @@ const tours: Record<CoreConceptId, OnboardingTour> = {
   media: {
     id: 'media',
     title: k('tour.media.title'),
+    sourceUrl: docs.mediaLibrary,
     description: k('tour.media.description'),
+    icon: ImagesIcon,
     steps: [
       {
         target: targetNavbar(),
         title: k('tour.media.assets.title'),
         content: k('tour.media.assets.content'),
-        learnMoreUrl: `${DOCS}/studio/assets`,
+        learnMoreUrl: docs.mediaLibrary,
       },
     ],
   },
+  }
 }
 
 /**
@@ -179,6 +220,17 @@ export interface CoreConceptsOptions {
    * exclude a tour just because a feature is unavailable.
    */
   include?: CoreConceptId[]
+  /**
+   * The schema name of your slug field, if it isn't `slug`.
+   *
+   * "Slug" is the term editors ask about most and understand least, so the
+   * publishing guide explains it. That step targets the field by schema name;
+   * if yours is called `path` or `permalink`, say so here. Get it wrong and the
+   * step quietly drops out with a warning rather than breaking the guide.
+   *
+   * @defaultValue 'slug'
+   */
+  slugField?: string
 }
 
 /**
@@ -193,6 +245,7 @@ export interface CoreConceptsOptions {
  */
 export function coreConcepts(options: CoreConceptsOptions = {}): OnboardingTour[] {
   const ids = options.include ?? ALL_CONCEPTS
+  const tours = buildTours(options)
 
   return ids.flatMap((id) => {
     const tour = tours[id]

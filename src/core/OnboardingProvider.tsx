@@ -131,6 +131,7 @@ function StepRunner(props: {
         onNext={onAdvance}
         onSkip={onSkip}
         referenceElement={state === 'resolved' ? element : null}
+        sourceUrl={tour.sourceUrl}
         step={step}
         total={total}
       />
