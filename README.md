@@ -429,10 +429,21 @@ i18n: {
 
 ## What's next
 
-- Server-synced completion state, so "seen it" follows a user across devices.
-- Tour engagement data (where people drop off).
-- A JSON Schema for the config, and an `init` command that reads your schema and
-  drafts tours from it.
+Nothing is being held back for a later version — the list below is what has been
+considered and deliberately left out, so you can tell a missing feature from an
+unfinished one.
+
+- **Tour engagement data**, showing where editors drop off. Useful, but it means
+  reporting on people's behaviour from inside their Studio, and this plugin
+  currently makes no network requests it was not asked to. If it happens it will
+  be opt-in and local to your own project, never to a third party.
+- **An in-Studio chat**, answering questions the guides do not cover. This would
+  change what the plugin is — no API keys, no per-seat cost and no procurement
+  conversation are part of why it is easy to adopt — so it belongs in its own
+  product rather than in a menu here.
+- **A JSON Schema for the config.** The config is TypeScript, so your editor
+  already checks it; the shipped `SKILL.md` covers what a schema could not,
+  which is how to write guides worth reading.
 
 ## Contributing
 
