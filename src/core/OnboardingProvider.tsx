@@ -11,8 +11,9 @@ import {
 import {Spotlight} from './Spotlight'
 import {StepPopover} from './StepPopover'
 import {TourErrorBoundary} from './TourErrorBoundary'
-import {type OnboardingTour, type TourStatus} from './types'
+import {type FieldGuide, type OnboardingTour, type TourStatus} from './types'
 import {UnavailableNotice} from './UnavailableNotice'
+import {collectFieldHelp, findFieldHelp, stepTarget, type FieldHelp} from './fieldHelp'
 import {query, useTargetElement} from './useTargetElement'
 
 interface OnboardingContextValue {
@@ -26,6 +27,10 @@ interface OnboardingContextValue {
   showMenuHint: boolean
   /** Retires the dot permanently for this user. */
   markMenuOpened: () => void
+  /** The help for one field, if any is declared. Drives the field's book icon. */
+  fieldHelpFor: (fieldName: string, documentType: string | undefined) => FieldHelp | undefined
+  /** Show one field's help on its own, outside any tour. */
+  showFieldHelp: (help: FieldHelp) => void
 }
 
 const OnboardingContext = createContext<OnboardingContextValue | null>(null)
@@ -41,6 +46,19 @@ export function useOnboarding(): OnboardingContextValue {
     throw new Error('useOnboarding must be used inside the onboarding plugin’s Studio layout')
   }
   return value
+}
+
+/**
+ * The runtime if it is there, and `null` if it isn't.
+ *
+ * Field actions are rendered by Sanity, not by us, and a hook that throws there
+ * takes down the whole structure tool. Anything mounted outside this plugin's
+ * own tree has to ask this way and degrade instead.
+ *
+ * @internal
+ */
+export function useOnboardingOptional(): OnboardingContextValue | null {
+  return useContext(OnboardingContext)
 }
 
 /**
@@ -78,7 +96,10 @@ const AUTO_START_GIVE_UP_MS = 30_000
  * so a single synchronous check is enough.
  */
 function hasAnyVisibleStep(tour: OnboardingTour): boolean {
-  return tour.steps.some((step) => !step.target || Boolean(query(step.target)))
+  return tour.steps.some((step) => {
+    const target = stepTarget(step)
+    return !target || Boolean(query(target))
+  })
 }
 
 /** Renders one step, and skips itself if its target never shows up. */
@@ -94,7 +115,7 @@ function StepRunner(props: {
   const {tour, stepIndex, skippedCount, onAdvance, onSkipStep, onSkip, onDismissForever} = props
   const step = tour.steps[stepIndex]
 
-  const {state, element, rect} = useTargetElement(step?.target, {
+  const {state, element, rect} = useTargetElement(step && stepTarget(step), {
     tourId: tour.id,
     stepIndex,
   })
@@ -140,6 +161,46 @@ function StepRunner(props: {
 }
 
 /**
+ * Renders one field's help on its own.
+ *
+ * Simpler than `StepRunner` in the ways that matter: there is no next step, no
+ * counter, and nothing to record. A target that cannot be found closes it
+ * rather than skipping onwards, because there is nothing to skip to — and it
+ * should not be reachable anyway, since the icon only appears on a field that
+ * is on screen.
+ */
+function FieldHelpRunner(props: {help: FieldHelp; onClose: () => void}): React.JSX.Element | null {
+  const {help, onClose} = props
+
+  const {state, element, rect} = useTargetElement(stepTarget(help.step), {
+    tourId: `field:${help.field}`,
+    stepIndex: 0,
+  })
+
+  useEffect(() => {
+    if (state === 'missing') onClose()
+  }, [state, onClose])
+
+  if (state === 'pending' || state === 'missing') return null
+
+  return (
+    <>
+      {rect && <Spotlight rect={rect} />}
+      <StepPopover
+        index={0}
+        onDismissForever={onClose}
+        onNext={onClose}
+        onSkip={onClose}
+        referenceElement={state === 'resolved' ? element : null}
+        standalone
+        step={help.step}
+        total={1}
+      />
+    </>
+  )
+}
+
+/**
  * Holds tour state and renders the active tour.
  *
  * Mounted through `studio.components.layout`, so it sits above the whole Studio
@@ -147,9 +208,10 @@ function StepRunner(props: {
  */
 export function OnboardingProvider(props: {
   tours: OnboardingTour[]
+  fieldGuides: FieldGuide[]
   children: React.ReactNode
 }): React.JSX.Element {
-  const {tours, children} = props
+  const {tours, fieldGuides, children} = props
   const currentUser = useCurrentUser()
   const userId = currentUser?.id ?? null
 
@@ -158,6 +220,14 @@ export function OnboardingProvider(props: {
   const [skippedCount, setSkippedCount] = useState(0)
   /** Set when a tour was started but every one of its steps was unavailable. */
   const [unavailableTour, setUnavailableTour] = useState<OnboardingTour | null>(null)
+  /**
+   * A single field's help, opened from that field's own book icon.
+   *
+   * Kept apart from tour state on purpose: it has no progress, no next step
+   * and nothing to record, and it must be able to open while a tour is
+   * running without disturbing it.
+   */
+  const [activeFieldHelp, setActiveFieldHelp] = useState<FieldHelp | null>(null)
   /**
    * Tours already auto-offered in this browser session.
    *
@@ -319,6 +389,18 @@ export function OnboardingProvider(props: {
     }
   }, [tours, activeTourId, currentUser, userId, beginTour])
 
+  /**
+   * Every field that should carry a book icon, from tour steps and standalone
+   * guides alike.
+   */
+  const fieldHelp = useMemo(() => collectFieldHelp(tours, fieldGuides), [tours, fieldGuides])
+
+  const fieldHelpFor = useCallback(
+    (fieldName: string, documentType: string | undefined) =>
+      findFieldHelp(fieldHelp, fieldName, documentType),
+    [fieldHelp],
+  )
+
   const markMenuOpened = useCallback(() => {
     setMenuOpened(userId)
     setMenuVersion((version) => version + 1)
@@ -335,8 +417,19 @@ export function OnboardingProvider(props: {
       // nothing to point at.
       showMenuHint: !menuOpened && tours.length > 0,
       markMenuOpened,
+      fieldHelpFor,
+      showFieldHelp: setActiveFieldHelp,
     }),
-    [tours, activeTourId, startTour, stopTour, statuses, menuOpened, markMenuOpened],
+    [
+      tours,
+      activeTourId,
+      startTour,
+      stopTour,
+      statuses,
+      menuOpened,
+      markMenuOpened,
+      fieldHelpFor,
+    ],
   )
 
   return (
@@ -354,6 +447,14 @@ export function OnboardingProvider(props: {
             stepIndex={stepIndex}
             tour={activeTour}
           />
+        </TourErrorBoundary>
+      )}
+      {activeFieldHelp && (
+        <TourErrorBoundary
+          onError={() => setActiveFieldHelp(null)}
+          tourId={`field:${activeFieldHelp.field}`}
+        >
+          <FieldHelpRunner help={activeFieldHelp} onClose={() => setActiveFieldHelp(null)} />
         </TourErrorBoundary>
       )}
       {unavailableTour && (

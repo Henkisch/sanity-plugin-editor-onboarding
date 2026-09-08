@@ -58,6 +58,18 @@ export type AutoStart = 'first-login' | 'manual' | ((context: AutoStartContext) 
  */
 export interface OnboardingStep {
   /**
+   * The schema name of a field this step explains, e.g. `'slug'`, or a dotted
+   * path for a nested one, e.g. `'seo.title'`.
+   *
+   * Two things follow from setting it. The step targets that field without you
+   * writing a selector, and the field itself gains a book icon in its action
+   * row, so an editor stuck on it can read this step on its own without
+   * remembering a guide exists.
+   *
+   * `target` still wins if you set both.
+   */
+  field?: string
+  /**
    * A CSS selector for the element to point at.
    *
    * If it never resolves the step is skipped rather than blocking the tour, and
@@ -125,6 +137,48 @@ export interface OnboardingTour {
 }
 
 /**
+ * Help attached to one schema field, reachable from the field itself.
+ *
+ * A field guide puts a book icon in that field's action row, beside the comment
+ * button. Clicking it explains that field and nothing else — no tour, no step
+ * counter — because someone who clicks it is stuck on this field right now.
+ *
+ * Use it for the fields your editors actually ask about. A tour step can do the
+ * same job by naming a `field`; this is the shorter path when the help does not
+ * belong to a guide.
+ *
+ * ```ts
+ * fieldGuides: [
+ *   {
+ *     field: 'ingredients',
+ *     documentType: 'recipe',
+ *     title: 'One ingredient per line',
+ *     content: 'The site renders each line as its own bullet.',
+ *   },
+ * ]
+ * ```
+ *
+ * @public
+ */
+export interface FieldGuide {
+  /** Schema name, or a dotted path for a nested field: `'seo.title'`. */
+  field: string
+  /**
+   * Restrict this guide to one document type.
+   *
+   * Omit it and the guide applies to every type with a field of that name,
+   * which is usually what you want for a field shared across types.
+   */
+  documentType?: string
+  /** Short heading. One line. */
+  title: LocalizedText
+  /** The explanation. One to three sentences. */
+  content: LocalizedText
+  /** Optional "read more" link rendered under the content. */
+  learnMoreUrl?: LocalizedText
+}
+
+/**
  * Options for {@link onboardingTool}.
  *
  * @public
@@ -132,6 +186,14 @@ export interface OnboardingTour {
 export interface OnboardingConfig {
   /** The tours to register. */
   tours: OnboardingTour[]
+  /**
+   * Help attached to individual fields, shown from a book icon in the field's
+   * own action row.
+   *
+   * Tour steps that name a `field` are picked up automatically and need no
+   * entry here.
+   */
+  fieldGuides?: FieldGuide[]
   /**
    * Show the built-in help button in the Studio navbar.
    *

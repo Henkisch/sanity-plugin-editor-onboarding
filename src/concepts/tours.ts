@@ -7,7 +7,6 @@ import {UsersIcon} from '@sanity/icons/Users'
 import {
   targetDocumentHistory,
   targetDocumentStatus,
-  targetField,
   targetGuidesButton,
   targetNavbar,
   targetNewDocument,
@@ -127,7 +126,7 @@ function buildTours(options: CoreConceptsOptions): Record<CoreConceptId, Onboard
         // Deliberately has no `learnMoreUrl`: Sanity documents slugs only for
         // developers, and sending an editor to a page about form paths is
         // worse than sending them nowhere.
-        target: targetField(slugField),
+        field: slugField,
         title: k('tour.publishing.slug.title'),
         content: k('tour.publishing.slug.content'),
       },

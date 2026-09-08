@@ -162,6 +162,42 @@ A target that can't be found is not a crash and not a silent failure: the step
 is skipped, the tour carries on, and you get a console warning naming the tour,
 the step and the selector that missed.
 
+### Help on a single field
+
+Editors get stuck on fields, not on tours. Any field can carry a book icon in
+its own action row, beside the comment button; clicking it explains that field
+and nothing else — no tour, no step counter.
+
+```ts
+onboardingTool({
+  tours: coreConcepts(),
+  fieldGuides: [
+    {
+      field: 'ingredients',
+      documentType: 'recipe', // optional; omit to match every type
+      title: 'One ingredient per line',
+      content: 'The site renders each line as its own bullet.',
+    },
+  ],
+})
+```
+
+A tour step does the same job by naming a `field` instead of a `target` — the
+built-in slug step works this way, so it is both the second step of the
+publishing guide and the help on the field itself, written once:
+
+```ts
+{field: 'slug', title: 'The slug is this page’s address', content: '...'}
+```
+
+Nested fields take a dotted path (`'seo.title'`). Fields with no guide show no
+icon at all, so this costs nothing on the other twenty fields in a document.
+
+This is the one part of the plugin built on a Sanity API marked unstable
+(`unstable_fieldActions`) — there is no other way into that row. It is only
+registered when you declare field help, and if Sanity changes the API the icons
+disappear while every tour keeps working.
+
 ### Starting a tour yourself
 
 The navbar help button is there by default. If you'd rather use your own:

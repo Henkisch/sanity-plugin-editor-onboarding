@@ -20,6 +20,9 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'progress': '{{current}} / {{total}}',
 
   // — Guides menu —
+  // — Hjälp på fältnivå —
+  'field.help': 'Vad är det här fältet?',
+
   'menu.title': 'Redaktionella guider',
   'menu.button-label': 'Redaktionella guider',
   'menu.status.completed': 'Genomförd',

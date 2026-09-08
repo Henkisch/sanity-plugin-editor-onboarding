@@ -27,6 +27,14 @@ export interface StepPopoverProps {
   referenceElement: HTMLElement | null
   /** The guide's source, from the tour. Rendered on its last step only. */
   sourceUrl?: LocalizedText
+  /**
+   * One step shown on its own, from a field's book icon.
+   *
+   * Drops the progress counter, the skip control and the permanent opt-out:
+   * there is no sequence to be somewhere in, and someone who asked a question
+   * about one field is not opting out of anything.
+   */
+  standalone?: boolean
   onNext: () => void
   onSkip: () => void
   onDismissForever: () => void
@@ -39,7 +47,8 @@ export interface StepPopoverProps {
  * theme means no visible edge at all.
  */
 function StepBody(props: StepPopoverProps & {elevated: boolean}): React.JSX.Element {
-  const {step, index, total, onNext, onSkip, onDismissForever, elevated, sourceUrl} = props
+  const {step, index, total, onNext, onSkip, onDismissForever, elevated, sourceUrl, standalone} =
+    props
   const {t} = useTranslation(ONBOARDING_NAMESPACE)
   const localize = useLocalizedText()
   const isLast = index === total - 1
@@ -86,25 +95,29 @@ function StepBody(props: StepPopoverProps & {elevated: boolean}): React.JSX.Elem
           </Text>
         )}
 
-        <Flex align="center" gap={2} justify="space-between">
-          <Text muted size={0}>
-            {t('progress', {current: index + 1, total})}
-          </Text>
+        <Flex align="center" gap={2} justify={standalone ? 'flex-end' : 'space-between'}>
+          {!standalone && (
+            <Text muted size={0}>
+              {t('progress', {current: index + 1, total})}
+            </Text>
+          )}
 
           <Flex gap={2}>
-            <Button
-              fontSize={1}
-              mode="bleed"
-              onClick={onSkip}
-              padding={2}
-              text={t('action.skip')}
-              tone="default"
-            />
+            {!standalone && (
+              <Button
+                fontSize={1}
+                mode="bleed"
+                onClick={onSkip}
+                padding={2}
+                text={t('action.skip')}
+                tone="default"
+              />
+            )}
             <Button
               fontSize={1}
               onClick={onNext}
               padding={2}
-              text={isLast ? t('action.done') : t('action.next')}
+              text={standalone ? t('action.close') : isLast ? t('action.done') : t('action.next')}
               tone="primary"
             />
           </Flex>
@@ -115,7 +128,7 @@ function StepBody(props: StepPopoverProps & {elevated: boolean}): React.JSX.Elem
           buried, but it also shouldn't compete with the primary action — so it
           appears once, on the first step only.
         */}
-        {index === 0 && (
+        {index === 0 && !standalone && (
           <Box>
             <Button
               fontSize={0}

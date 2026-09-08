@@ -4,6 +4,7 @@ import {
   coreConcepts,
   onboardingTool,
   targetCustom,
+  type FieldGuide,
   type OnboardingTour,
 } from 'sanity-plugin-editor-onboarding'
 import {structureTool} from 'sanity/structure'
@@ -41,6 +42,26 @@ const seoTour: OnboardingTour = {
   ],
 }
 
+/**
+ * Help hung on individual fields, with no tour involved. Each one puts a book
+ * icon in that field's own action row.
+ */
+const fieldGuides: FieldGuide[] = [
+  {
+    field: 'publishedAt',
+    documentType: 'post',
+    title: 'This is a publish date, not a switch',
+    content:
+      'It is what the site prints as the article date. Setting it to the future does not hold the post back — use a release for that.',
+  },
+  {
+    field: 'bio',
+    documentType: 'author',
+    title: 'Two or three sentences',
+    content: 'The bio appears under every article this author writes, so keep it short.',
+  },
+]
+
 export default defineConfig({
   name: 'default',
   title: 'Onboarding plugin test studio',
@@ -55,7 +76,7 @@ export default defineConfig({
     // `svSELocale()` (imported from '@sanity/locale-sv-se') to check the
     // plugin's sv-SE bundle end to end.
     // Phase 1's zero-config library, plus a Phase 2 tour of local components.
-    onboardingTool({tours: [...coreConcepts(), seoTour]}),
+    onboardingTool({fieldGuides, tours: [...coreConcepts(), seoTour]}),
   ],
 
   schema: {types: schemaTypes},

@@ -18,6 +18,7 @@ export {
 export type {
   AutoStart,
   AutoStartContext,
+  FieldGuide,
   OnboardingConfig,
   OnboardingStep,
   OnboardingTour,

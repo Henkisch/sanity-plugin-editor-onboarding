@@ -1,5 +1,6 @@
 import {definePlugin, SANITY_VERSION, type LayoutProps, type NavbarProps} from 'sanity'
 
+import {fieldGuideActionFor} from './ui/FieldGuideAction'
 import {OnboardingProvider} from './core/OnboardingProvider'
 import {onboardingLocaleBundles} from './i18n/bundles'
 import {type OnboardingConfig} from './core/types'
@@ -50,7 +51,14 @@ export const onboardingTool = definePlugin<OnboardingConfig>((config) => {
   warnOnUnverifiedStudio()
 
   const tours = config?.tours ?? []
+  const fieldGuides = config?.fieldGuides ?? []
   const showNavbarButton = config?.navbarButton !== false
+
+  // Only touch Sanity's unstable field-action API when something would
+  // actually appear there. A Studio that declares no field help never
+  // registers against it at all.
+  const hasFieldHelp =
+    fieldGuides.length > 0 || tours.some((tour) => tour.steps.some((step) => step.field))
 
   const duplicateId = tours
     .map((tour) => tour.id)
@@ -72,13 +80,24 @@ export const onboardingTool = definePlugin<OnboardingConfig>((config) => {
     // namespace to `i18n.bundles` in sanity.config.ts.
     i18n: {bundles: onboardingLocaleBundles},
 
+    document: hasFieldHelp
+      ? {
+          unstable_fieldActions: (previous, context) => [
+            ...previous,
+            fieldGuideActionFor(context.documentType),
+          ],
+        }
+      : undefined,
+
     studio: {
       components: {
         // The provider wraps the whole Studio but renders none of its layout —
         // `renderDefault` is always called, so other plugins' layout
         // customisations still apply.
         layout: (props: LayoutProps) => (
-          <OnboardingProvider tours={tours}>{props.renderDefault(props)}</OnboardingProvider>
+          <OnboardingProvider fieldGuides={fieldGuides} tours={tours}>
+            {props.renderDefault(props)}
+          </OnboardingProvider>
         ),
 
         // Wrapping the navbar in our own layout squashes it (the default

@@ -17,6 +17,9 @@ const enUS = {
   'action.source': 'Source: Sanity docs',
   'progress': '{{current}} / {{total}}',
 
+  // — Field-level help —
+  'field.help': 'What is this field?',
+
   // — Guides menu —
   'menu.title': 'Editorial guides',
   'menu.button-label': 'Editorial guides',
