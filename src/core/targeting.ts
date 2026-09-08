@@ -65,6 +65,16 @@ export const targetNewDocument = (): string => '[data-testid="new-document-butto
  */
 export const targetGuidesButton = (): string => '[data-testid="onboarding-guides-button"]'
 
+/**
+ * The Tasks button in the navbar.
+ *
+ * Absent on Studios with Tasks turned off, so a step pointing here drops out on
+ * its own.
+ *
+ * @public
+ */
+export const targetTasks = (): string => '[data-testid="tasks-toolbar"]'
+
 /** The global search button. @public */
 export const targetSearch = (): string => '[data-testid="studio-search"]'
 
@@ -74,8 +84,18 @@ export const targetPerspectiveMenu = (): string => '[data-testid="global-perspec
 /** The link to the Content Releases tool. Absent on Studios without it. @public */
 export const targetReleases = (): string => '[data-testid="releases-tool-link"]'
 
-/** The primary action button in an open document's footer, e.g. Publish. @public */
-export const targetPublishButton = (): string => '[data-testid="action-publish"]'
+/**
+ * The primary action button in an open document's footer, e.g. Publish.
+ *
+ * Studio builds that button's test id out of its **translated** label —
+ * `action-publish` in English, `action-publicera` in Swedish — so matching the
+ * English one skipped this step in every other language, silently. Selected by
+ * position instead: the footer's only other action is its overflow menu.
+ *
+ * @public
+ */
+export const targetPublishButton = (): string =>
+  '[data-testid="pane-footer"] [data-testid^="action-"]:not([data-testid="action-menu-button"])'
 
 /**
  * The Draft / Published chips at the top of an open document.
@@ -83,9 +103,16 @@ export const targetPublishButton = (): string => '[data-testid="action-publish"]
  * This is Studio's control for switching between the version you're editing and
  * the one that is live.
  *
+ * Matched by shape rather than by name: Studio interpolates the chip's
+ * **translated** label into its test id, so `document-header-Draft-chip` exists
+ * only in an English Studio and is `document-header-Utkast-chip` in a Swedish
+ * one. This resolves to whichever chip comes first, which is all the step needs
+ * — it is describing the pair.
+ *
  * @public
  */
-export const targetDocumentStatus = (): string => '[data-testid="document-header-Draft-chip"]'
+export const targetDocumentStatus = (): string =>
+  '[data-testid^="document-header-"][data-testid$="-chip"]'
 
 /**
  * The open document's context menu, which holds version history and

@@ -353,6 +353,12 @@ while a guide is open, which is why `aria-modal` is `false`.
 - **Completion state is per browser.** It lives in `localStorage`, keyed by
   Sanity user id, so a user who switches browser or machine is offered the
   auto-starting tour again. Server-synced state is planned; see below.
+- **Some Studio test ids contain translated text.** Sanity builds a few of them
+  from the label shown to the user, so `action-publish` is `action-publicera` in
+  a Swedish Studio and `document-header-Draft-chip` is
+  `document-header-Utkast-chip`. The built-in helpers match by shape rather than
+  by name where that happens, but it is worth knowing before writing your own
+  selector against something with a visible label in it.
 - **Sanity's `data-testid` attributes are not a public API.** The built-in
   helpers target the attributes Sanity's own end-to-end tests use. They are
   verified against the Studio version noted below, but a major Studio release

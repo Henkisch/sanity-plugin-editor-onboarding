@@ -76,9 +76,11 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'tour.collaboration.presence.title': 'Du redigerar inte ensam',
   'tour.collaboration.presence.content':
     'När en kollega öppnar samma dokument visas deras avatar här, och deras markör syns i fältet de arbetar i. Era ändringar slås ihop medan ni skriver.',
-  'tour.collaboration.comments.title': 'Kommentarer och uppgifter hör till innehållet',
-  'tour.collaboration.comments.content':
-    'Lämna en kommentar på ett specifikt fält, nämn en kollega för att notifiera hen, eller tilldela en uppgift — allt kopplat till dokumentet i stället för begravt i en chattråd.',
+  'tour.collaboration.tasks.title': 'Här samlas det som ska göras',
+  'tour.collaboration.tasks.content':
+    'Uppgifter visar vad som tilldelats dig och vad som återstår. Kommentarer fungerar '
+    + 'likadant — lämna en på vilket fält som helst och nämn en kollega, så stannar den kvar '
+    + 'vid innehållet i stället för att försvinna i en chatt.',
 
   // — Core concepts: releases —
   'tour.releases.title': 'Schemalägg med releaser',

@@ -74,9 +74,9 @@ const enUS = {
   'tour.collaboration.presence.title': 'You are not editing alone',
   'tour.collaboration.presence.content':
     'When a colleague opens the same document their avatar appears here, and their cursor shows in the field they are working on. Edits from both of you merge as you type.',
-  'tour.collaboration.comments.title': 'Comments and tasks live with the content',
-  'tour.collaboration.comments.content':
-    'Leave a comment on a specific field, mention a colleague to notify them, or assign a task — all attached to the document rather than buried in a chat thread.',
+  'tour.collaboration.tasks.title': 'Work that needs doing lives here',
+  'tour.collaboration.tasks.content':
+    'Tasks shows what has been assigned to you and what is still outstanding. Comments work the same way — leave one on any field and mention a colleague, and it stays attached to the content rather than buried in a chat thread.',
 
   // — Core concepts: releases —
   'tour.releases.title': 'Scheduling with releases',

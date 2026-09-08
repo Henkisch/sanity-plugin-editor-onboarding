@@ -74,6 +74,23 @@ describe('the media guide', () => {
   })
 })
 
+describe('the collaboration guide', () => {
+  const collaboration = () => coreConcepts({include: ['collaboration']})[0]
+
+  // Its second step used to point at the tool switcher, chosen because it
+  // reliably exists rather than because it had anything to do with working
+  // together.
+  it('does not point at the tool switcher', () => {
+    for (const step of collaboration().steps) {
+      expect(step.target).not.toContain('tool-collapse-menu')
+    }
+  })
+
+  it('points at Tasks, which drops out on Studios that have it turned off', () => {
+    expect(collaboration().steps[1].target).toBe('[data-testid="tasks-toolbar"]')
+  })
+})
+
 describe('guide invariants', () => {
   it('gives every tour a stable id, since ids key persistence', () => {
     const ids = coreConcepts().map((tour) => tour.id)

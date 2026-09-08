@@ -14,6 +14,7 @@ export {
   targetPublishButton,
   targetReleases,
   targetSearch,
+  targetTasks,
   targetToolMenu,
 } from './core/targeting'
 export type {

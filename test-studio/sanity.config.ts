@@ -1,3 +1,4 @@
+import {svSELocale} from '@sanity/locale-sv-se'
 import {visionTool} from '@sanity/vision'
 import {defineConfig} from 'sanity'
 import {
@@ -72,9 +73,8 @@ export default defineConfig({
   plugins: [
     structureTool(),
     visionTool(),
-    // Swedish is installed but left out while we work in English. Re-add
-    // `svSELocale()` (imported from '@sanity/locale-sv-se') to check the
-    // plugin's sv-SE bundle end to end.
+    // Installed so the plugin's Swedish bundle can be verified end to end.
+    svSELocale(),
     // Phase 1's zero-config library, plus a Phase 2 tour of local components.
     onboardingTool({fieldGuides, tours: [...coreConcepts(), seoTour]}),
   ],

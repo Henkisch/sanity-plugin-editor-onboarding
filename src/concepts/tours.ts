@@ -8,6 +8,7 @@ import {
   targetAssetBrowse,
   targetDocumentHistory,
   targetDocumentStatus,
+  targetTasks,
   targetGuidesButton,
   targetNavbar,
   targetNewDocument,
@@ -15,7 +16,6 @@ import {
   targetPublishButton,
   targetReleases,
   targetSearch,
-  targetToolMenu,
 } from '../core/targeting'
 
 /**
@@ -159,9 +159,15 @@ function buildTours(options: CoreConceptsOptions): Record<CoreConceptId, Onboard
         content: k('tour.collaboration.presence.content'),
       },
       {
-        target: targetToolMenu(),
-        title: k('tour.collaboration.comments.title'),
-        content: k('tour.collaboration.comments.content'),
+        // Was the tool switcher, which has nothing to do with collaboration and
+        // was chosen only because it reliably exists. Sanity gives the Comments
+        // button no test id — only a localized `aria-label`, which would break
+        // the moment a Studio runs in another language — so this points at
+        // Tasks, which does have one, and the copy leads with what the ring is
+        // actually on.
+        target: targetTasks(),
+        title: k('tour.collaboration.tasks.title'),
+        content: k('tour.collaboration.tasks.content'),
         learnMoreUrl: docs.comments,
       },
     ],
