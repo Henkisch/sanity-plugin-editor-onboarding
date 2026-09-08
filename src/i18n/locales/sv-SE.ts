@@ -31,7 +31,7 @@ const svSE: Record<OnboardingResourceKey, string> = {
     'Den här guiden pekar på delar av Studio som inte är öppna just nu. Öppna ett dokument och försök igen.',
 
   // — Core concepts: essentials —
-  'tour.essentials.title': 'Kom igång med Studio',
+  'tour.essentials.title': 'Kom igång med Sanity Studio',
   'tour.essentials.description': 'Utkast, publicerat innehåll och hur du hittar runt',
   'tour.essentials.intro.title': 'Hitta runt i Sanity Studio',
   'tour.essentials.intro.content':

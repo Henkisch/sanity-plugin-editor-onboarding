@@ -29,7 +29,7 @@ const enUS = {
     'This guide points at parts of the Studio that aren’t open right now. Open a document and try again.',
 
   // — Core concepts: essentials —
-  'tour.essentials.title': 'Studio essentials',
+  'tour.essentials.title': 'Sanity Studio essentials',
   'tour.essentials.description': 'Drafts, published content, and finding your way around',
   'tour.essentials.intro.title': 'Getting around Sanity Studio',
   'tour.essentials.intro.content':
