@@ -366,6 +366,22 @@ i18n: {
 - A JSON Schema for the config, and an `init` command that reads your schema and
   drafts tours from it.
 
+## Contributing
+
+```bash
+npm install
+npm test          # vitest, jsdom
+npm run dev       # the Studio in test-studio/, on :3333
+npm run build     # test-studio consumes dist/, so build before checking a change there
+npm run check:links
+```
+
+`npm run dev` needs `test-studio/.env` with a `SANITY_STUDIO_PROJECT_ID` and
+`SANITY_STUDIO_DATASET`.
+
+Note that **test-studio resolves this plugin to `dist/`, not `src/`** — a source
+change is invisible in the running Studio until you rebuild.
+
 ## License
 
 MIT © Henrik Larsson
