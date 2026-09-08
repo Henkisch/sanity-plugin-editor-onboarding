@@ -1,5 +1,6 @@
 import {Box, Button, Card, Flex, Portal, Stack, Text} from '@sanity/ui'
 import {Popover} from '@sanity/ui/popover'
+import {useCallback, useEffect, useId} from 'react'
 import {useTranslation} from 'sanity'
 import {styled} from 'styled-components'
 
@@ -51,24 +52,49 @@ function StepBody(props: StepPopoverProps & {elevated: boolean}): React.JSX.Elem
     props
   const {t} = useTranslation(ONBOARDING_NAMESPACE)
   const localize = useLocalizedText()
+  const titleId = useId()
+  const contentId = useId()
   const isLast = index === total - 1
+
+  const focusOnMount = useCallback((node: HTMLDivElement | null) => {
+    // `preventScroll` because the target has already been scrolled into
+    // view; letting focus scroll again fights that and jumps the page.
+    node?.focus({preventScroll: true})
+  }, [])
+
   const learnMoreUrl = localize(step.learnMoreUrl)
   const source = localize(sourceUrl)
 
   return (
     <Card
+      // A dialog rather than a tooltip: it holds the focus and the controls for
+      // getting out, and a screen reader needs to announce it as something that
+      // has arrived rather than as decoration on whatever is behind it. Not
+      // modal — the Studio underneath stays available on purpose.
+      aria-describedby={contentId}
+      aria-labelledby={titleId}
+      aria-modal={false}
       border={elevated}
       padding={3}
       radius={3}
+      // Focused on mount, so a keyboard user's next Tab lands on Next rather
+      // than somewhere behind the popup, and a screen reader reads the step.
+      ref={focusOnMount}
+      // Not a native `<dialog>`: that element carries modal semantics and a
+      // top-layer backdrop, which is the one thing this plugin promises never
+      // to do. The role gives the announcement without the behaviour.
+      // oxlint-disable-next-line prefer-tag-over-role
+      role="dialog"
       shadow={elevated ? 3 : undefined}
       style={{width: POPOVER_WIDTH}}
+      tabIndex={-1}
     >
       <Stack gap={3}>
-        <Text size={1} weight="semibold">
+        <Text id={titleId} size={1} weight="semibold">
           {localize(step.title)}
         </Text>
 
-        <Text size={1} muted>
+        <Text id={contentId} size={1} muted>
           {localize(step.content)}
         </Text>
 
@@ -153,7 +179,23 @@ function StepBody(props: StepPopoverProps & {elevated: boolean}): React.JSX.Elem
  * When a step has no target, it is centred instead.
  */
 export function StepPopover(props: StepPopoverProps): React.JSX.Element {
-  const {referenceElement, step} = props
+  const {referenceElement, step, standalone, onNext, onSkip} = props
+
+  // Escape leaves, the way it does everywhere else in a Studio. Bound to the
+  // document rather than the popup so it still works when focus has moved on —
+  // being unable to dismiss something is worse than dismissing it by accident.
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      event.stopPropagation()
+      // A standalone step has nothing to skip: closing is the only exit.
+      if (standalone) onNext()
+      else onSkip()
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [standalone, onNext, onSkip])
 
   if (!referenceElement) {
     return (

@@ -333,6 +333,21 @@ Positioning, portalling and collision handling come from `@sanity/ui` (and
 Floating UI underneath it), so the parts that are genuinely hard aren't
 hand-rolled.
 
+## Accessibility
+
+Each step is a non-modal `role="dialog"`, labelled by its own title and
+described by its own content, so a screen reader announces it as something that
+has arrived rather than reading it as part of the page behind it.
+
+It takes focus when it opens, so the next Tab reaches its own buttons rather
+than something behind the popup. Escape leaves, the way it does everywhere else
+in a Studio. When a guide closes, focus goes back to whatever opened it — or to
+the guides button if that control is gone, since leaving focus on `body` would
+restart a keyboard user at the top of the Studio.
+
+Nothing is dimmed and nothing is trapped: the Studio underneath stays usable
+while a guide is open, which is why `aria-modal` is `false`.
+
 ## Known limitations
 
 - **Completion state is per browser.** It lives in `localStorage`, keyed by

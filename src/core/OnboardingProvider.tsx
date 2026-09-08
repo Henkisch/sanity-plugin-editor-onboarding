@@ -14,6 +14,7 @@ import {TourErrorBoundary} from './TourErrorBoundary'
 import {type FieldGuide, type OnboardingTour, type TourStatus} from './types'
 import {UnavailableNotice} from './UnavailableNotice'
 import {collectFieldHelp, findFieldHelp, stepTarget, type FieldHelp} from './fieldHelp'
+import {targetGuidesButton} from './targeting'
 import {query, useTargetElement} from './useTargetElement'
 
 interface OnboardingContextValue {
@@ -229,6 +230,16 @@ export function OnboardingProvider(props: {
    */
   const [activeFieldHelp, setActiveFieldHelp] = useState<FieldHelp | null>(null)
   /**
+   * Where focus was before a guide took it, so it can be handed back.
+   *
+   * Kept separately for tours and field help, because a field's guide can open
+   * while a tour is running and each has to return focus to its own caller. A
+   * keyboard user who opens a guide and closes it should be back where they
+   * were, not at the top of the document.
+   */
+  const focusBeforeTour = useRef<HTMLElement | null>(null)
+  const focusBeforeFieldHelp = useRef<HTMLElement | null>(null)
+  /**
    * Tours already auto-offered in this browser session.
    *
    * `skipped` means "not now, ask me next time" — next *session*, not five
@@ -262,7 +273,33 @@ export function OnboardingProvider(props: {
     return Object.fromEntries(tours.map((tour) => [tour.id, getTourStatus(userId, tour.id)]))
   }, [tours, userId, statusVersion])
 
+  /** The element to hand focus back to, if it is still on the page. */
+  const rememberFocus = (into: {current: HTMLElement | null}) => {
+    const active = document.activeElement
+    into.current = active instanceof HTMLElement ? active : null
+  }
+
+  const restoreFocus = useCallback((from: {current: HTMLElement | null}) => {
+    const element = from.current
+    from.current = null
+
+    // `isConnected` because the control that started a guide is often gone by
+    // the time it closes: a tour started from the guides menu remembers the
+    // menu item, and the menu unmounts on the way out.
+    if (element?.isConnected) {
+      element.focus({preventScroll: true})
+      return
+    }
+
+    // Falling back on the guides button rather than giving up. Leaving focus on
+    // `body` means a keyboard user's next Tab restarts at the top of the
+    // Studio, which is a worse place than where they were.
+    const fallback = document.querySelector(targetGuidesButton())
+    if (fallback instanceof HTMLElement) fallback.focus({preventScroll: true})
+  }, [])
+
   const beginTour = useCallback((tourId: string) => {
+    rememberFocus(focusBeforeTour)
     offeredThisSession.current.add(tourId)
     handledSkip.current = null
     setUnavailableTour(null)
@@ -293,12 +330,13 @@ export function OnboardingProvider(props: {
   const endTour = useCallback(
     (status: TourStatus) => {
       if (activeTourId) setTourStatus(userId, activeTourId, status, stepIndex)
+      restoreFocus(focusBeforeTour)
       setActiveTourId(null)
       setStepIndex(0)
       setSkippedCount(0)
       setStatusVersion((version) => version + 1)
     },
-    [activeTourId, userId, stepIndex],
+    [activeTourId, userId, stepIndex, restoreFocus],
   )
 
   const stopTour = useCallback(() => endTour('skipped'), [endTour])
@@ -395,6 +433,16 @@ export function OnboardingProvider(props: {
    */
   const fieldHelp = useMemo(() => collectFieldHelp(tours, fieldGuides), [tours, fieldGuides])
 
+  const showFieldHelp = useCallback((help: FieldHelp) => {
+    rememberFocus(focusBeforeFieldHelp)
+    setActiveFieldHelp(help)
+  }, [])
+
+  const closeFieldHelp = useCallback(() => {
+    setActiveFieldHelp(null)
+    restoreFocus(focusBeforeFieldHelp)
+  }, [restoreFocus])
+
   const fieldHelpFor = useCallback(
     (fieldName: string, documentType: string | undefined) =>
       findFieldHelp(fieldHelp, fieldName, documentType),
@@ -418,7 +466,7 @@ export function OnboardingProvider(props: {
       showMenuHint: !menuOpened && tours.length > 0,
       markMenuOpened,
       fieldHelpFor,
-      showFieldHelp: setActiveFieldHelp,
+      showFieldHelp,
     }),
     [
       tours,
@@ -429,6 +477,7 @@ export function OnboardingProvider(props: {
       menuOpened,
       markMenuOpened,
       fieldHelpFor,
+      showFieldHelp,
     ],
   )
 
@@ -451,10 +500,10 @@ export function OnboardingProvider(props: {
       )}
       {activeFieldHelp && (
         <TourErrorBoundary
-          onError={() => setActiveFieldHelp(null)}
+          onError={closeFieldHelp}
           tourId={`field:${activeFieldHelp.field}`}
         >
-          <FieldHelpRunner help={activeFieldHelp} onClose={() => setActiveFieldHelp(null)} />
+          <FieldHelpRunner help={activeFieldHelp} onClose={closeFieldHelp} />
         </TourErrorBoundary>
       )}
       {unavailableTour && (
