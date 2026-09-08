@@ -1,6 +1,9 @@
 import {describe, expect, it} from 'vitest'
 
 import {
+  fromTourItems,
+  toTourItems,
+  tourItemPath,
   emptyProgress,
   mergeProgress,
   newerRecord,
@@ -139,5 +142,64 @@ describe('progressDocumentId', () => {
 
   it('replaces characters a Sanity id cannot hold', () => {
     expect(progressDocumentId('user@example.com')).toBe('onboarding.progress.user-example.com')
+  })
+})
+
+describe('the keyed-array storage shape', () => {
+  // Sanity patch paths cannot address `tours.seo-panel`: the hyphen is a syntax
+  // error, and `tours["seo-panel"]` is read as a literal. Keyed arrays are the
+  // shape its patch system is actually built for, and this is verified against
+  // a real dataset, not assumed.
+  it('selects a tour by key, hyphens and all', () => {
+    expect(tourItemPath('seo-panel')).toBe('tours[_key=="seo-panel"]')
+  })
+
+  it('escapes a quote in a tour id rather than emitting a broken filter', () => {
+    expect(tourItemPath('say "hi"')).toBe('tours[_key=="say \\"hi\\""]')
+  })
+
+  it('round-trips progress through the stored shape', () => {
+    const progress = {
+      tours: {
+        essentials: {status: 'completed' as const, updatedAt: '2026-06-01T00:00:00Z'},
+        'seo-panel': {status: 'skipped' as const, updatedAt: '2026-06-02T00:00:00Z', stepIndex: 2},
+      },
+    }
+
+    expect(fromTourItems(toTourItems(progress))).toEqual(progress.tours)
+  })
+
+  it('gives every item a key and a type, which Sanity requires of array members', () => {
+    const items = toTourItems({tours: {essentials: at('2026-06-01T00:00:00Z')}})
+
+    expect(items[0]._key).toBe('essentials')
+    expect(items[0]._type).toBe('onboarding.tourProgress')
+  })
+
+  it('omits stepIndex rather than storing undefined', () => {
+    expect('stepIndex' in toTourItems({tours: {essentials: at('2026-06-01T00:00:00Z')}})[0]).toBe(
+      false,
+    )
+  })
+
+  // The document is writable by the editor it belongs to, so a malformed one
+  // must not take their guides down with it.
+  it('ignores entries that are not usable rather than trusting the document', () => {
+    expect(
+      fromTourItems([
+        null,
+        'nonsense',
+        {_key: 'no-status'},
+        {status: 'completed'},
+        {_key: '', status: 'completed'},
+        {_key: 'bad-status', status: 'invented'},
+        {_key: 'good', status: 'completed', updatedAt: '2026-06-01T00:00:00Z'},
+      ]),
+    ).toEqual({good: {status: 'completed', updatedAt: '2026-06-01T00:00:00Z'}})
+  })
+
+  it('treats anything that is not an array as no progress', () => {
+    expect(fromTourItems(undefined)).toEqual({})
+    expect(fromTourItems({essentials: {status: 'completed'}})).toEqual({})
   })
 })

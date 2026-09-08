@@ -312,7 +312,9 @@ uses an unregistered type, so it never shows up in the structure tool or in
 search — but it is still your dataset, which is why this is opt-in rather than
 assumed.
 
-It is best-effort in both directions. An editor without write access, or without
+Writes touch only the guides they name, so two tabs belonging to the same
+editor cannot erase each other's progress. It is best-effort in both
+directions. An editor without write access, or without
 a network, keeps working against their browser's own store; the developer gets
 one console warning and the editor gets none. Local and project state are merged
 per guide, newest wins, so two machines that each finished a different guide end

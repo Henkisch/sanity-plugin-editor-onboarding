@@ -104,3 +104,76 @@ export function progressDiffers(previous: UserProgress, next: UserProgress): boo
 export function progressDocumentId(userId: string): string {
   return `onboarding.progress.${userId.replace(/[^a-zA-Z0-9._-]/g, '-')}`
 }
+
+/**
+ * Sanity patch paths cannot address an object key containing a hyphen —
+ * `tours.seo-panel` is a syntax error, and the bracket form is read as a
+ * literal — so progress is stored as a keyed array instead. That is the shape
+ * Sanity's patch system is built for, and `_key` filters take any string.
+ *
+ * @internal
+ */
+export interface TourProgressItem extends TourRecord {
+  _key: string
+  _type: string
+}
+
+export const TOUR_ITEM_TYPE = 'onboarding.tourProgress'
+
+/** Escaped for use inside a `_key == "..."` filter. */
+function quoteKey(tourId: string): string {
+  return tourId.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+}
+
+/** The patch path selecting one tour's entry. @internal */
+export function tourItemPath(tourId: string): string {
+  return `tours[_key=="${quoteKey(tourId)}"]`
+}
+
+/** Progress as the array Sanity stores. @internal */
+export function toTourItems(progress: UserProgress): TourProgressItem[] {
+  const items: TourProgressItem[] = []
+  for (const [tourId, record] of Object.entries(progress.tours)) {
+    items.push({
+      _key: tourId,
+      _type: TOUR_ITEM_TYPE,
+      status: record.status,
+      updatedAt: record.updatedAt,
+      ...(typeof record.stepIndex === 'number' ? {stepIndex: record.stepIndex} : {}),
+    })
+  }
+  return items
+}
+
+/**
+ * The stored array back as a lookup.
+ *
+ * Entries without a usable `_key` or `status` are dropped rather than trusted:
+ * this document is writable by the editor it belongs to, and a malformed one
+ * must not take the guides down.
+ */
+export function fromTourItems(items: unknown): UserProgress['tours'] {
+  if (!Array.isArray(items)) return {}
+
+  const tours: UserProgress['tours'] = {}
+  for (const item of items) {
+    if (typeof item !== 'object' || item === null) continue
+
+    const record: Record<string, unknown> = item
+    const key = record._key
+    const status = record.status
+    const updatedAt = record.updatedAt
+    const stepIndex = record.stepIndex
+
+    if (typeof key !== 'string' || key.length === 0) continue
+    if (status !== 'skipped' && status !== 'dismissed' && status !== 'completed') continue
+
+    tours[key] = {
+      status,
+      updatedAt: typeof updatedAt === 'string' ? updatedAt : '',
+      ...(typeof stepIndex === 'number' ? {stepIndex} : {}),
+    }
+  }
+
+  return tours
+}

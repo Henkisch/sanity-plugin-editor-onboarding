@@ -1,6 +1,13 @@
 import {type SanityClient} from 'sanity'
 
-import {emptyProgress, progressDocumentId, type UserProgress} from './progressSync'
+import {
+  emptyProgress,
+  fromTourItems,
+  progressDocumentId,
+  toTourItems,
+  tourItemPath,
+  type UserProgress,
+} from './progressSync'
 
 /**
  * Onboarding progress kept in the project, so "seen it" follows an editor
@@ -32,7 +39,8 @@ export const PROGRESS_API_VERSION = '2024-01-01'
 interface ProgressDocument {
   _id: string
   _type: string
-  tours?: UserProgress['tours']
+  /** A keyed array, not an object — see `tourItemPath`. */
+  tours?: unknown
   menuOpenedAt?: string
 }
 
@@ -65,7 +73,7 @@ export async function fetchProgress(
     if (!document) return emptyProgress()
 
     return {
-      tours: document.tours ?? {},
+      tours: fromTourItems(document.tours),
       ...(document.menuOpenedAt ? {menuOpenedAt: document.menuOpenedAt} : {}),
     }
   } catch (error) {
@@ -75,24 +83,52 @@ export async function fetchProgress(
 }
 
 /**
- * Write this user's progress back.
+ * Write this user's progress back, touching only the guides it names.
  *
- * `createOrReplace` rather than a patch: the merge that produced this value
- * already accounts for what was there, and a replace cannot leave a partially
- * applied document behind.
+ * Not `createOrReplace`: two tabs belonging to the same editor would then
+ * overwrite each other wholesale, and whichever finished second would erase the
+ * other's guide. Each entry is removed and re-inserted by key in one patch
+ * instead, so a tab writing `essentials` leaves a tab writing `publishing`
+ * alone. Two writes to the *same* guide still resolve last-write-wins, which is
+ * what the merge rules assume anyway.
+ *
+ * `menuOpenedAt` is `setIfMissing`: having opened the menu cannot stop being
+ * true, so the earliest record should survive.
  */
 export async function saveProgress(
   client: SanityClient,
   userId: string,
   progress: UserProgress,
 ): Promise<void> {
+  const items = toTourItems(progress)
+  if (items.length === 0 && !progress.menuOpenedAt) return
+
+  const id = progressDocumentId(userId)
+
   try {
-    await client.createOrReplace({
-      _id: progressDocumentId(userId),
-      _type: DOCUMENT_TYPE,
-      tours: progress.tours,
-      ...(progress.menuOpenedAt ? {menuOpenedAt: progress.menuOpenedAt} : {}),
-    })
+    await client
+      .transaction()
+      .createIfNotExists({_id: id, _type: DOCUMENT_TYPE, tours: []})
+      .patch(id, (patch) => {
+        let next = patch.setIfMissing({tours: []})
+
+        if (progress.menuOpenedAt) {
+          next = next.setIfMissing({menuOpenedAt: progress.menuOpenedAt})
+        }
+
+        if (items.length > 0) {
+          // Unset then insert is an atomic replace of just these keys; without
+          // the unset, re-running would append duplicates.
+          next = next
+            .unset(items.map((item) => tourItemPath(item._key)))
+            .insert('after', 'tours[-1]', items)
+        }
+
+        return next
+      })
+      // The editor is not waiting on this, and a slower commit is cheaper than
+      // holding up the Studio's own writes.
+      .commit({visibility: 'async'})
   } catch (error) {
     warnOnce(error)
   }
