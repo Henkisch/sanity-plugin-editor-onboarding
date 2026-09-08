@@ -12,8 +12,13 @@ import {query} from './useTargetElement'
  * design is that a genuinely broken selector looks exactly like an absent
  * feature, and an editor is simply shown less than intended.
  *
- * This is the counterweight: once per session, in development only, say what
- * resolved and what did not, so a developer sees it before an editor doesn't.
+ * This is the counterweight: in development only, say what resolved and what
+ * did not, so a developer sees it before an editor doesn't.
+ *
+ * Reported per view rather than once per session. A document's fields, its
+ * publish button and its history menu do not exist on a list, so a single
+ * report at boot can only ever describe the view the Studio happened to open
+ * on — which is the one view where the steps worth checking are all absent.
  *
  * @internal
  */

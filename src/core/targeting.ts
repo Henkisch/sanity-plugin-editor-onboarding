@@ -89,13 +89,21 @@ export const targetReleases = (): string => '[data-testid="releases-tool-link"]'
  *
  * Studio builds that button's test id out of its **translated** label —
  * `action-publish` in English, `action-publicera` in Swedish — so matching the
- * English one skipped this step in every other language, silently. Selected by
- * position instead: the footer's only other action is its overflow menu.
+ * English one skipped this step in every language but one, silently.
+ *
+ * Matched by shape instead, and verified against a running Studio: it is the
+ * document pane's only `@sanity/ui` button whose id starts with `action-` once
+ * the Portable Text toolbar (`action-button-*`), the overflow menus
+ * (`action-menu*`) and the list pane's create button are excluded. Note that it
+ * is **not** inside `pane-footer`, despite appearing at the foot of the pane.
  *
  * @public
  */
 export const targetPublishButton = (): string =>
-  '[data-testid="pane-footer"] [data-testid^="action-"]:not([data-testid="action-menu-button"])'
+  '[data-testid="document-pane"] [data-testid^="action-"][data-ui="Button"]' +
+  ':not([data-testid^="action-button-"])' +
+  ':not([data-testid^="action-menu"])' +
+  ':not([data-testid="action-intent-button"])'
 
 /**
  * The Draft / Published chips at the top of an open document.

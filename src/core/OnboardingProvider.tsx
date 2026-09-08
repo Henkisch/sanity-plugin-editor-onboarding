@@ -92,6 +92,14 @@ function isUserBusyEditing(): boolean {
  */
 const AUTO_START_SETTLE_MS = 1500
 
+/**
+ * How often to re-check which targets resolve, in development.
+ *
+ * Frequent enough to catch a document form shortly after it renders, rare enough
+ * that a `querySelectorAll` per registered step is beneath notice.
+ */
+const HEALTH_CHECK_INTERVAL_MS = 2000
+
 
 /** How long auto-start waits for a quiet moment before giving up entirely. */
 const AUTO_START_GIVE_UP_MS = 30_000
@@ -260,6 +268,8 @@ export function OnboardingProvider(props: {
   const offeredThisSession = useRef<Set<string>>(new Set())
   /** Guards against a step being skipped more than once. See `skipStep`. */
   const handledSkip = useRef<string | null>(null)
+  /** The last health report printed, so an unchanged one is not repeated. */
+  const lastHealthReport = useRef<string | null>(null)
   // Bumped whenever a tour ends, to re-read statuses for the help menu.
   const [statusVersion, setStatusVersion] = useState(0)
   /**
@@ -405,20 +415,31 @@ export function OnboardingProvider(props: {
     [activeTour, skippedCount],
   )
 
-  // Once per session, in development, say which targets resolved. A step whose
-  // selector Sanity has renamed skips itself in silence, which is right for an
-  // editor and useless for the developer who needs to fix it.
+  // In development, say which targets resolved. A step whose selector Sanity has
+  // renamed skips itself in silence, which is right for an editor and useless
+  // for the developer who needs to fix it.
+  //
+  // Polled rather than reported once after a delay. A Studio does not finish
+  // rendering at a time anyone can name — a document form arrives well after the
+  // shell, and later still on a cold cache — so any fixed wait is either too
+  // short to see the fields or long enough to feel broken. This re-checks until
+  // the picture stops changing, and prints only when it does change, so opening
+  // a document says its piece once and moving between documents says nothing.
   useEffect(() => {
     if (!isDevelopment() || tours.length === 0) return undefined
 
-    // Late enough that the Studio has rendered something worth checking.
-    const timeoutId = window.setTimeout(() => {
-      // `warn` rather than `info`: Studio consoles are busy, and this is the
-      // one message a developer needs to see when a guide has gone quiet.
-      console.warn(formatReport(checkTargets(tours), SANITY_VERSION))
-    }, AUTO_START_SETTLE_MS)
+    const report = () => {
+      const message = formatReport(checkTargets(tours), SANITY_VERSION)
+      if (message === lastHealthReport.current) return
 
-    return () => window.clearTimeout(timeoutId)
+      lastHealthReport.current = message
+      // `warn` rather than `info`: Studio consoles are busy, and this is the one
+      // message a developer needs to see when a guide has gone quiet.
+      console.warn(message)
+    }
+
+    const intervalId = window.setInterval(report, HEALTH_CHECK_INTERVAL_MS)
+    return () => window.clearInterval(intervalId)
   }, [tours])
 
   // Pull the project's copy of this user's progress in, once.

@@ -8,14 +8,23 @@ import {
   targetPublishButton,
 } from './targeting'
 
-/** Builds the markup a Studio renders, in the language given. */
-function documentFooter(publishLabel: string): void {
+/**
+ * The markup a Studio renders around the publish button, in the language given.
+ *
+ * Copied from a running Studio rather than imagined: the button is inside the
+ * document pane but *not* inside `pane-footer`, and it sits among Portable Text
+ * toolbar buttons and overflow menus that share its `action-` prefix.
+ */
+function documentPane(publishLabel: string): void {
   document.body.innerHTML = `
-    <div data-testid="pane-footer">
-      <button data-ui="Button">-</button>
-      <button data-testid="action-${publishLabel}">${publishLabel}</button>
-      <button data-testid="action-menu-button"></button>
-    </div>`
+    <div data-testid="document-pane">
+      <button data-testid="action-button-strong" data-ui="Button">B</button>
+      <button data-testid="action-menu-auto-collapse-menu" data-ui="Button"></button>
+      <div data-testid="pane-footer"></div>
+      <button data-testid="action-${publishLabel}" data-ui="Button">${publishLabel}</button>
+      <button data-testid="action-menu-button" data-ui="MenuButton"></button>
+    </div>
+    <button data-testid="action-intent-button" data-ui="Button">New</button>`
 }
 
 function documentHeader(draftLabel: string, publishedLabel: string): void {
@@ -31,23 +40,27 @@ function documentHeader(draftLabel: string, publishedLabel: string): void {
 // language — silently, and for exactly the editors most in need of a guide.
 describe('selectors that must not depend on the Studio language', () => {
   it('finds the publish button in English', () => {
-    documentFooter('publish')
+    documentPane('publish')
 
     expect(document.querySelector(targetPublishButton())?.textContent).toBe('publish')
   })
 
   it('finds the publish button in Swedish', () => {
-    documentFooter('publicera')
+    documentPane('publicera')
 
     expect(document.querySelector(targetPublishButton())?.textContent).toBe('publicera')
   })
 
-  it('never mistakes the overflow menu for the publish button', () => {
-    documentFooter('publicera')
+  // Everything else in that pane whose id also starts with `action-`: the
+  // Portable Text toolbar, the overflow menus, and the list pane's create
+  // button. Matching any of them would ring the wrong control entirely.
+  it('matches the publish button and nothing else in the pane', () => {
+    documentPane('publicera')
 
-    expect(document.querySelector(targetPublishButton())?.getAttribute('data-testid')).not.toBe(
-      'action-menu-button',
-    )
+    const matches = [...document.querySelectorAll(targetPublishButton())]
+
+    expect(matches).toHaveLength(1)
+    expect(matches[0].getAttribute('data-testid')).toBe('action-publicera')
   })
 
   it('finds a document status chip in English', () => {
