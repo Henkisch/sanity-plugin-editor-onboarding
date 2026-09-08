@@ -100,6 +100,19 @@ export const targetDocumentHistory = (): string =>
   '[data-testid="document-pane"] [data-testid="pane-context-menu-button"]'
 
 /**
+ * The "Select" button on an image field — the control that reuses an asset
+ * already in the project rather than uploading a second copy.
+ *
+ * Matched by prefix because Studio suffixes the id with the asset source, which
+ * changes when Media Library is installed. Present only while a document with
+ * an image field is open, which is exactly when reuse can be demonstrated.
+ *
+ * @public
+ */
+export const targetAssetBrowse = (): string =>
+  '[data-testid^="image-object-input-browse-button"]'
+
+/**
  * A document type's entry in the structure tool's list.
  *
  * Note that Studio keys these by the type's **title**, not its schema name — so

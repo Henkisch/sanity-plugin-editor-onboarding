@@ -1,6 +1,7 @@
 export {coreConcepts, type CoreConceptId, type CoreConceptsOptions} from './concepts/tours'
 export {OnboardingTarget, type OnboardingTargetProps} from './core/OnboardingTarget'
 export {
+  targetAssetBrowse,
   targetCustom,
   targetDocumentHistory,
   targetDocumentStatus,

@@ -5,6 +5,7 @@ import {RocketIcon} from '@sanity/icons/Rocket'
 import {UsersIcon} from '@sanity/icons/Users'
 
 import {
+  targetAssetBrowse,
   targetDocumentHistory,
   targetDocumentStatus,
   targetGuidesButton,
@@ -193,10 +194,12 @@ function buildTours(options: CoreConceptsOptions): Record<CoreConceptId, Onboard
     sourceUrl: docs.mediaLibrary,
     description: k('tour.media.description'),
     icon: ImagesIcon,
+    unavailableMessage: k('tour.media.unavailable'),
     steps: [
       {
-        target: targetNavbar(),
+        target: targetAssetBrowse(),
         title: k('tour.media.assets.title'),
+        placement: 'top',
         content: k('tour.media.assets.content'),
         learnMoreUrl: docs.mediaLibrary,
       },

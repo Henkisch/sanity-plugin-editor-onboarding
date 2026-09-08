@@ -91,6 +91,8 @@ const enUS = {
   // — Core concepts: media —
   'tour.media.title': 'Images and files',
   'tour.media.description': 'How assets are stored and reused',
+  'tour.media.unavailable':
+    'This guide points at an image field. Open a document that has one, then start it again.',
   'tour.media.assets.title': 'Upload once, use anywhere',
   'tour.media.assets.content':
     'Images and files live in a shared library rather than inside the document you uploaded them to, so the same asset can be reused across the site without a second copy.',

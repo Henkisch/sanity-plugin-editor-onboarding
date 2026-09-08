@@ -60,6 +60,20 @@ describe('the slug step', () => {
   })
 })
 
+describe('the media guide', () => {
+  const media = () => coreConcepts({include: ['media']})[0]
+
+  // It used to point at the navbar, which exists in every Studio — so the guide
+  // always ran, and rang something with nothing to do with assets.
+  it('points at the control that reuses an asset, not at the navbar', () => {
+    expect(media().steps[0].target).toContain('image-object-input-browse-button')
+  })
+
+  it('says so rather than doing nothing when no image field is open', () => {
+    expect(media().unavailableMessage).toBeDefined()
+  })
+})
+
 describe('guide invariants', () => {
   it('gives every tour a stable id, since ids key persistence', () => {
     const ids = coreConcepts().map((tour) => tour.id)

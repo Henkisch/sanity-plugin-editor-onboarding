@@ -93,6 +93,8 @@ const svSE: Record<OnboardingResourceKey, string> = {
   // — Core concepts: media —
   'tour.media.title': 'Bilder och filer',
   'tour.media.description': 'Hur filer lagras och återanvänds',
+  'tour.media.unavailable':
+    'Den här guiden pekar på ett bildfält. Öppna ett dokument som har ett och försök igen.',
   'tour.media.assets.title': 'Ladda upp en gång, använd överallt',
   'tour.media.assets.content':
     'Bilder och filer ligger i ett gemensamt bibliotek i stället för inuti dokumentet du laddade upp dem i, så att samma fil kan återanvändas på hela webbplatsen utan en extra kopia.',
