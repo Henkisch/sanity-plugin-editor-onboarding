@@ -39,9 +39,9 @@ const seoTour: OnboardingTour = {
       placement: 'top',
     },
     {
-      target: targetCustom('seo-score'),
-      title: studioText('tour.seo.score.title'),
-      content: studioText('tour.seo.score.content'),
+      target: targetCustom('seo-hint'),
+      title: studioText('tour.seo.hint.title'),
+      content: studioText('tour.seo.hint.content'),
       placement: 'bottom',
     },
   ],
@@ -49,21 +49,29 @@ const seoTour: OnboardingTour = {
 
 /**
  * Help hung on individual fields, with no tour involved. Each one puts a book
- * icon in that field's own action row.
+ * icon in that field's own action row, and each is localized the same way the
+ * guides are — an editor who reads the Studio in Swedish should not meet an
+ * English sentence the moment they ask a question.
  */
 const fieldGuides: FieldGuide[] = [
   {
     field: 'publishedAt',
     documentType: 'post',
-    title: 'This is a publish date, not a switch',
-    content:
-      'It is what the site prints as the article date. Setting it to the future does not hold the post back — use a release for that.',
+    title: studioText('field.publishedAt.title'),
+    content: studioText('field.publishedAt.content'),
+  },
+  {
+    // A nested field, addressed by its path through the object that holds it.
+    field: 'seo.title',
+    documentType: 'post',
+    title: studioText('field.seoTitle.title'),
+    content: studioText('field.seoTitle.content'),
   },
   {
     field: 'bio',
     documentType: 'author',
-    title: 'Two or three sentences',
-    content: 'The bio appears under every article this author writes, so keep it short.',
+    title: studioText('field.bio.title'),
+    content: studioText('field.bio.content'),
   },
 ]
 
