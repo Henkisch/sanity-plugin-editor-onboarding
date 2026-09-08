@@ -35,10 +35,11 @@ describe('reading', () => {
       }),
     })
 
-    const progress = await fetchProgress(client, 'u1')
+    const {progress, needsRepair} = await fetchProgress(client, 'u1')
 
     expect(progress.tours.essentials.status).toBe('completed')
     expect(progress.menuOpenedAt).toBe('2026-05-01T00:00:00Z')
+    expect(needsRepair).toBe(false)
   })
 
   it('asks for the id derived from the user, never a query', async () => {
@@ -53,7 +54,7 @@ describe('reading', () => {
   it('reads a first-time user as empty rather than missing', async () => {
     const {fetchProgress} = await loadStore()
 
-    const progress = await fetchProgress(
+    const {progress} = await fetchProgress(
       fakeClient({getDocument: vi.fn().mockResolvedValue(undefined)}),
       'u1',
     )
@@ -70,7 +71,7 @@ describe('reading', () => {
       getDocument: vi.fn().mockRejectedValue(new Error('Insufficient permissions')),
     })
 
-    const progress = await fetchProgress(client, 'u1')
+    const {progress} = await fetchProgress(client, 'u1')
 
     expect(progress.tours).toEqual({})
     expect(console.warn).toHaveBeenCalledTimes(1)
@@ -130,6 +131,58 @@ function recordingClient(commit: () => Promise<unknown> = () => Promise.resolve(
   const build = (() => transaction) as SanityClient['transaction']
   return {client: fakeClient({transaction: build}), calls}
 }
+
+describe('the pre-release object shape', () => {
+  // Verified against a real dataset: patching an array path into an object
+  // reports success and changes nothing, so a document left in that shape would
+  // accept every write and record none of them — silently, and forever.
+  const legacyClient = () =>
+    fakeClient({
+      getDocument: vi.fn().mockResolvedValue({
+        _id: 'onboarding.progress.u1',
+        tours: {essentials: {status: 'completed', updatedAt: '2026-06-01T00:00:00Z'}},
+      }),
+    })
+
+  it('still reads the progress rather than losing it', async () => {
+    const {fetchProgress} = await loadStore()
+
+    const {progress} = await fetchProgress(legacyClient(), 'u1')
+
+    expect(progress.tours.essentials.status).toBe('completed')
+  })
+
+  it('reports that the document needs repairing', async () => {
+    const {fetchProgress} = await loadStore()
+
+    expect((await fetchProgress(legacyClient(), 'u1')).needsRepair).toBe(true)
+  })
+
+  it('clears the old field before writing an array in its place', async () => {
+    const {saveProgress} = await loadStore()
+    const {client, calls} = recordingClient()
+
+    await saveProgress(
+      client,
+      'u1',
+      {tours: {essentials: {status: 'completed', updatedAt: '2026-06-01T00:00:00Z'}}},
+      {repairShape: true},
+    )
+
+    expect(calls.unset[0]).toEqual(['tours'])
+  })
+
+  it('leaves the field alone on an ordinary write', async () => {
+    const {saveProgress} = await loadStore()
+    const {client, calls} = recordingClient()
+
+    await saveProgress(client, 'u1', {
+      tours: {essentials: {status: 'completed', updatedAt: '2026-06-01T00:00:00Z'}},
+    })
+
+    expect(calls.unset).not.toContainEqual(['tours'])
+  })
+})
 
 describe('writing', () => {
   it('writes one document per user, at a predictable id', async () => {

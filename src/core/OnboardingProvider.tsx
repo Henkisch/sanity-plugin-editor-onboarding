@@ -407,7 +407,7 @@ export function OnboardingProvider(props: {
     let cancelled = false
 
     void (async () => {
-      const remote = await fetchProgress(client, userId)
+      const {progress: remote, needsRepair} = await fetchProgress(client, userId)
       if (cancelled) return
 
       const local = getUserProgress(userId)
@@ -420,10 +420,13 @@ export function OnboardingProvider(props: {
       setMenuVersion((version) => version + 1)
       setRemoteLoaded(true)
 
-      // Only write when this browser knew something the project did not.
-      // Onboarding state changes a handful of times per user, ever, and this
-      // runs in someone else's dataset.
-      if (progressDiffers(remote, merged)) void saveProgress(client, userId, merged)
+      // Only write when this browser knew something the project did not, or
+      // when the stored document needs its shape repaired. Onboarding state
+      // changes a handful of times per user, ever, and this runs in someone
+      // else's dataset.
+      if (needsRepair || progressDiffers(remote, merged)) {
+        void saveProgress(client, userId, merged, {repairShape: needsRepair})
+      }
     })()
 
     return () => {

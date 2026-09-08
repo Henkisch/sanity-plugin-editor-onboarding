@@ -198,8 +198,24 @@ describe('the keyed-array storage shape', () => {
     ).toEqual({good: {status: 'completed', updatedAt: '2026-06-01T00:00:00Z'}})
   })
 
-  it('treats anything that is not an array as no progress', () => {
+  it('treats a value that is neither array nor object as no progress', () => {
     expect(fromTourItems(undefined)).toEqual({})
-    expect(fromTourItems({essentials: {status: 'completed'}})).toEqual({})
+    expect(fromTourItems('nonsense')).toEqual({})
+    expect(fromTourItems(42)).toEqual({})
+  })
+
+  // An early version of this feature stored an object keyed by tour id. Reading
+  // it is what keeps an upgrade from silently forgetting what someone has
+  // already seen.
+  it('still reads progress stored in the pre-release object shape', () => {
+    expect(
+      fromTourItems({essentials: {status: 'completed', updatedAt: '2026-06-01T00:00:00Z'}}),
+    ).toEqual({essentials: {status: 'completed', updatedAt: '2026-06-01T00:00:00Z'}})
+  })
+
+  it('applies the same scrutiny to the old shape as to the new one', () => {
+    expect(fromTourItems({good: {status: 'completed'}, bad: {status: 'invented'}})).toEqual({
+      good: {status: 'completed', updatedAt: ''},
+    })
   })
 })

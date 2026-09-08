@@ -145,34 +145,71 @@ export function toTourItems(progress: UserProgress): TourProgressItem[] {
   return items
 }
 
+/** Narrows an unknown to something whose properties can be read. */
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+/** One record, if the value describes one. */
+function toRecord(value: unknown, key: unknown): [string, TourRecord] | undefined {
+  if (!isPlainRecord(value)) return undefined
+
+  const status = value.status
+  const updatedAt = value.updatedAt
+  const stepIndex = value.stepIndex
+
+  if (typeof key !== 'string' || key.length === 0) return undefined
+  if (status !== 'skipped' && status !== 'dismissed' && status !== 'completed') return undefined
+
+  return [
+    key,
+    {
+      status,
+      updatedAt: typeof updatedAt === 'string' ? updatedAt : '',
+      ...(typeof stepIndex === 'number' ? {stepIndex} : {}),
+    },
+  ]
+}
+
 /**
- * The stored array back as a lookup.
+ * Whether a stored `tours` value predates the keyed-array shape.
  *
- * Entries without a usable `_key` or `status` are dropped rather than trusted:
- * this document is writable by the editor it belongs to, and a malformed one
- * must not take the guides down.
+ * An early version of this feature stored an object keyed by tour id. Patching
+ * an array path into an object does not fail — it silently does nothing — so a
+ * document left in that shape would accept writes forever and record none of
+ * them. Detecting it is what lets the next write repair it.
+ *
+ * @internal
+ */
+export function isLegacyTourShape(tours: unknown): tours is Record<string, unknown> {
+  return isPlainRecord(tours) && !Array.isArray(tours)
+}
+
+/**
+ * The stored value back as a lookup, in either shape it may be in.
+ *
+ * Entries without a usable key or status are dropped rather than trusted: this
+ * document is writable by the editor it belongs to, and a malformed one must
+ * not take the guides down.
  */
 export function fromTourItems(items: unknown): UserProgress['tours'] {
+  if (isLegacyTourShape(items)) {
+    const tours: UserProgress['tours'] = {}
+    for (const [key, value] of Object.entries(items)) {
+      const entry = toRecord(value, key)
+      if (entry) tours[entry[0]] = entry[1]
+    }
+    return tours
+  }
+
   if (!Array.isArray(items)) return {}
 
   const tours: UserProgress['tours'] = {}
   for (const item of items) {
-    if (typeof item !== 'object' || item === null) continue
+    if (!isPlainRecord(item)) continue
 
-    const record: Record<string, unknown> = item
-    const key = record._key
-    const status = record.status
-    const updatedAt = record.updatedAt
-    const stepIndex = record.stepIndex
-
-    if (typeof key !== 'string' || key.length === 0) continue
-    if (status !== 'skipped' && status !== 'dismissed' && status !== 'completed') continue
-
-    tours[key] = {
-      status,
-      updatedAt: typeof updatedAt === 'string' ? updatedAt : '',
-      ...(typeof stepIndex === 'number' ? {stepIndex} : {}),
-    }
+    const entry = toRecord(item, item._key)
+    if (entry) tours[entry[0]] = entry[1]
   }
 
   return tours

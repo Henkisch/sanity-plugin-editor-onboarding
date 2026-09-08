@@ -3,6 +3,7 @@ import {type SanityClient} from 'sanity'
 import {
   emptyProgress,
   fromTourItems,
+  isLegacyTourShape,
   progressDocumentId,
   toTourItems,
   tourItemPath,
@@ -59,6 +60,17 @@ function warnOnce(reason: unknown): void {
   )
 }
 
+/** What was read, and whether the document needs its shape repaired. @internal */
+export interface FetchedProgress {
+  progress: UserProgress
+  /**
+   * True when `tours` is stored in the pre-release object shape. Patching an
+   * array path into an object silently does nothing, so such a document would
+   * accept every future write and record none of them.
+   */
+  needsRepair: boolean
+}
+
 /**
  * This user's stored progress, or empty progress if there is none to read.
  *
@@ -67,18 +79,21 @@ function warnOnce(reason: unknown): void {
 export async function fetchProgress(
   client: SanityClient,
   userId: string,
-): Promise<UserProgress> {
+): Promise<FetchedProgress> {
   try {
     const document = await client.getDocument<ProgressDocument>(progressDocumentId(userId))
-    if (!document) return emptyProgress()
+    if (!document) return {progress: emptyProgress(), needsRepair: false}
 
     return {
-      tours: fromTourItems(document.tours),
-      ...(document.menuOpenedAt ? {menuOpenedAt: document.menuOpenedAt} : {}),
+      progress: {
+        tours: fromTourItems(document.tours),
+        ...(document.menuOpenedAt ? {menuOpenedAt: document.menuOpenedAt} : {}),
+      },
+      needsRepair: isLegacyTourShape(document.tours),
     }
   } catch (error) {
     warnOnce(error)
-    return emptyProgress()
+    return {progress: emptyProgress(), needsRepair: false}
   }
 }
 
@@ -99,6 +114,7 @@ export async function saveProgress(
   client: SanityClient,
   userId: string,
   progress: UserProgress,
+  options: {repairShape?: boolean} = {},
 ): Promise<void> {
   const items = toTourItems(progress)
   if (items.length === 0 && !progress.menuOpenedAt) return
@@ -110,7 +126,12 @@ export async function saveProgress(
       .transaction()
       .createIfNotExists({_id: id, _type: DOCUMENT_TYPE, tours: []})
       .patch(id, (patch) => {
-        let next = patch.setIfMissing({tours: []})
+        // Drop a `tours` left in the pre-release object shape before setting an
+        // array in its place. `setIfMissing` would not replace it, and the
+        // insert below would then quietly do nothing forever. Only ever done on
+        // the load-time write, which carries the full merged picture.
+        let next = options.repairShape ? patch.unset(['tours']) : patch
+        next = next.setIfMissing({tours: []})
 
         if (progress.menuOpenedAt) {
           next = next.setIfMissing({menuOpenedAt: progress.menuOpenedAt})
