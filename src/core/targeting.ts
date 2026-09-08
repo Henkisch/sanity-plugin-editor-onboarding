@@ -19,6 +19,16 @@ export const targetToolMenu = (): string => '[data-testid="tool-collapse-menu"]'
 /** The "create new document" button in the navbar. @public */
 export const targetNewDocument = (): string => '[data-testid="new-document-button"]'
 
+/**
+ * This plugin's own Guides button in the navbar.
+ *
+ * Unlike every other helper here, this targets markup the plugin controls, so
+ * it is stable across Studio versions.
+ *
+ * @public
+ */
+export const targetGuidesButton = (): string => '[data-testid="onboarding-guides-button"]'
+
 /** The global search button. @public */
 export const targetSearch = (): string => '[data-testid="studio-search"]'
 

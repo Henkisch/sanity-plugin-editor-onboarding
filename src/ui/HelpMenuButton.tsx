@@ -1,11 +1,39 @@
 import {CheckmarkIcon} from '@sanity/icons/Checkmark'
 import {EyeClosedIcon} from '@sanity/icons/EyeClosed'
-import {HelpCircleIcon} from '@sanity/icons/HelpCircle'
+import {BookIcon} from '@sanity/icons/Book'
 import {Box, Button, Text} from '@sanity/ui'
 import {Menu, MenuButton, MenuDivider, MenuItem} from '@sanity/ui/menu'
+import {useCallback} from 'react'
+import {styled} from 'styled-components'
 
 import {useOnboarding} from '../core/OnboardingProvider'
 import {type TourStatus} from '../core/types'
+
+/**
+ * A 4px dot in the button's top-right corner.
+ *
+ * Deliberately a copy of what Sanity's own `StatusButton` draws rather than a
+ * use of it: that component is marked `@hidden @beta`, and a plugin whose whole
+ * promise is "never break the Studio" should not hang its navbar button on an
+ * unstable internal. The markup below is a handful of lines of stable
+ * `@sanity/ui` and matches the native treatment.
+ */
+const DottedButton = styled(Button)<{$hint: boolean}>`
+  position: relative;
+
+  &::after {
+    display: ${(props) => (props.$hint ? 'block' : 'none')};
+    content: '';
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 4px;
+    height: 4px;
+    border-radius: 3px;
+    background-color: var(--card-badge-primary-dot-color, currentColor);
+    box-shadow: 0 0 0 1px var(--card-bg-color);
+  }
+`
 
 /**
  * A quiet marker for tours the user has finished or hidden, so the menu shows
@@ -26,16 +54,27 @@ function statusIcon(status: TourStatus | null): typeof CheckmarkIcon | undefined
  * plugins' navbar customisations.
  */
 export function HelpMenuButton(): React.JSX.Element | null {
-  const {tours, startTour, statuses} = useOnboarding()
+  const {tours, startTour, statuses, showMenuHint, markMenuOpened} = useOnboarding()
+
+  const handleOpen = useCallback(() => {
+    // Opening it once is the whole point of the dot, so retire it immediately.
+    if (showMenuHint) markMenuOpened()
+  }, [showMenuHint, markMenuOpened])
 
   if (tours.length === 0) return null
 
   return (
     <MenuButton
       button={
-        <Button
+        <DottedButton
           aria-label="Guides"
-          icon={HelpCircleIcon}
+          // Not HelpCircleIcon: Sanity's own Resources button in this same
+          // navbar uses it, and two near-identical "?" circles side by side is
+          // a coin flip for the user. A book reads as "guides" and has a
+          // distinct silhouette against the row of circular icons.
+          $hint={showMenuHint}
+          data-testid="onboarding-guides-button"
+          icon={BookIcon}
           mode="bleed"
           title="Guides"
           tone="default"
@@ -60,6 +99,7 @@ export function HelpMenuButton(): React.JSX.Element | null {
           ))}
         </Menu>
       }
+      onOpen={handleOpen}
       popover={{placement: 'bottom-end', portal: true}}
     />
   )

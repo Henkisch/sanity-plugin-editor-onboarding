@@ -1,6 +1,7 @@
 import {
   targetDocumentHistory,
   targetDocumentStatus,
+  targetGuidesButton,
   targetNavbar,
   targetNewDocument,
   targetPerspectiveMenu,
@@ -64,6 +65,15 @@ const tours: Record<CoreConceptId, OnboardingTour> = {
         title: 'Find anything',
         content:
           'Search across every document type at once — useful when you know the headline but not where it lives.',
+      },
+      {
+        // The handoff. Everything else in this library is opt-in from the menu,
+        // so this is the one moment where we can reliably show people where it
+        // lives — while their attention is already on the tour.
+        target: targetGuidesButton(),
+        title: 'More guides live here',
+        content:
+          'Short guides on publishing, comments and tasks, releases, and images are all in this menu. Open it any time — including to run this one again.',
       },
     ],
   },

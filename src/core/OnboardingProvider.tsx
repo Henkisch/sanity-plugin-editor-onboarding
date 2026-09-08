@@ -1,7 +1,13 @@
 import {createContext, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react'
 import {useCurrentUser} from 'sanity'
 
-import {getTourStatus, mayAutoStart, setTourStatus} from './completionStore'
+import {
+  getTourStatus,
+  hasOpenedMenu,
+  mayAutoStart,
+  setMenuOpened,
+  setTourStatus,
+} from './completionStore'
 import {Spotlight} from './Spotlight'
 import {StepPopover} from './StepPopover'
 import {TourErrorBoundary} from './TourErrorBoundary'
@@ -16,6 +22,10 @@ interface OnboardingContextValue {
   stopTour: () => void
   /** Status per tour id, re-read whenever a tour ends. */
   statuses: Record<string, TourStatus | null>
+  /** Whether the navbar button should still show its one-time "look here" dot. */
+  showMenuHint: boolean
+  /** Retires the dot permanently for this user. */
+  markMenuOpened: () => void
 }
 
 const OnboardingContext = createContext<OnboardingContextValue | null>(null)
@@ -159,6 +169,15 @@ export function OnboardingProvider(props: {
   const handledSkip = useRef<string | null>(null)
   // Bumped whenever a tour ends, to re-read statuses for the help menu.
   const [statusVersion, setStatusVersion] = useState(0)
+  // Bumped when the menu is opened, to re-read the stored flag.
+  const [menuVersion, setMenuVersion] = useState(0)
+
+  // Derived rather than held in state: the flag is keyed by user id, which is
+  // not known on the first render, and localStorage is not reactive.
+  const menuOpened = useMemo(() => {
+    void menuVersion
+    return hasOpenedMenu(userId)
+  }, [userId, menuVersion])
 
   const activeTour = useMemo(
     () => tours.find((tour) => tour.id === activeTourId) ?? null,
@@ -299,9 +318,24 @@ export function OnboardingProvider(props: {
     }
   }, [tours, activeTourId, currentUser, userId, beginTour])
 
+  const markMenuOpened = useCallback(() => {
+    setMenuOpened(userId)
+    setMenuVersion((version) => version + 1)
+  }, [userId])
+
   const contextValue = useMemo<OnboardingContextValue>(
-    () => ({tours, activeTourId, startTour, stopTour, statuses}),
-    [tours, activeTourId, startTour, stopTour, statuses],
+    () => ({
+      tours,
+      activeTourId,
+      startTour,
+      stopTour,
+      statuses,
+      // Only hint while there is something to find. Nothing registered means
+      // nothing to point at.
+      showMenuHint: !menuOpened && tours.length > 0,
+      markMenuOpened,
+    }),
+    [tours, activeTourId, startTour, stopTour, statuses, menuOpened, markMenuOpened],
   )
 
   return (

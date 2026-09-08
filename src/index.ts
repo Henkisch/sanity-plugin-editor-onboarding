@@ -4,6 +4,7 @@ export {
   targetDocumentStatus,
   targetDocumentType,
   targetField,
+  targetGuidesButton,
   targetNavbar,
   targetNewDocument,
   targetPerspectiveMenu,

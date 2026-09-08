@@ -15,6 +15,12 @@ interface StoredState {
   version: number
   /** Keyed by `${userId}:${tourId}`. */
   tours: Record<string, TourRecord>
+  /**
+   * Users who have opened the guides menu at least once, mapped to when.
+   *
+   * Optional so that state written by an earlier version still reads cleanly.
+   */
+  menuOpened?: Record<string, string>
 }
 
 const emptyState = (): StoredState => ({version: SCHEMA_VERSION, tours: {}})
@@ -97,6 +103,33 @@ export function setTourStatus(
 export function mayAutoStart(userId: string | null, tourId: string): boolean {
   const status = getTourStatus(userId, tourId)
   return status !== 'dismissed' && status !== 'completed'
+}
+
+/**
+ * Whether this user has ever opened the guides menu.
+ *
+ * Used to decide whether the navbar button still needs its "there is something
+ * here" dot. Once true it stays true — the dot is a one-time pointer, not a
+ * recurring notification.
+ *
+ * @internal
+ */
+export function hasOpenedMenu(userId: string | null): boolean {
+  return Boolean(read().menuOpened?.[userId ?? 'anonymous'])
+}
+
+/**
+ * Record that the user opened the guides menu, retiring the dot for good.
+ *
+ * @internal
+ */
+export function setMenuOpened(userId: string | null): void {
+  const state = read()
+  state.menuOpened = {
+    ...state.menuOpened,
+    [userId ?? 'anonymous']: new Date().toISOString(),
+  }
+  write(state)
 }
 
 /**
