@@ -7,6 +7,11 @@ Install it and your editors get quiet, in-Studio answers to the questions they
 always ask: what the draft/published distinction means, what publishing actually
 does, where document history lives.
 
+![A guide running in Sanity Studio: a soft ring on a control in the navbar, with a small popup beside it stepping through five points](docs/tour.gif)
+
+That is the whole surface — a ring and a popup. Nothing is dimmed, no modal
+opens, and it never interrupts someone mid-sentence.
+
 ## Quickstart
 
 ```sh
