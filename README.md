@@ -65,6 +65,26 @@ Point it at a name that isn't in your schema, or leave it out of a project with
 no slug at all, and the step drops out with a console warning like any other
 missing target.
 
+## Drafting guides from your schema
+
+```bash
+npx sanity-plugin-editor-onboarding init
+```
+
+Reads your schema and drafts a field guide for every field it can classify —
+references, images, files, arrays, portable text — into a file you edit and
+commit. It leaves slugs alone, since `coreConcepts()` already explains those,
+and skips fields it cannot identify rather than guessing: Sanity's schema
+extract reports `datetime`, `text` and `string` identically.
+
+The output is a first draft. The copy is chosen from field types alone and
+knows nothing about your project, so read every guide, rewrite it in your own
+words, and delete the ones that state the obvious.
+
+The package also ships a `SKILL.md`, so an agent working in your repo can read
+your actual schema source — titles, descriptions, validation rules — and write
+better guides than any type-level heuristic can.
+
 ## Your own tours
 
 ```ts

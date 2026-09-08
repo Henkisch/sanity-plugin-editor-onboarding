@@ -28,11 +28,17 @@
       "source": "./src/index.ts",
       "default": "./dist/index.js"
     },
+    "./init": {
+      "source": "./src/init/index.ts",
+      "default": "./dist/init.js"
+    },
     "./package.json": "./package.json"
   },
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "bin",
+    "dist",
+    "SKILL.md"
   ],
   "scripts": {
     "build": "plugin-kit verify-package --silent && pkg-utils build --strict --check --clean",
@@ -80,6 +86,7 @@
     "access": "public",
     "exports": {
       ".": "./dist/index.js",
+      "./init": "./dist/init.js",
       "./package.json": "./package.json"
     }
   },
@@ -91,5 +98,8 @@
     "verifyPackage": {
       "tsconfig": false
     }
+  },
+  "bin": {
+    "sanity-plugin-editor-onboarding": "./bin/cli.mjs"
   }
 }
