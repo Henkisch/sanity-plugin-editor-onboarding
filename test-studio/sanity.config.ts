@@ -10,34 +10,38 @@ import {
 } from 'sanity-plugin-editor-onboarding'
 import {structureTool} from 'sanity/structure'
 
+import {studioLocaleBundles, studioText} from './i18n/bundle'
 import {schemaTypes} from './schemaTypes'
 
 /**
- * A developer-defined tour pointing at this Studio's own components — the
- * Phase 2 surface. Nothing here is a Sanity `data-testid`; both steps resolve
- * through ids registered in `components/SeoPanel.tsx`.
+ * A developer-defined tour pointing at this Studio's own components. Nothing
+ * here is a Sanity `data-testid`; both steps resolve through ids registered in
+ * `components/SeoPanel.tsx`.
+ *
+ * Every string is a key rather than a sentence, so this guide follows the
+ * editor's language the way the built-in ones do. The plugin translates its own
+ * chrome either way — but the words in your tour are yours, and plain strings
+ * would leave an English guide inside a Swedish Studio.
  *
  * Manual by design: the panel only exists inside an open document, so an
  * auto-starting version would find nothing on most views.
  */
 const seoTour: OnboardingTour = {
   id: 'seo-panel',
-  title: 'The SEO panel',
-  description: "A tour of this Studio's own UI, not Sanity's.",
-  unavailableMessage: 'Open a blog post first — the SEO panel is part of the document form.',
+  title: studioText('tour.seo.title'),
+  description: studioText('tour.seo.description'),
+  unavailableMessage: studioText('tour.seo.unavailable'),
   steps: [
     {
       target: targetCustom('seo-panel'),
-      title: 'Search appearance',
-      content:
-        'This panel is a custom input component belonging to this Studio. It marks itself with the useOnboardingTarget() hook, so a step can point at it without a fragile CSS selector.',
+      title: studioText('tour.seo.panel.title'),
+      content: studioText('tour.seo.panel.content'),
       placement: 'top',
     },
     {
       target: targetCustom('seo-score'),
-      title: 'How the title scores',
-      content:
-        'The badge is marked from the outside with <OnboardingTarget>, which adds no wrapper element and leaves the component untouched.',
+      title: studioText('tour.seo.score.title'),
+      content: studioText('tour.seo.score.content'),
       placement: 'bottom',
     },
   ],
@@ -80,6 +84,9 @@ export default defineConfig({
     // just the localStorage one.
     onboardingTool({fieldGuides, syncProgress: true, tours: [...coreConcepts(), seoTour]}),
   ],
+
+  // Registers this Studio's own strings alongside the plugin's.
+  i18n: {bundles: studioLocaleBundles},
 
   schema: {types: schemaTypes},
 })
