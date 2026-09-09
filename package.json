@@ -1,6 +1,6 @@
 {
   "name": "sanity-plugin-editor-onboarding",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Interactive, unobtrusive onboarding tours for Sanity Studio editors \u2014 with a zero-config library of core Sanity concepts.",
   "keywords": [
     "sanity",
