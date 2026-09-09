@@ -493,6 +493,7 @@ I cannot get on my own.
 ```bash
 npm install
 npm test          # vitest, jsdom
+npm run typecheck # tsc over src/, tests included — the build only checks what ships
 npm run dev       # the Studio in test-studio/, on :3333
 npm run build     # test-studio consumes dist/, so build before checking a change there
 npm run check:links
