@@ -193,6 +193,8 @@ Editors get stuck on fields, not on tours. Any field can carry a book icon in
 its own action row, beside the comment button; clicking it explains that field
 and nothing else — no tour, no step counter.
 
+![The Slug field in Sanity Studio with a book icon in its action row, and an open popup titled "The slug is this page's address" explaining what a slug is](https://raw.githubusercontent.com/Henkisch/sanity-plugin-editor-onboarding/main/docs/field-help.png)
+
 ```ts
 onboardingTool({
   tours: coreConcepts(),
