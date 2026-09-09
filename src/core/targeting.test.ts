@@ -1,6 +1,7 @@
 import {describe, expect, it} from 'vitest'
 
 import {
+  targetAssetBrowse,
   targetCustom,
   targetDocumentStatus,
   targetDocumentType,
@@ -73,6 +74,40 @@ describe('selectors that must not depend on the Studio language', () => {
     documentHeader('Utkast', 'Publicerad')
 
     expect(document.querySelector(targetDocumentStatus())).not.toBeNull()
+  })
+})
+
+// Studio names this button after the asset sources available, and adding one —
+// which is what installing Media Library does — changes the shape of the id
+// rather than just its suffix.
+describe('the asset browse button, however many asset sources exist', () => {
+  it('finds it on a stock Studio, with one source', () => {
+    document.body.innerHTML =
+      '<button data-testid="image-object-input-browse-button-sanity-default">Select</button>'
+
+    expect(document.querySelector(targetAssetBrowse())).not.toBeNull()
+  })
+
+  it('finds it with a custom asset source installed', () => {
+    document.body.innerHTML =
+      '<button data-testid="image-object-input-browse-button-my-dam">Select</button>'
+
+    expect(document.querySelector(targetAssetBrowse())).not.toBeNull()
+  })
+
+  // The one that was broken: `multi-` lands before `browse-button`, so a prefix
+  // match on the single-source form never sees it.
+  it('finds it once a second source makes Studio render the multi variant', () => {
+    document.body.innerHTML =
+      '<button data-testid="image-object-input-multi-browse-button">Select</button>'
+
+    expect(document.querySelector(targetAssetBrowse())).not.toBeNull()
+  })
+
+  it('matches nothing when Studio renders no browse button at all', () => {
+    document.body.innerHTML = '<button data-testid="file-input-upload-button">Upload</button>'
+
+    expect(document.querySelector(targetAssetBrowse())).toBeNull()
   })
 })
 

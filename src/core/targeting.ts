@@ -138,14 +138,24 @@ export const targetDocumentHistory = (): string =>
  * The "Select" button on an image field — the control that reuses an asset
  * already in the project rather than uploading a second copy.
  *
- * Matched by prefix because Studio suffixes the id with the asset source, which
- * changes when Media Library is installed. Present only while a document with
- * an image field is open, which is exactly when reuse can be demonstrated.
+ * Studio renders this button two different ways, and both have to be matched:
+ *
+ * - one asset source: `image-object-input-browse-button-<source>`, where the
+ *   suffix is the source's name (`sanity-default` on a stock Studio);
+ * - more than one, which is what installing Media Library or any custom asset
+ *   source causes: `image-object-input-multi-browse-button`, with `multi-`
+ *   inserted *before* `browse-button`, so a prefix match on the first form
+ *   silently misses it.
+ *
+ * With no asset sources at all Studio renders no button, and the step drops out
+ * on its own. Present only while a document with an image field is open, which
+ * is exactly when reuse can be demonstrated.
  *
  * @public
  */
 export const targetAssetBrowse = (): string =>
-  '[data-testid^="image-object-input-browse-button"]'
+  '[data-testid^="image-object-input-browse-button-"],' +
+  '[data-testid="image-object-input-multi-browse-button"]'
 
 /**
  * A document type's entry in the structure tool's list.
