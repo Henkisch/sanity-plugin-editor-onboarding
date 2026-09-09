@@ -3,14 +3,24 @@
 Short, unobtrusive guided tours for Sanity Studio editors — with a library of
 core Sanity concepts that works with **zero configuration**.
 
-Install it and your editors get in-Studio answers to the questions they
-often ask: what the draft/published distinction means, what publishing actually
-does, where document history lives.
+I build most things on Sanity these days, which means regularly handing a Studio
+to someone who has never used a CMS. Every handover has the same moment of
+doubt: will they actually get it? You can leave them to work it out, write a PDF
+nobody opens twice, or run a training session they will have forgotten in a
+fortnight. All three put the help somewhere other than where the confusion
+happens — not there at 4pm on a Tuesday when someone is staring at a field
+called "slug" wondering whether they are allowed to change it.
+
+So this puts it in the Studio: answers to the questions editors reliably ask —
+what the draft/published distinction means, what publishing actually does, why
+renaming a slug breaks links — at the moment they are looking at the thing.
 
 ![A guide running in Sanity Studio: a soft ring on a control in the navbar, with a small popup beside it stepping through five points](https://raw.githubusercontent.com/Henkisch/sanity-plugin-editor-onboarding/main/docs/tour.gif)
 
 That is the whole surface — a ring and a popup. Nothing is dimmed, no modal
-opens, and it never interrupts someone mid-sentence.
+opens, and it never interrupts someone mid-sentence. An editor who is not afraid
+of breaking something asks fewer questions and publishes more, which is really
+the point.
 
 ## Quickstart
 
@@ -469,6 +479,14 @@ unfinished one.
 - **A JSON Schema for the config.** The config is TypeScript, so your editor
   already checks it; the shipped `SKILL.md` covers what a schema could not,
   which is how to write guides worth reading.
+
+## A note on where this is
+
+It is new. It has been walked end to end in a real Studio in two languages and
+has a test suite behind it, but nobody outside this repository has used it in
+anger yet — so if you install it and something is wrong, or a guide says
+something an editor found confusing, please open an issue. That is the feedback
+I cannot get on my own.
 
 ## Contributing
 
