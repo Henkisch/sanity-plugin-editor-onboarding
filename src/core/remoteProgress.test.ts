@@ -1,6 +1,5 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest'
-
 import {type SanityClient} from 'sanity'
+import {beforeEach, describe, expect, it, vi} from 'vitest'
 
 /**
  * The module warns at most once per session, so each test gets a fresh copy
@@ -28,9 +27,7 @@ describe('reading', () => {
     const client = fakeClient({
       getDocument: vi.fn().mockResolvedValue({
         _id: 'onboarding.progress.u1',
-        tours: [
-          {_key: 'essentials', status: 'completed', updatedAt: '2026-06-01T00:00:00Z'},
-        ],
+        tours: [{_key: 'essentials', status: 'completed', updatedAt: '2026-06-01T00:00:00Z'}],
         menuOpenedAt: '2026-05-01T00:00:00Z',
       }),
     })
@@ -86,6 +83,21 @@ describe('reading', () => {
 
     expect(console.warn).toHaveBeenCalledTimes(1)
   })
+
+  it('reads resetAt off the document', async () => {
+    const {fetchProgress} = await loadStore()
+    const client = fakeClient({
+      getDocument: vi.fn().mockResolvedValue({
+        _id: 'onboarding.progress.u1',
+        tours: [],
+        resetAt: '2026-06-01T00:00:00Z',
+      }),
+    })
+
+    const {progress} = await fetchProgress(client, 'u1')
+
+    expect(progress.resetAt).toBe('2026-06-01T00:00:00Z')
+  })
 })
 
 /** Records what a transaction was asked to do, without a real client. */
@@ -93,6 +105,7 @@ function recordingClient(commit: () => Promise<unknown> = () => Promise.resolve(
   const calls = {
     createIfNotExists: [] as unknown[],
     setIfMissing: [] as unknown[],
+    set: [] as unknown[],
     unset: [] as string[][],
     insert: [] as unknown[][],
     patchedId: '',
@@ -101,6 +114,10 @@ function recordingClient(commit: () => Promise<unknown> = () => Promise.resolve(
   const patch = {
     setIfMissing(value: unknown) {
       calls.setIfMissing.push(value)
+      return patch
+    },
+    set(value: unknown) {
+      calls.set.push(value)
       return patch
     },
     unset(paths: string[]) {
@@ -252,5 +269,55 @@ describe('writing', () => {
       saveProgress(client, 'u1', {tours: {essentials: {status: 'completed', updatedAt: 'x'}}}),
     ).resolves.toBeUndefined()
     expect(console.warn).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('resetting', () => {
+  it('unsets tours when clearTours is set', async () => {
+    const {saveProgress} = await loadStore()
+    const {client, calls} = recordingClient()
+
+    await saveProgress(
+      client,
+      'u1',
+      {tours: {}, resetAt: '2026-06-01T00:00:00Z'},
+      {clearTours: true},
+    )
+
+    expect(calls.unset).toContainEqual(['tours'])
+  })
+
+  // This is the early return that used to swallow a reset entirely: no
+  // records and no menuOpenedAt used to mean nothing worth writing, but a
+  // reset with neither still has to reach the dataset.
+  it('still writes when there is nothing else to record', async () => {
+    const {saveProgress} = await loadStore()
+    const {client, calls} = recordingClient()
+
+    await saveProgress(
+      client,
+      'u1',
+      {tours: {}, resetAt: '2026-06-01T00:00:00Z'},
+      {clearTours: true},
+    )
+
+    expect(calls.patchedId).not.toBe('')
+  })
+
+  // The opposite of menuOpenedAt: a second reset must overwrite the first,
+  // not lose to it.
+  it('writes resetAt with set, not setIfMissing', async () => {
+    const {saveProgress} = await loadStore()
+    const {client, calls} = recordingClient()
+
+    await saveProgress(
+      client,
+      'u1',
+      {tours: {}, resetAt: '2026-06-01T00:00:00Z'},
+      {clearTours: true},
+    )
+
+    expect(calls.set).toContainEqual({resetAt: '2026-06-01T00:00:00Z'})
+    expect(calls.setIfMissing).not.toContainEqual({resetAt: '2026-06-01T00:00:00Z'})
   })
 })

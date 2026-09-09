@@ -9,18 +9,19 @@ import {
   hasOpenedMenu,
   mayAutoStart,
   setMenuOpened,
+  setResetAt,
   setTourStatus,
 } from './completionStore'
-import {Spotlight} from './Spotlight'
-import {StepPopover} from './StepPopover'
-import {TourErrorBoundary} from './TourErrorBoundary'
+import {collectFieldHelp, findFieldHelp, stepTarget, type FieldHelp} from './fieldHelp'
 import {checkTargets, formatReport, isDevelopment} from './healthCheck'
 import {mergeProgress, progressDiffers} from './progressSync'
 import {fetchProgress, saveProgress, PROGRESS_API_VERSION} from './remoteProgress'
+import {Spotlight} from './Spotlight'
+import {StepPopover} from './StepPopover'
+import {targetGuidesButton} from './targeting'
+import {TourErrorBoundary} from './TourErrorBoundary'
 import {type FieldGuide, type OnboardingTour, type TourStatus} from './types'
 import {UnavailableNotice} from './UnavailableNotice'
-import {collectFieldHelp, findFieldHelp, stepTarget, type FieldHelp} from './fieldHelp'
-import {targetGuidesButton} from './targeting'
 import {query, useTargetElement} from './useTargetElement'
 
 interface OnboardingContextValue {
@@ -99,7 +100,6 @@ const AUTO_START_SETTLE_MS = 1500
  * that a `querySelectorAll` per registered step is beneath notice.
  */
 const HEALTH_CHECK_INTERVAL_MS = 2000
-
 
 /** How long auto-start waits for a quiet moment before giving up entirely. */
 const AUTO_START_GIVE_UP_MS = 30_000
@@ -549,6 +549,11 @@ export function OnboardingProvider(props: {
    * Local first so the menu updates immediately, then mirrored if syncing is on.
    * Deliberately not a confirmation dialog — nothing here is content, and the
    * worst outcome is being offered a guide again.
+   *
+   * The mirror carries a `resetAt` timestamp rather than an empty write:
+   * clearing only this browser's records would leave the project's copy (and
+   * any other browser's) to hand them straight back on the next load, which
+   * is what used to make "Start over" look like a broken button.
    */
   const resetAll = useCallback(() => {
     for (const tour of tours) resetTourStatus(userId, tour.id)
@@ -556,7 +561,10 @@ export function OnboardingProvider(props: {
     offeredThisSession.current.clear()
     setStatusVersion((version) => version + 1)
 
-    if (syncProgress && userId) void saveProgress(client, userId, getUserProgress(userId))
+    if (syncProgress && userId) {
+      setResetAt(userId)
+      void saveProgress(client, userId, getUserProgress(userId), {clearTours: true})
+    }
   }, [tours, userId, syncProgress, client])
 
   const markMenuOpened = useCallback(() => {
@@ -612,10 +620,7 @@ export function OnboardingProvider(props: {
         </TourErrorBoundary>
       )}
       {activeFieldHelp && (
-        <TourErrorBoundary
-          onError={closeFieldHelp}
-          tourId={`field:${activeFieldHelp.field}`}
-        >
+        <TourErrorBoundary onError={closeFieldHelp} tourId={`field:${activeFieldHelp.field}`}>
           <FieldHelpRunner help={activeFieldHelp} onClose={closeFieldHelp} />
         </TourErrorBoundary>
       )}

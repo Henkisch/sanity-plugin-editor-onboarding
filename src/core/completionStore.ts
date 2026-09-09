@@ -22,6 +22,13 @@ interface StoredState {
    * Optional so that state written by an earlier version still reads cleanly.
    */
   menuOpened?: Record<string, string>
+  /**
+   * Users who have chosen "Start over" at least once, mapped to when they last
+   * did.
+   *
+   * Optional so that state written by an earlier version still reads cleanly.
+   */
+  resetAt?: Record<string, string>
 }
 
 const emptyState = (): StoredState => ({version: SCHEMA_VERSION, tours: {}})
@@ -63,7 +70,8 @@ function write(state: StoredState): void {
   }
 }
 
-const keyFor = (userId: string | null, tourId: string): string => `${userId ?? 'anonymous'}:${tourId}`
+const keyFor = (userId: string | null, tourId: string): string =>
+  `${userId ?? 'anonymous'}:${tourId}`
 
 /**
  * How the given user last left the given tour, or `null` if they never have.
@@ -134,6 +142,23 @@ export function setMenuOpened(userId: string | null): void {
 }
 
 /**
+ * Record that the user chose "Start over" now, and return that timestamp so
+ * the caller can mirror the same value elsewhere rather than reading it back.
+ *
+ * @internal
+ */
+export function setResetAt(userId: string | null): string {
+  const state = read()
+  const resetAt = new Date().toISOString()
+  state.resetAt = {
+    ...state.resetAt,
+    [userId ?? 'anonymous']: resetAt,
+  }
+  write(state)
+  return resetAt
+}
+
+/**
  * This user's progress, in the shape the project-side store uses.
  *
  * The local store keys every user's tours in one map; a synced document holds
@@ -151,7 +176,13 @@ export function getUserProgress(userId: string | null): UserProgress {
   }
 
   const menuOpenedAt = state.menuOpened?.[userId ?? 'anonymous']
-  return menuOpenedAt ? {tours, menuOpenedAt} : {tours}
+  const resetAt = state.resetAt?.[userId ?? 'anonymous']
+
+  return {
+    tours,
+    ...(menuOpenedAt ? {menuOpenedAt} : {}),
+    ...(resetAt ? {resetAt} : {}),
+  }
 }
 
 /**
@@ -160,18 +191,37 @@ export function getUserProgress(userId: string | null): UserProgress {
  * Other users' records in the same browser are left untouched: a shared machine
  * must not have one person's sync wipe another's state.
  *
+ * This expects the complete merged picture for this user, not a partial one:
+ * any of this user's records missing from `progress.tours` are deleted, not
+ * left alone. That is what lets a reset propagate — a merge that dropped a
+ * record because of a reset must not find it still here on the next read —
+ * so a caller with only a subset of this user's tours must not call this.
+ *
  * @internal
  */
 export function setUserProgress(userId: string | null, progress: UserProgress): void {
   const state = read()
   const owner = userId ?? 'anonymous'
+  const prefix = `${owner}:`
 
   for (const [tourId, record] of Object.entries(progress.tours)) {
     state.tours[keyFor(userId, tourId)] = record
   }
 
+  // Anything this user has locally that the merged picture no longer carries
+  // was dropped deliberately — most often by a reset elsewhere — and must not
+  // survive here, or a second device could hand it straight back.
+  for (const key of Object.keys(state.tours)) {
+    if (!key.startsWith(prefix)) continue
+    if (!(key.slice(prefix.length) in progress.tours)) delete state.tours[key]
+  }
+
   if (progress.menuOpenedAt) {
     state.menuOpened = {...state.menuOpened, [owner]: progress.menuOpenedAt}
+  }
+
+  if (progress.resetAt) {
+    state.resetAt = {...state.resetAt, [owner]: progress.resetAt}
   }
 
   write(state)
