@@ -416,6 +416,30 @@ describe('field help', () => {
     expect(screen.getByText('Slug help')).toBeTruthy()
     expect(session.onboarding.activeTourId).toBe(tour.id)
   })
+
+  // The bug this replaces: both popups bound Escape to the document, so
+  // dismissing a field's guide also ended the tour behind it — the plugin
+  // taking something away from an editor who asked for one small thing.
+  it('closes only the field guide, leaving the tour behind it running', () => {
+    setFixture(`
+      <div data-testid="studio-navbar">navbar</div>
+      <div data-testid="field-slug">field</div>
+    `)
+    const tour = makeTour()
+    const guide: FieldGuide = {field: 'slug', title: 'Slug help', content: 'Explains slugs'}
+    const session = renderProvider({tours: [tour], fieldGuides: [guide]})
+
+    act(() => session.onboarding.startTour(tour.id))
+    const help = session.onboarding.fieldHelpFor('slug', undefined)
+    if (!help) throw new Error('expected field help to be registered for "slug"')
+    act(() => session.onboarding.showFieldHelp(help))
+
+    fireEvent.keyDown(document, {key: 'Escape'})
+
+    expect(screen.queryByText('Slug help')).toBeNull()
+    expect(screen.getByText('Step one')).toBeTruthy()
+    expect(getTourStatus('u1', tour.id)).toBeNull()
+  })
 })
 
 describe('start over', () => {

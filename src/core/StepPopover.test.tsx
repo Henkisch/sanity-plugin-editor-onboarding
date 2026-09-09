@@ -1,6 +1,6 @@
-import {cleanup, fireEvent, render, screen} from '@testing-library/react'
 import {ThemeProvider} from '@sanity/ui'
 import {buildTheme} from '@sanity/ui/theme'
+import {cleanup, fireEvent, render, screen} from '@testing-library/react'
 import {afterEach, describe, expect, it, vi} from 'vitest'
 
 import {StepPopover, type StepPopoverProps} from './StepPopover'
@@ -102,6 +102,85 @@ describe('keyboard', () => {
     fireEvent.keyDown(document, {key: 'Escape'})
 
     expect(onSkip).not.toHaveBeenCalled()
+  })
+})
+
+// A field's own guide can open on top of a running tour, and both bind
+// Escape to the document — where a sibling listener cannot be stopped by
+// `stopPropagation`. Without a precedence rule, dismissing the guide also
+// ended the tour underneath it, taking something away the editor never
+// asked to lose.
+describe('two popups at once', () => {
+  function makeProps(overrides: Partial<StepPopoverProps> = {}): StepPopoverProps {
+    return {
+      step: {title: 'Drafts and published', content: 'Every document has a draft.'},
+      index: 0,
+      total: 3,
+      referenceElement: null,
+      onNext: vi.fn(),
+      onSkip: vi.fn(),
+      onDismissForever: vi.fn(),
+      ...overrides,
+    }
+  }
+
+  it('a standalone popup takes Escape from a tour, leaving the tour running', () => {
+    const tourProps = makeProps()
+    const fieldProps = makeProps({standalone: true, total: 1})
+
+    render(
+      <ThemeProvider theme={theme}>
+        <StepPopover {...tourProps} />
+        <StepPopover {...fieldProps} />
+      </ThemeProvider>,
+    )
+
+    fireEvent.keyDown(document, {key: 'Escape'})
+
+    expect(fieldProps.onNext).toHaveBeenCalled()
+    expect(tourProps.onSkip).not.toHaveBeenCalled()
+  })
+
+  it('once the standalone popup is gone, Escape reaches the tour again', () => {
+    const tourProps = makeProps()
+    const fieldProps = makeProps({standalone: true, total: 1})
+
+    const {rerender} = render(
+      <ThemeProvider theme={theme}>
+        <StepPopover {...tourProps} />
+        <StepPopover {...fieldProps} />
+      </ThemeProvider>,
+    )
+
+    rerender(
+      <ThemeProvider theme={theme}>
+        <StepPopover {...tourProps} />
+      </ThemeProvider>,
+    )
+
+    fireEvent.keyDown(document, {key: 'Escape'})
+
+    expect(tourProps.onSkip).toHaveBeenCalled()
+  })
+
+  // Not reachable in the product today — nothing but a field guide can ever
+  // sit above a tour — but this is exactly what `ownsEscape`'s fallback
+  // branch decides, so it is worth pinning on its own.
+  it('between two non-standalone popups, the last mounted wins', () => {
+    const firstProps = makeProps()
+    const secondProps = makeProps()
+
+    render(
+      <ThemeProvider theme={theme}>
+        <StepPopover {...firstProps} />
+        <StepPopover {...secondProps} />
+      </ThemeProvider>,
+    )
+
+    fireEvent.keyDown(document, {key: 'Escape'})
+
+    expect(secondProps.onSkip).toHaveBeenCalled()
+    expect(firstProps.onSkip).not.toHaveBeenCalled()
   })
 })
 

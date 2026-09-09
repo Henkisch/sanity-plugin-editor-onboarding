@@ -172,6 +172,30 @@ function StepBody(props: StepPopoverProps & {elevated: boolean}): React.JSX.Elem
 }
 
 /**
+ * Every step popup currently mounted, in mount order.
+ *
+ * A field's own guide can open on top of a running tour — that is the point of
+ * it — and both bind Escape to the document, where `stopPropagation` does
+ * nothing about a sibling listener on the same node. Without this, one Escape
+ * closed the guide and ended the tour underneath it in the same keystroke.
+ */
+const openPopovers: {token: string; standalone: boolean}[] = []
+
+/**
+ * Whether this popup is the one Escape should reach.
+ *
+ * A standalone popup always wins while it is open: it is the only kind that
+ * can sit above a tour, and it is the one the editor is looking at. Otherwise
+ * the most recently mounted wins — which matters because a tour's popup
+ * remounts on every step, and mount order alone would hand precedence back to
+ * a tour that a field guide is sitting on top of.
+ */
+function ownsEscape(token: string, standalone: boolean): boolean {
+  if (openPopovers.some((entry) => entry.standalone)) return standalone
+  return openPopovers.at(-1)?.token === token
+}
+
+/**
  * The step popup itself.
  *
  * When anchored, this is a Sanity UI `Popover`, so it inherits the Studio's
@@ -180,13 +204,28 @@ function StepBody(props: StepPopoverProps & {elevated: boolean}): React.JSX.Elem
  */
 export function StepPopover(props: StepPopoverProps): React.JSX.Element {
   const {referenceElement, step, standalone, onNext, onSkip} = props
+  const token = useId()
+
+  // Registered in its own effect, keyed only on `token`, so a callback prop
+  // changing identity can never re-fire this and duplicate the entry.
+  useEffect(() => {
+    const entry = {token, standalone: Boolean(standalone)}
+    openPopovers.push(entry)
+    return () => {
+      const index = openPopovers.indexOf(entry)
+      if (index !== -1) openPopovers.splice(index, 1)
+    }
+  }, [token, standalone])
 
   // Escape leaves, the way it does everywhere else in a Studio. Bound to the
   // document rather than the popup so it still works when focus has moved on —
   // being unable to dismiss something is worse than dismissing it by accident.
+  // Which of several open popups this Escape belongs to is decided below,
+  // since `stopPropagation` cannot stop a sibling listener on the same node.
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return
+      if (!ownsEscape(token, Boolean(standalone))) return
       event.stopPropagation()
       // A standalone step has nothing to skip: closing is the only exit.
       if (standalone) onNext()
@@ -195,7 +234,7 @@ export function StepPopover(props: StepPopoverProps): React.JSX.Element {
 
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [standalone, onNext, onSkip])
+  }, [token, standalone, onNext, onSkip])
 
   if (!referenceElement) {
     return (
