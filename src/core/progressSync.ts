@@ -24,6 +24,15 @@ export interface UserProgress {
   tours: Record<string, TourRecord>
   /** When this user first opened the guides menu, if they have. */
   menuOpenedAt?: string
+  /**
+   * When this user last chose "Start over", if they have.
+   *
+   * A reset has to be able to travel: clearing only this browser's records
+   * leaves the project's copy — and any other browser's — to hand them
+   * straight back on the next merge. A timestamp is what lets a merge tell
+   * "never had a record" apart from "deliberately cleared it".
+   */
+  resetAt?: string
 }
 
 export const emptyProgress = (): UserProgress => ({tours: {}})
@@ -48,6 +57,19 @@ export function newerRecord(a?: TourRecord, b?: TourRecord): TourRecord | undefi
 }
 
 /**
+ * Whether a record predates the reset that should have removed it.
+ *
+ * Strictly newer survives, so a record written in the same millisecond as the
+ * reset — or with a timestamp that will not parse — is dropped rather than
+ * resurrected. Losing one record is recoverable; a guide someone cleared
+ * coming back is the bug this exists to prevent.
+ */
+function clearedByReset(record: TourRecord, resetAt: string | undefined): boolean {
+  if (!resetAt) return false
+  return !(Date.parse(record.updatedAt) > Date.parse(resetAt))
+}
+
+/**
  * One view of a user's progress from two.
  *
  * Last write wins per tour, rather than per document: two browsers that each
@@ -57,21 +79,34 @@ export function newerRecord(a?: TourRecord, b?: TourRecord): TourRecord | undefi
  * `menuOpenedAt` keeps the earliest known value. It only decides whether to
  * show a one-time dot, and having opened the menu is not something that can
  * stop being true.
+ *
+ * `resetAt` keeps the latest known value instead — the opposite rule — because
+ * the most recent "Start over" is the one whose effect should stick, and any
+ * record from before it is dropped rather than merged in.
  */
 export function mergeProgress(local: UserProgress, remote: UserProgress): UserProgress {
+  const resetAt = [local.resetAt, remote.resetAt]
+    .filter((value): value is string => typeof value === 'string')
+    .sort()
+    .at(-1)
+
   const tourIds = new Set([...Object.keys(local.tours), ...Object.keys(remote.tours)])
 
   const tours: Record<string, TourRecord> = {}
   for (const id of tourIds) {
     const record = newerRecord(local.tours[id], remote.tours[id])
-    if (record) tours[id] = record
+    if (record && !clearedByReset(record, resetAt)) tours[id] = record
   }
 
   const opened = [local.menuOpenedAt, remote.menuOpenedAt].filter(
     (value): value is string => typeof value === 'string',
   )
 
-  return opened.length > 0 ? {tours, menuOpenedAt: opened.sort()[0]} : {tours}
+  return {
+    tours,
+    ...(opened.length > 0 ? {menuOpenedAt: opened.sort()[0]} : {}),
+    ...(resetAt ? {resetAt} : {}),
+  }
 }
 
 /**
@@ -83,6 +118,7 @@ export function mergeProgress(local: UserProgress, remote: UserProgress): UserPr
  */
 export function progressDiffers(previous: UserProgress, next: UserProgress): boolean {
   if (previous.menuOpenedAt !== next.menuOpenedAt) return true
+  if (previous.resetAt !== next.resetAt) return true
 
   const ids = new Set([...Object.keys(previous.tours), ...Object.keys(next.tours)])
   for (const id of ids) {

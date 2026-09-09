@@ -96,12 +96,51 @@ describe('mergeProgress', () => {
   })
 
   it('remembers the menu was opened when only one side saw it', () => {
-    expect(mergeProgress({tours: {}}, {tours: {}, menuOpenedAt: '2026-01-01T00:00:00Z'})
-      .menuOpenedAt).toBe('2026-01-01T00:00:00Z')
+    expect(
+      mergeProgress({tours: {}}, {tours: {}, menuOpenedAt: '2026-01-01T00:00:00Z'}).menuOpenedAt,
+    ).toBe('2026-01-01T00:00:00Z')
   })
 
   it('leaves menuOpenedAt off entirely when neither side has it', () => {
     expect('menuOpenedAt' in mergeProgress(emptyProgress(), emptyProgress())).toBe(false)
+  })
+
+  // The bug this whole mechanism exists to close: a reset that clears one
+  // browser must not be undone by a record the other side still remembers.
+  it('drops a record older than a reset', () => {
+    const local: UserProgress = {
+      tours: {essentials: at('2026-01-01T00:00:00Z')},
+      resetAt: '2026-06-01T00:00:00Z',
+    }
+    const remote: UserProgress = {tours: {}}
+
+    expect(mergeProgress(local, remote).tours).toEqual({})
+  })
+
+  it('keeps a record newer than a reset — finishing a guide after resetting sticks', () => {
+    const local: UserProgress = {tours: {}, resetAt: '2026-01-01T00:00:00Z'}
+    const remote: UserProgress = {tours: {essentials: at('2026-06-01T00:00:00Z')}}
+
+    expect(mergeProgress(local, remote).tours.essentials.status).toBe('completed')
+  })
+
+  it('takes the later of two resetAt values, and carries it on the result', () => {
+    const local: UserProgress = {tours: {}, resetAt: '2026-06-01T00:00:00Z'}
+    const remote: UserProgress = {tours: {}, resetAt: '2026-01-01T00:00:00Z'}
+
+    expect(mergeProgress(local, remote).resetAt).toBe('2026-06-01T00:00:00Z')
+  })
+
+  // A record that cannot be dated is treated as older than the reset, not
+  // newer: resurrecting it would be worse than losing it.
+  it('drops a record with an unparseable updatedAt rather than resurrecting it', () => {
+    const local: UserProgress = {
+      tours: {essentials: at('nonsense')},
+      resetAt: '2026-01-01T00:00:00Z',
+    }
+    const remote: UserProgress = {tours: {}}
+
+    expect(mergeProgress(local, remote).tours).toEqual({})
   })
 })
 
@@ -114,9 +153,9 @@ describe('progressDiffers', () => {
   })
 
   it('is true when a guide was added', () => {
-    expect(
-      progressDiffers({tours: {}}, {tours: {essentials: at('2026-06-01T00:00:00Z')}}),
-    ).toBe(true)
+    expect(progressDiffers({tours: {}}, {tours: {essentials: at('2026-06-01T00:00:00Z')}})).toBe(
+      true,
+    )
   })
 
   it('is true when a status changed', () => {
@@ -132,6 +171,10 @@ describe('progressDiffers', () => {
     expect(progressDiffers({tours: {}}, {tours: {}, menuOpenedAt: '2026-01-01T00:00:00Z'})).toBe(
       true,
     )
+  })
+
+  it('is true when only resetAt changed', () => {
+    expect(progressDiffers({tours: {}}, {tours: {}, resetAt: '2026-01-01T00:00:00Z'})).toBe(true)
   })
 })
 
@@ -161,7 +204,7 @@ describe('the keyed-array storage shape', () => {
   it('round-trips progress through the stored shape', () => {
     const progress = {
       tours: {
-        essentials: {status: 'completed' as const, updatedAt: '2026-06-01T00:00:00Z'},
+        'essentials': {status: 'completed' as const, updatedAt: '2026-06-01T00:00:00Z'},
         'seo-panel': {status: 'skipped' as const, updatedAt: '2026-06-02T00:00:00Z', stepIndex: 2},
       },
     }

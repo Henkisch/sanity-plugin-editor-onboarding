@@ -2,11 +2,14 @@ import {afterEach, describe, expect, it, vi} from 'vitest'
 
 import {
   getTourStatus,
+  getUserProgress,
   hasOpenedMenu,
   mayAutoStart,
   resetTourStatus,
   setMenuOpened,
+  setResetAt,
   setTourStatus,
+  setUserProgress,
 } from './completionStore'
 
 const STORAGE_KEY = 'sanity-plugin-editor-onboarding:v1'
@@ -104,6 +107,35 @@ describe('resetting', () => {
     resetTourStatus('user-1', 'essentials')
 
     expect(getTourStatus('user-1', 'publishing')).toBe('dismissed')
+  })
+})
+
+describe('resetAt', () => {
+  it('is readable back through getUserProgress', () => {
+    const resetAt = setResetAt('user-1')
+
+    expect(getUserProgress('user-1').resetAt).toBe(resetAt)
+  })
+})
+
+describe('setUserProgress', () => {
+  it("removes this user's records that are absent from the progress it is given", () => {
+    setTourStatus('user-1', 'essentials', 'completed')
+
+    setUserProgress('user-1', {tours: {}})
+
+    expect(getTourStatus('user-1', 'essentials')).toBeNull()
+  })
+
+  // The regression that matters most here: a shared machine must not have one
+  // person's reset wipe another's state.
+  it("leaves a different user's records alone while pruning this one's", () => {
+    setTourStatus('user-1', 'essentials', 'completed')
+    setTourStatus('user-2', 'essentials', 'completed')
+
+    setUserProgress('user-1', {tours: {}})
+
+    expect(getTourStatus('user-2', 'essentials')).toBe('completed')
   })
 })
 

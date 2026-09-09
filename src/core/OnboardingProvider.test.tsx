@@ -15,7 +15,11 @@ const theme = buildTheme()
  * reassign in `beforeEach` rather than values captured once at import time.
  */
 let currentUser: {id: string; roles: {name: string}[]} | null
-let fakeClient: {getDocument: (id: string) => Promise<undefined>}
+let fakeClient: {
+  getDocument: (id: string) => Promise<undefined>
+  /** Only present for the sync tests, which drive a reset through a real patch. */
+  transaction?: () => unknown
+}
 
 // The plugin's own strings come from Sanity's i18n, which needs a Studio. These
 // tests are about structure and behaviour, so the raw keys are enough — except
@@ -479,5 +483,59 @@ describe('start over', () => {
     } finally {
       vi.useRealTimers()
     }
+  })
+
+  // The bug this replaces: reset cleared the browser and left the project's copy
+  // intact, so the next page load merged every "completed" straight back in and
+  // the menu item read as broken.
+  it('does not resurrect a reset guide on the next load', () => {
+    /** Records what a transaction was asked to do, so the mirrored write can be inspected. */
+    const patchCalls = {unset: [] as string[][], set: [] as unknown[]}
+    const patch = {
+      unset(paths: string[]) {
+        patchCalls.unset.push(paths)
+        return patch
+      },
+      setIfMissing() {
+        return patch
+      },
+      set(value: unknown) {
+        patchCalls.set.push(value)
+        return patch
+      },
+      insert() {
+        return patch
+      },
+    }
+    const transaction = {
+      createIfNotExists() {
+        return transaction
+      },
+      patch(_id: string, build: (p: typeof patch) => typeof patch) {
+        build(patch)
+        return transaction
+      },
+      commit: () => Promise.resolve({}),
+    }
+
+    const tour = makeTour()
+    setTourStatus('u1', tour.id, 'completed')
+    fakeClient = {
+      getDocument: () => Promise.resolve(undefined),
+      transaction: () => transaction,
+    }
+
+    const {onboarding} = renderProvider({tours: [tour], syncProgress: true})
+    act(() => onboarding.resetAll())
+
+    // The round trip itself — that a record dated before `resetAt` is dropped
+    // on the next merge — is covered by `progressSync.test.ts`. This only
+    // checks that `resetAll` sends the patch those unit tests assume exists.
+    expect(patchCalls.unset).toContainEqual(['tours'])
+    expect(
+      patchCalls.set.some(
+        (value) => typeof value === 'object' && value !== null && 'resetAt' in value,
+      ),
+    ).toBe(true)
   })
 })
