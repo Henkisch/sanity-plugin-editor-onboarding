@@ -1,7 +1,7 @@
 {
   "name": "sanity-plugin-editor-onboarding",
   "version": "1.0.2",
-  "description": "Interactive, unobtrusive onboarding tours for Sanity Studio editors \u2014 with a zero-config library of core Sanity concepts.",
+  "description": "Interactive, unobtrusive onboarding tours for Sanity Studio editors — with a zero-config library of core Sanity concepts.",
   "keywords": [
     "sanity",
     "sanity-plugin",
@@ -70,7 +70,7 @@
     "oxlint-tsgolint": "^7.0.2001",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "sanity": "^6.12.0",
+    "sanity": "^6.16.0",
     "styled-components": "^6.5.3",
     "typescript": "^6.0.3",
     "vitest": "^3.2.7"
