@@ -99,8 +99,10 @@ Ask the maintainer for values rather than inventing any.
 
 ## Do not
 
-- Run `npm publish` or `npm version` — publishing needs a real terminal for
-  npm's 2FA and is the maintainer's call, never an agent's.
+- Run `npm publish` or `npm version`. Releases are cut by semantic-release in
+  CI on every merge to `main` (`.github/workflows/ci.yml`, npm trusted
+  publishing). The version comes from commit types, so write conventional
+  commits: `fix:` → patch, `feat:` → minor.
 - Add a runtime dependency. The plugin ships only `@sanity/icons` and
   `@sanity/ui`, both already present in every Studio.
 - Add a dimmed backdrop, a modal, or an animation flourish.

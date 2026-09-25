@@ -22,3 +22,34 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+
+  # Publishes to npm via trusted publishing (OIDC) — no NPM_TOKEN. The trusted
+  # publisher on npmjs.com is bound to this repo and this file name, so renaming
+  # ci.yml breaks publishing. semantic-release decides whether there is anything
+  # to release: a push carrying only `chore:`/`docs:`/`ci:` commits is a no-op.
+  # The release commit it pushes back carries `[skip ci]`, which is what keeps
+  # this from re-triggering itself.
+  release:
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # to push the release commit and tag, and publish a GitHub release
+      issues: write # to comment on released issues
+      pull-requests: write # to comment on released pull requests
+      id-token: write # for npm trusted publishing and provenance
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # semantic-release analyzes every commit since the last release
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          # Trusted publishing needs npm >= 11.5.1; Node 22 ships npm 10.
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm audit signatures
+      - run: npx --no-install semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
