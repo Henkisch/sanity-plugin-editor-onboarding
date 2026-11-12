@@ -34,8 +34,8 @@ const enUS = {
   'tour.essentials.description': 'Drafts, published content, and finding your way around',
   'tour.essentials.intro.title': 'Getting around Sanity Studio',
   'tour.essentials.intro.content':
-    'Four quick steps, and you can leave whenever you like. Everything here stays available '
-    + 'under the book icon in the top bar.',
+    'Four quick steps, and you can leave whenever you like. Everything here stays available ' +
+    'under the book icon in the top bar.',
   'tour.essentials.drafts.title': 'Drafts and published content',
   'tour.essentials.drafts.content':
     'Every document has a draft you edit and a published version your site reads. This switches the whole Studio between the two, so you can see exactly what is live.',
@@ -59,9 +59,9 @@ const enUS = {
     'Edits save as you type — there is no save button. These chips switch between the draft you are working on and the version that is currently live.',
   'tour.publishing.slug.title': 'The slug is this page’s address',
   'tour.publishing.slug.content':
-    'A slug is the last part of a web address — everything after your domain name. It is '
-    + 'usually built from the title, so you rarely need to write one yourself. Changing it '
-    + 'later changes the link, and anything already pointing at the old address stops working.',
+    'A slug is the last part of a web address — everything after your domain name. It is ' +
+    'usually built from the title, so you rarely need to write one yourself. Changing it ' +
+    'later changes the link, and anything already pointing at the old address stops working.',
   'tour.publishing.publish.title': 'Publishing makes it live',
   'tour.publishing.publish.content':
     'Your edits stay in the draft until you publish. Publishing copies the draft over the published version your site reads.',
@@ -97,6 +97,32 @@ const enUS = {
   'tour.media.assets.title': 'Upload once, use anywhere',
   'tour.media.assets.content':
     'Images and files live in a shared library rather than inside the document you uploaded them to, so the same asset can be reused across the site without a second copy.',
+
+  // — Convention finder (developer-only tool) —
+  'conventions.heading': 'Conventions',
+  'conventions.intro':
+    'Finds patterns your editors already follow in published content and turns the ones you choose into field guides. Nothing reaches editors until you paste the code into your config.',
+  'conventions.type-label': 'Document type',
+  'conventions.run': 'Find conventions',
+  'conventions.running': 'Looking for patterns…',
+  'conventions.cost':
+    'Sends up to {{limit}} published documents, shortened, to Sanity’s AI. One request, billed to this project’s AI credits.',
+  // i18next picks the form from `count`.
+  'conventions.too-few_one':
+    'This type has {{count}} published document. At least {{min}} are needed before anything can count as a pattern.',
+  'conventions.too-few_other':
+    'This type has {{count}} published documents. At least {{min}} are needed before anything can count as a pattern.',
+  'conventions.none':
+    'No conventions found. That is a valid answer: nothing here follows a pattern the field descriptions don’t already state.',
+  'conventions.evidence': 'Seen in {{count}} of {{total}}',
+  'conventions.select-hint': 'Tick the ones worth showing editors, then copy them as code.',
+  'conventions.copy': 'Copy as fieldGuides code',
+  'conventions.copied': 'Copied. Paste it into the fieldGuides array in sanity.config.ts.',
+  'conventions.error.ai-disabled':
+    'AI features are turned off for this organization. An owner can turn them on at sanity.io/manage.',
+  'conventions.error.quota': 'This project has used up its AI credits or reached its AI budget.',
+  'conventions.error.session': 'Your session has expired. Reload the Studio and sign in again.',
+  'conventions.error.unknown': 'The request failed. Details are in the browser console.',
 }
 
 export default enUS

@@ -112,6 +112,15 @@ validation rules the extract throws away, and you can see which fields have
 options an editor would find surprising. That is where the good guides come
 from.
 
+## Finding conventions in existing content
+
+`conventionFinder: true` adds a Conventions tool (administrators and developers
+only) that reads published documents and suggests guides for patterns editors
+already follow. It runs on Sanity's AI and costs the project AI credits, so
+only turn it on when the developer asks. Its output is `fieldGuides` code for a
+human to review. Do not use it, or anything else, to restate a field's
+`description`: the Studio already shows that under the label.
+
 ## Localization
 
 Every string can be a plain string or a bundle key:

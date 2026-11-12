@@ -100,6 +100,39 @@ The package also ships a `SKILL.md`, so an agent working in your repo can read
 your actual schema source — titles, descriptions, validation rules — and write
 better guides than any type-level heuristic can.
 
+## Finding the conventions your editors already follow
+
+```ts
+onboardingTool({tours: coreConcepts(), conventionFinder: true})
+```
+
+Adds a **Conventions** tool for administrators and developers. Pick a document
+type and it reads up to twelve published documents, measures how each field is
+filled in, and asks Sanity's AI for the patterns most of them follow but no
+field description states — every SEO title ending in the brand name,
+durations always in quarter hours, price variants always ordered small to large.
+Tick the ones worth telling a new editor and copy them as `fieldGuides` code.
+
+It deliberately does not explain fields. An earlier version tried, and on a
+well-documented schema it mostly rephrased descriptions the Studio already
+prints under every label. The patterns in the content are the one thing nobody
+has written down.
+
+- **Off by default.** Each run is one Agent Actions request, billed to the
+  project's AI credits, and sends the shortened documents to Sanity's AI. It
+  runs on the logged-in user's session: no token, nothing in the bundle.
+- **Nothing reaches an editor by itself.** The output is code you review,
+  commit and deploy like any other change. No documents are written.
+- **Thin evidence is dropped.** A pattern seen in fewer than three documents is
+  discarded, and a type with fewer than three published documents is not sent
+  at all.
+- **Roles and language are configurable:**
+  `conventionFinder: {roles: ['administrator'], language: 'Svenska (sv-SE)'}`.
+  The language defaults to the Studio's own.
+
+Agent Actions are experimental in Sanity, and AI features can be switched off
+per organization; the tool says so when that is why a run failed.
+
 ## Your own tours
 
 ```ts

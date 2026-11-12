@@ -224,4 +224,37 @@ export interface OnboardingConfig {
    * @defaultValue true
    */
   navbarButton?: boolean
+  /**
+   * Add a "Conventions" tool that finds patterns your editors already follow
+   * in published content and turns the ones you pick into `fieldGuides` code.
+   *
+   * Off by default: each run sends up to twelve published documents, shortened,
+   * to Sanity's AI and is billed to the project's AI credits. Only users with
+   * one of `roles` see the tool, and nothing it finds reaches an editor until a
+   * developer pastes the code into this config.
+   *
+   * @defaultValue false
+   */
+  conventionFinder?: boolean | ConventionFinderOptions
+}
+
+/**
+ * Options for {@link OnboardingConfig.conventionFinder}.
+ *
+ * @public
+ */
+export interface ConventionFinderOptions {
+  /**
+   * Role names that see the tool.
+   *
+   * @defaultValue ['administrator', 'developer']
+   */
+  roles?: string[]
+  /**
+   * The language guides are written in, e.g. `'Svenska (sv-SE)'`.
+   *
+   * Defaults to the Studio's current language. Set it when you run the Studio
+   * in English but your editors read it in another language.
+   */
+  language?: string
 }

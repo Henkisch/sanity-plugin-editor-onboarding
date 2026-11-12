@@ -1,7 +1,7 @@
 import {type DraftedGuide} from './drafts'
 
 /** A TypeScript string literal, safe for any content. @internal */
-function literal(value: string): string {
+export function literal(value: string): string {
   return `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
 }
 

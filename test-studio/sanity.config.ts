@@ -87,7 +87,14 @@ export default defineConfig({
     // Phase 1's zero-config library, plus a Phase 2 tour of local components.
     // Progress is synced here so the dataset-backed path gets exercised, not
     // just the localStorage one.
-    onboardingTool({fieldGuides, syncProgress: true, tours: [...coreConcepts(), seoTour]}),
+    onboardingTool({
+      fieldGuides,
+      syncProgress: true,
+      tours: [...coreConcepts(), seoTour],
+      // Too little content here to find anything, which is the point: this
+      // exercises the "too few documents" path without spending credits.
+      conventionFinder: true,
+    }),
   ],
 
   // Registers this Studio's own strings alongside the plugin's.

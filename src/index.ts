@@ -20,6 +20,7 @@ export {
 export type {
   AutoStart,
   AutoStartContext,
+  ConventionFinderOptions,
   FieldGuide,
   OnboardingConfig,
   OnboardingStep,
