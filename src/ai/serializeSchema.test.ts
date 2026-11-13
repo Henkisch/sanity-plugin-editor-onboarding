@@ -128,6 +128,25 @@ describe('serializeSchema', () => {
     expect(field(fieldsOf([post, seo, author], 'post'), 'seo.title')).toBeDefined()
   })
 
+  it('marks image fields as images whatever they are named, so a tour can find one', () => {
+    const imageWithAlt = {name: 'imageWithAlt', type: 'image', fields: []}
+    const doc = {
+      name: 'doc',
+      type: 'document',
+      fields: [
+        {name: 'cover', type: 'image'},
+        {name: 'hero', type: 'imageWithAlt'},
+        {name: 'pdf', type: 'file'},
+        {name: 'title', type: 'string'},
+      ],
+    }
+    const fields = fieldsOf([doc, imageWithAlt], 'doc')
+    expect(field(fields, 'cover')?.asset).toBe('image')
+    expect(field(fields, 'hero')?.asset).toBe('image')
+    expect(field(fields, 'pdf')?.asset).toBe('file')
+    expect(field(fields, 'title')?.asset).toBeUndefined()
+  })
+
   it("includes a project's own image fields but not the Studio's asset plumbing", () => {
     const paths = fieldsOf([post, seo, author], 'post').map((candidate) => candidate.path)
     expect(paths).toContain('coverImage.alt')

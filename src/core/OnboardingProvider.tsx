@@ -3,6 +3,7 @@ import {SANITY_VERSION, useClient, useCurrentUser} from 'sanity'
 
 import {
   getTourStatus,
+  clearTourStatus,
   getUserProgress,
   resetTourStatus,
   setUserProgress,
@@ -37,6 +38,8 @@ interface OnboardingContextValue {
   markMenuOpened: () => void
   /** Forget every guide's status, so they behave as never seen. */
   resetAll: () => void
+  /** Forget one guide's status, so it behaves as never seen. */
+  resetTour: (tourId: string) => void
   /** The help for one field, if any is declared. Drives the field's book icon. */
   fieldHelpFor: (fieldName: string, documentType: string | undefined) => FieldHelp | undefined
   /** Show one field's help on its own, outside any tour. */
@@ -576,6 +579,20 @@ export function OnboardingProvider(props: {
     }
   }, [tours, userId, syncProgress, client])
 
+  /**
+   * Start over for one guide. Mirrored like any other status change, since a
+   * `reset` record is just the newest record for that guide.
+   */
+  const resetTour = useCallback(
+    (tourId: string) => {
+      clearTourStatus(userId, tourId)
+      offeredThisSession.current.delete(tourId)
+      setStatusVersion((version) => version + 1)
+      if (syncProgress && userId) void saveProgress(client, userId, getUserProgress(userId))
+    },
+    [userId, syncProgress, client],
+  )
+
   const markMenuOpened = useCallback(() => {
     setMenuOpened(userId)
     setMenuVersion((version) => version + 1)
@@ -594,6 +611,7 @@ export function OnboardingProvider(props: {
       showMenuHint: !menuOpened && tours.length > 0,
       markMenuOpened,
       resetAll,
+      resetTour,
       fieldHelpFor,
       showFieldHelp,
     }),
@@ -606,6 +624,7 @@ export function OnboardingProvider(props: {
       menuOpened,
       markMenuOpened,
       resetAll,
+      resetTour,
       fieldHelpFor,
       showFieldHelp,
     ],

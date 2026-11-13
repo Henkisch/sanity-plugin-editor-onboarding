@@ -14,6 +14,7 @@ export {
   targetPublishButton,
   targetReleases,
   targetSearch,
+  targetPresence,
   targetTasks,
   targetToolMenu,
 } from './core/targeting'
@@ -24,6 +25,7 @@ export type {
   FieldGuide,
   OnboardingConfig,
   OnboardingStep,
+  OnboardingToolOptions,
   OnboardingTour,
   TourStatus,
 } from './core/types'

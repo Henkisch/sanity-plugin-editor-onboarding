@@ -31,9 +31,13 @@ Log in as a user with the `administrator` or `developer` role.
 The test Studio has too little content for a pattern, which is the point: it
 exercises every path that must not spend credits.
 
-- [ ] **Editor onboarding** appears in the top tool menu.
-- [ ] Open it, pick **Blog post**, click **Find conventions**: a yellow notice
-      says the type has 1 published document — singular — and that 3 are needed.
+- [ ] **Onboarding** appears in the top tool menu.
+- [ ] Under **Suggest more**, **Blog post (1)** is greyed out: 3 published
+      documents are needed. No AI request is possible for it.
+- [ ] **Start** on **Editing and publishing**, from a document list: a blog
+      post opens and the guide starts on it. Same from the guides menu.
+- [ ] **Reset** beside a finished guide clears its status; the menu shows a
+      reset icon beside its checkmark that does the same.
 - [ ] DevTools → Network, filter `agent`: no request was sent.
 - [ ] The cost line says up to 12 documents and names the AI credits.
 
@@ -43,7 +47,7 @@ exercises every path that must not spend credits.
       rebuild, reload: the tool is gone from the menu. Revert.
 - [ ] Remove `conventionFinder` entirely: the tool is gone, and the book icons
       from `fieldGuides` still work. Revert.
-- [ ] If you can, log in as an `editor`: no Editor onboarding tool.
+- [ ] If you can, log in as an `editor`: no Onboarding tool.
 
 ## D. A real Studio (costs one AI request per run)
 
@@ -61,7 +65,7 @@ export default defineConfig([
     basePath: '/real',
     projectId: '<project id>',
     dataset: '<dataset>',
-    plugins: [structureTool(), onboardingTool({tours: [], conventionFinder: true})],
+    plugins: [structureTool(), onboardingTool({tours: [], tool: true, conventionFinder: true})],
     schema: {types: realSchemaTypes},
   },
 ])

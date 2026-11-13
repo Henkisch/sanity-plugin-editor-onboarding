@@ -29,6 +29,11 @@ export interface SerializedField {
   to?: string[]
   /** Array member type names. */
   of?: string[]
+  /**
+   * Set when the field is an image or a file, whatever it is named. The
+   * Onboarding tool uses it to find a document where the image guide can run.
+   */
+  asset?: 'image' | 'file'
   /** `options.list`. The title is kept only where it differs from the value. */
   list?: Array<string | number | {value: string | number; title: string}>
   /** Human-readable rule summary, e.g. `['required', 'max 60 (warning)']`. */
@@ -176,6 +181,9 @@ function serializeField(field: CompiledField, path: string[]): SerializedField {
   if (description) result.description = description
   if (type.to?.length) result.to = type.to.map((target) => target.name)
   if (type.of?.length) result.of = type.of.map((member) => member.name)
+  const chain = typeChain(type)
+  if (chain.includes('image')) result.asset = 'image'
+  else if (chain.includes('file')) result.asset = 'file'
   if (list.length) result.list = list
   if (validation.length) result.validation = validation
   if (hidden) result.hidden = hidden

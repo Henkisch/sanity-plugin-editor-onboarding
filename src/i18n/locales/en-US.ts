@@ -21,8 +21,9 @@ const enUS = {
   'field.help': 'What is this field?',
 
   // — Guides menu —
-  'menu.title': 'Editorial guides',
-  'menu.button-label': 'Editorial guides',
+  'menu.title': 'Guides',
+  'menu.button-label': 'Guides',
+  'menu.reset-one': 'Show this guide as new again',
   'menu.show-all-again': 'Show all guides again',
   'menu.status.completed': 'Completed',
   'menu.status.dismissed': 'Hidden',
@@ -74,7 +75,10 @@ const enUS = {
   'tour.collaboration.description': 'Presence, comments, and tasks',
   'tour.collaboration.presence.title': 'You are not editing alone',
   'tour.collaboration.presence.content':
-    'When a colleague opens the same document their avatar appears here, and their cursor shows in the field they are working on. Edits from both of you merge as you type.',
+    'When a colleague opens the same document, their avatar appears at the top of it and their cursor shows in the field they are working on. Edits from both of you merge as you type.',
+  'tour.collaboration.online.title': 'See who else is here',
+  'tour.collaboration.online.content':
+    'This shows everyone who has the Studio open right now, and which document each of them is in.',
   'tour.collaboration.tasks.title': 'Work that needs doing lives here',
   'tour.collaboration.tasks.content':
     'Tasks shows what has been assigned to you and what is still outstanding. Comments work the same way — leave one on any field and mention a colleague, and it stays attached to the content rather than buried in a chat thread.',
@@ -98,24 +102,33 @@ const enUS = {
   'tour.media.assets.content':
     'Images and files live in a shared library rather than inside the document you uploaded them to, so the same asset can be reused across the site without a second copy.',
 
-  // — Convention finder (developer-only tool) —
-  'conventions.heading': 'Conventions',
+  // — Field guide suggestions (developer-only, in the Onboarding tool) —
+  'conventions.heading': 'Suggest more',
   'conventions.intro':
-    'Finds patterns your editors already follow in published content and turns the ones you choose into field guides. Nothing reaches editors until you paste the code into your config.',
+    'Reads your published content and suggests field guides based on how editors already fill in each field. You choose which ones editors see.',
+  'conventions.examples-heading': 'It might suggest',
+  'conventions.example-1': 'Give times in whole quarter hours',
+  'conventions.example-2': 'End SEO titles with the company name',
+  'conventions.example-3': 'List price variants smallest first',
   'conventions.type-label': 'Document type',
-  'conventions.run': 'Find conventions',
-  'conventions.running': 'Looking for patterns…',
+  'conventions.run': 'Find suggestions',
+  'conventions.running': 'Reading documents and looking for patterns. This takes 5 to 15 seconds.',
   'conventions.cost':
     'Sends up to {{limit}} published documents, shortened, to Sanity’s AI. One request, billed to this project’s AI credits.',
   // i18next picks the form from `count`.
   'conventions.too-few_one':
-    'This type has {{count}} published document. At least {{min}} are needed before anything can count as a pattern.',
+    'This type has {{count}} published document. At least {{min}} are needed before anything counts as a pattern.',
   'conventions.too-few_other':
-    'This type has {{count}} published documents. At least {{min}} are needed before anything can count as a pattern.',
+    'This type has {{count}} published documents. At least {{min}} are needed before anything counts as a pattern.',
   'conventions.none':
-    'No conventions found. That is a valid answer: nothing here follows a pattern the field descriptions don’t already state.',
-  'conventions.evidence': 'Seen in {{count}} of {{total}}',
-  'conventions.select-hint': 'Tick the ones worth showing editors, then copy them as code.',
+    'No suggestions this time. The content follows no pattern that the field descriptions don’t already state.',
+  'conventions.evidence': '{{count}} of {{total}} documents',
+  'conventions.show-examples': 'Show examples ({{count}})',
+  'conventions.select-hint': 'Pick the suggestions that should become field guides.',
+  'conventions.select-all': 'Select all',
+  'conventions.select-none': 'Clear selection',
+  'conventions.chosen_one': '{{count}} selected',
+  'conventions.chosen_other': '{{count}} selected',
   'conventions.copy': 'Copy as fieldGuides code',
   'conventions.copied': 'Copied. Paste it into the fieldGuides array in sanity.config.ts.',
   'conventions.error.ai-disabled':
@@ -123,6 +136,37 @@ const enUS = {
   'conventions.error.quota': 'This project has used up its AI credits or reached its AI budget.',
   'conventions.error.session': 'Your session has expired. Reload the Studio and sign in again.',
   'conventions.error.unknown': 'The request failed. Details are in the browser console.',
+
+  // — Onboarding tool —
+  'tool.heading': 'Onboarding',
+  'tool.guides.heading': 'Guides',
+  'tool.guides.empty': 'No guides are registered.',
+  'tool.guides.steps_one': '{{count}} step',
+  'tool.guides.steps_other': '{{count}} steps',
+  'tool.guides.start': 'Start',
+  'tool.guides.reset': 'Reset',
+  'tool.guides.reset-hint': 'Forget your progress, so this guide behaves as if you had never seen it.',
+  'tool.guides.your-status': 'You: {{status}}',
+  'tool.autostart.first-login': 'Starts on first login',
+  'tool.autostart.manual': 'Starts from the guides menu',
+  'tool.autostart.custom': 'Starts by a custom rule',
+  'tool.fields.heading': 'Field guides',
+  'tool.fields.intro': 'Fields that show a book icon, and where their text is set.',
+  'tool.fields.existing': 'Existing field guides',
+  'tool.fields.empty': 'No field has a guide yet.',
+  'tool.fields.all-types': 'All document types',
+  'tool.fields.from-config': 'In fieldGuides',
+  'tool.fields.from-tour': 'Step in “{{tour}}”',
+  'tool.settings.heading': 'Settings',
+  'tool.settings.intro':
+    'Set in sanity.config.ts. The Studio reads them before anyone signs in, which is why they live in code.',
+  'tool.settings.on': 'On',
+  'tool.settings.off': 'Off',
+  'tool.settings.sync': 'Progress follows editors between devices',
+  'tool.settings.navbar': 'Guides button in the top bar',
+  'tool.settings.finder': 'Field guide suggestions (uses AI credits)',
+  'tool.settings.roles': 'This tool is shown to',
+  'tool.settings.language': 'Studio language',
 }
 
 export default enUS

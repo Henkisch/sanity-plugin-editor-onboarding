@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest'
 
-import {MAX_STRING_LENGTH, summarizeDocument} from './sampleContent'
+import {countQuery, MAX_STRING_LENGTH, readCounts, summarizeDocument} from './sampleContent'
 
 describe('summarizeDocument', () => {
   it('drops system fields, which say nothing about what a field means', () => {
@@ -44,5 +44,18 @@ describe('summarizeDocument', () => {
     expect(summarizeDocument({tags: ['a', 'b', 'c', 'd', 'e']})).toEqual({
       tags: ['a', 'b', 'c', '[+2 more]'],
     })
+  })
+})
+
+describe('countQuery', () => {
+  it('passes type names as params, never inside the query text', () => {
+    const {query, params} = countQuery(['post', 'weird"type'])
+    expect(query).not.toContain('weird')
+    expect(params).toEqual({t0: 'post', t1: 'weird"type'})
+  })
+
+  it('reads the counts back by type name, ignoring anything malformed', () => {
+    expect(readCounts(['post', 'author'], {t0: 11, t1: 'x'})).toEqual({post: 11})
+    expect(readCounts(['post'], null)).toEqual({})
   })
 })

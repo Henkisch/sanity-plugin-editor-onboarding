@@ -1,8 +1,9 @@
 import {CheckmarkIcon} from '@sanity/icons/Checkmark'
-import {RestoreIcon} from '@sanity/icons/Restore'
 import {EyeClosedIcon} from '@sanity/icons/EyeClosed'
+import {ResetIcon} from '@sanity/icons/Reset'
+import {RestoreIcon} from '@sanity/icons/Restore'
 import {BookIcon} from '@sanity/icons/Book'
-import {Box, Button, Text} from '@sanity/ui'
+import {Box, Button, Flex, Text} from '@sanity/ui'
 import {Menu, MenuButton, MenuDivider, MenuItem} from '@sanity/ui/menu'
 import {useCallback} from 'react'
 import {useTranslation} from 'sanity'
@@ -12,6 +13,7 @@ import {ONBOARDING_NAMESPACE} from '../i18n/index'
 import {useLocalizedText} from '../i18n/useLocalizedText'
 import {useOnboarding} from '../core/OnboardingProvider'
 import {type TourStatus} from '../core/types'
+import {useStartGuide} from './useStartGuide'
 
 /**
  * A 4px dot in the button's top-right corner.
@@ -58,7 +60,8 @@ function statusIcon(status: TourStatus | null): typeof CheckmarkIcon | undefined
  * plugins' navbar customisations.
  */
 export function HelpMenuButton(): React.JSX.Element | null {
-  const {tours, startTour, statuses, showMenuHint, markMenuOpened, resetAll} = useOnboarding()
+  const {tours, statuses, showMenuHint, markMenuOpened, resetAll, resetTour} = useOnboarding()
+  const {start} = useStartGuide()
   const {t} = useTranslation(ONBOARDING_NAMESPACE)
   const localize = useLocalizedText()
 
@@ -98,12 +101,14 @@ export function HelpMenuButton(): React.JSX.Element | null {
           </Box>
           <MenuDivider />
           {tours.map((tour) => (
-            <MenuItem
-              key={tour.id}
+            <TourMenuItem
               icon={tour.icon ?? BookIcon}
-              iconRight={statusIcon(statuses[tour.id] ?? null)}
-              onClick={() => startTour(tour.id)}
-              text={localize(tour.title)}
+              key={tour.id}
+              onReset={() => resetTour(tour.id)}
+              onStart={() => start(tour)}
+              resetLabel={t('menu.reset-one')}
+              status={statusIcon(statuses[tour.id] ?? null)}
+              title={localize(tour.title)}
             />
           ))}
           {/*
@@ -127,5 +132,44 @@ export function HelpMenuButton(): React.JSX.Element | null {
       onOpen={handleOpen}
       popover={{placement: 'bottom-end', portal: true}}
     />
+  )
+}
+
+/**
+ * One guide in the menu, with a way to forget it beside the status marker.
+ *
+ * The reset is a separate button next to the menu item rather than inside it:
+ * a button within a button is invalid, and a click on it would also start the
+ * guide. Only shown once there is something to reset.
+ */
+function TourMenuItem(props: {
+  icon: React.ElementType
+  title: string
+  status: React.ElementType | undefined
+  resetLabel: string
+  onStart: () => void
+  onReset: () => void
+}) {
+  return (
+    <Flex align="center" gap={1}>
+      <Box flex={1}>
+        <MenuItem
+          icon={props.icon}
+          iconRight={props.status}
+          onClick={props.onStart}
+          text={props.title}
+        />
+      </Box>
+      {props.status && (
+        <Button
+          aria-label={props.resetLabel}
+          icon={ResetIcon}
+          mode="bleed"
+          onClick={props.onReset}
+          padding={2}
+          title={props.resetLabel}
+        />
+      )}
+    </Flex>
   )
 }

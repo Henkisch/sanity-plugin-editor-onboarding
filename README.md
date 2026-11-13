@@ -42,7 +42,7 @@ export default defineConfig({
 That's the whole setup. Start your Studio and you get:
 
 - A short **Studio essentials** tour that starts once, on first login.
-- An **Editorial guides** button in the navbar listing every guide, so a tour is never lost
+- A **Guides** button in the navbar listing every guide, so a tour is never lost
   to someone who dismissed it. It carries a small dot until opened once, and the
   last step of the first tour points at it.
 - Steps that point at features your project doesn't have (Content Releases, say)
@@ -100,18 +100,31 @@ The package also ships a `SKILL.md`, so an agent working in your repo can read
 your actual schema source — titles, descriptions, validation rules — and write
 better guides than any type-level heuristic can.
 
-## Finding the conventions your editors already follow
+## The Onboarding tool
 
 ```ts
-onboardingTool({tours: coreConcepts(), conventionFinder: true})
+onboardingTool({tours: coreConcepts(), tool: true, conventionFinder: true})
 ```
 
-Adds an **Editor onboarding** tool for administrators and developers. Pick a document
-type and it reads up to twelve published documents, measures how each field is
-filled in, and asks Sanity's AI for the patterns most of them follow but no
-field description states — every SEO title ending in the brand name,
-durations always in quarter hours, price variants always ordered small to large.
-Tick the ones worth telling a new editor and copy them as `fieldGuides` code.
+`tool: true` adds an **Onboarding** tool for administrators and developers: every
+guide and field guide the plugin is running, the settings it is running with,
+and a **Start** button per guide. Start opens a document the guide can run in
+first — one whose fields it names, one with an image field for the image
+guide, any document for the publishing guide — so a guide can be tried from
+anywhere. A guide that points at your own components cannot be matched that
+way; give it `documentType: 'post'` and it opens a post. **Reset** next to a
+finished guide makes it behave as never seen, including for auto-start. The
+same Start behaviour and a per-guide reset are in the editors' guides menu.
+
+### Suggesting field guides from your content
+
+`conventionFinder: true` adds **Suggest more** to the tool (and turns the tool
+on). Pick a document type and it reads up to twelve published documents,
+measures how each field is filled in, and asks Sanity's AI for the patterns
+most of them follow but no field description states — every SEO title ending in
+the brand name, durations always in quarter hours, price variants always
+ordered small to large. Tick the ones worth telling a new editor and copy them
+as `fieldGuides` code.
 
 It deliberately does not explain fields. An earlier version tried, and on a
 well-documented schema it mostly rephrased descriptions the Studio already
@@ -124,11 +137,11 @@ has written down.
 - **Nothing reaches an editor by itself.** The output is code you review,
   commit and deploy like any other change. No documents are written.
 - **Thin evidence is dropped.** A pattern seen in fewer than three documents is
-  discarded, and a type with fewer than three published documents is not sent
-  at all.
-- **Roles and language are configurable:**
-  `conventionFinder: {roles: ['administrator'], language: 'Svenska (sv-SE)'}`.
-  The language defaults to the Studio's own.
+  discarded, and a type with fewer than three published documents cannot be
+  picked at all.
+- **Configurable:** `tool: {roles: ['administrator']}` decides who sees the
+  tool; `conventionFinder: {language: 'Svenska (sv-SE)'}` sets the language
+  suggestions are written in, which defaults to the Studio's own.
 
 Agent Actions are experimental in Sanity, and AI features can be switched off
 per organization; the tool says so when that is why a run failed.
@@ -321,14 +334,14 @@ Any key you leave out falls back to English, so a partial translation is
 perfectly usable. The full key list lives in `src/i18n/locales/en-US.ts`, and
 the exported `OnboardingResourceKey` type will tell you if you miss one.
 
-The same mechanism overrides individual strings — handy if "Editorial guides"
+The same mechanism overrides individual strings — handy if "Guides"
 should read as something else in your Studio:
 
 ```ts
 defineLocaleResourceBundle({
   locale: 'en-US',
   namespace: 'onboarding',
-  resources: {'menu.title': 'Guides', 'menu.button-label': 'Guides'},
+  resources: {'menu.title': 'Help', 'menu.button-label': 'Help'},
 })
 ```
 

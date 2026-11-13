@@ -73,3 +73,32 @@ function truncate(text: string): string {
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
 }
+
+/**
+ * A query counting published documents for each of `types`, and its params.
+ *
+ * One request for every type at once, keyed by position rather than by type
+ * name so that a name is only ever a parameter, never spliced into the query.
+ *
+ * @internal
+ */
+export function countQuery(types: string[]): {query: string; params: Record<string, string>} {
+  const params: Record<string, string> = {}
+  const fields = types.map((type, index) => {
+    params[`t${index}`] = type
+    return `"t${index}": count(*[_type == $t${index} && !(_id in path("drafts.**")) && !(_id in path("versions.**"))])`
+  })
+  return {query: `{${fields.join(', ')}}`, params}
+}
+
+/** The counts back, by type name. @internal */
+export function readCounts(types: string[], result: unknown): Record<string, number> {
+  const counts: Record<string, number> = {}
+  if (typeof result !== 'object' || result === null) return counts
+  const record: Record<string, unknown> = {...result}
+  types.forEach((type, index) => {
+    const value = record[`t${index}`]
+    if (typeof value === 'number') counts[type] = value
+  })
+  return counts
+}

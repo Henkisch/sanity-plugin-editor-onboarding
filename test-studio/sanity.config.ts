@@ -30,6 +30,9 @@ const seoTour: OnboardingTour = {
   title: studioText('tour.seo.title'),
   description: studioText('tour.seo.description'),
   unavailableMessage: studioText('tour.seo.unavailable'),
+  // The panel is this Studio's own component, which the plugin cannot see
+  // into, so the Onboarding tool needs telling where to open it.
+  documentType: 'post',
   steps: [
     {
       target: targetCustom('seo-panel'),
@@ -91,6 +94,7 @@ export default defineConfig({
       fieldGuides,
       syncProgress: true,
       tours: [...coreConcepts(), seoTour],
+      tool: true,
       // Too little content here to find anything, which is the point: this
       // exercises the "too few documents" path without spending credits.
       conventionFinder: true,
