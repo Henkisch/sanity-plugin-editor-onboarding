@@ -1,8 +1,8 @@
 import {describe, expect, it, vi} from 'vitest'
 
-import {coreConcepts, type CoreConceptId} from './tours'
-import {docs} from './docs'
 import {stepTarget} from '../core/fieldHelp'
+import {docs} from './docs'
+import {coreConcepts, type CoreConceptId} from './tours'
 
 const ALL: CoreConceptId[] = ['essentials', 'publishing', 'collaboration', 'releases', 'media']
 
@@ -82,12 +82,22 @@ describe('the collaboration guide', () => {
   // together.
   it('does not point at the tool switcher', () => {
     for (const step of collaboration().steps) {
-      expect(step.target).not.toContain('tool-collapse-menu')
+      expect(step.target ?? '').not.toContain('tool-collapse-menu')
     }
   })
 
+  // It used to ring the whole navbar, where Studio 6 shows no avatars at all,
+  // under copy that said "their avatar appears here".
+  it('centres the presence step rather than ringing a navbar with no avatars in it', () => {
+    expect(collaboration().steps[0].target).toBeUndefined()
+  })
+
+  it('points at the presence menu by its id, since its label is translated', () => {
+    expect(collaboration().steps[1].target).toBe('#global-presence-menu')
+  })
+
   it('points at Tasks, which drops out on Studios that have it turned off', () => {
-    expect(collaboration().steps[1].target).toBe('[data-testid="tasks-toolbar"]')
+    expect(collaboration().steps[2].target).toBe('[data-testid="tasks-toolbar"]')
   })
 })
 
@@ -127,15 +137,17 @@ describe('guide invariants', () => {
     }
   })
 
-  // Only `essentials` may open unanchored: a tour whose steps are all unanchored
-  // could never report itself unavailable, and the others describe UI that is
-  // often not on screen.
-  it('leaves only the essentials tour with an unanchored step', () => {
+  // A tour whose steps are all unanchored could never report itself
+  // unavailable, so every tour keeps at least one anchored step. Only
+  // `essentials` (its welcome) and `collaboration` (presence, which has no
+  // element to point at when an editor is alone) may centre one.
+  it('centres a step only where there is nothing on screen to point at', () => {
+    const mayCentre = new Set(['essentials', 'collaboration'])
     for (const tour of coreConcepts()) {
       const unanchored = tour.steps.filter((step) => !stepTarget(step))
 
-      if (tour.id === 'essentials') expect(unanchored).toHaveLength(1)
-      else expect(unanchored).toHaveLength(0)
+      expect(unanchored.length, tour.id).toBe(mayCentre.has(tour.id) ? 1 : 0)
+      expect(tour.steps.length - unanchored.length, tour.id).toBeGreaterThan(0)
     }
   })
 

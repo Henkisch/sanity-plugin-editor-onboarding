@@ -1,11 +1,11 @@
-import {type UserProgress} from './progressSync'
+import {type RecordedStatus, type UserProgress} from './progressSync'
 import {type TourStatus} from './types'
 
 const STORAGE_KEY = 'sanity-plugin-editor-onboarding:v1'
 const SCHEMA_VERSION = 1
 
 interface TourRecord {
-  status: TourStatus
+  status: RecordedStatus
   /** ISO timestamp of when the status was last written. */
   updatedAt: string
   /** Index of the step the user was on. Useful for future resume support. */
@@ -79,7 +79,22 @@ const keyFor = (userId: string | null, tourId: string): string =>
  * @internal
  */
 export function getTourStatus(userId: string | null, tourId: string): TourStatus | null {
-  return read().tours[keyFor(userId, tourId)]?.status ?? null
+  const status = read().tours[keyFor(userId, tourId)]?.status
+  return status && status !== 'reset' ? status : null
+}
+
+/**
+ * Make one tour behave as never seen, in a way that survives syncing.
+ *
+ * Written as a dated `reset` record rather than a deletion — see
+ * `RecordedStatus` for why a deletion would come straight back.
+ *
+ * @internal
+ */
+export function clearTourStatus(userId: string | null, tourId: string): void {
+  const state = read()
+  state.tours[keyFor(userId, tourId)] = {status: 'reset', updatedAt: new Date().toISOString()}
+  write(state)
 }
 
 /**

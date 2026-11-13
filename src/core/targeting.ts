@@ -75,6 +75,18 @@ export const targetGuidesButton = (): string => '[data-testid="onboarding-guides
  */
 export const targetTasks = (): string => '[data-testid="tasks-toolbar"]'
 
+/**
+ * The navbar's presence menu: everyone who has the Studio open right now.
+ *
+ * Matched by its element id. It has no test id, and its `aria-label` is
+ * translated, so `Global presence` would only match an English Studio. Checked
+ * against a live Studio 6 navbar. Narrow windows fold it away, and a step
+ * pointing here then drops out on its own.
+ *
+ * @public
+ */
+export const targetPresence = (): string => '#global-presence-menu'
+
 /** The global search button. @public */
 export const targetSearch = (): string => '[data-testid="studio-search"]'
 

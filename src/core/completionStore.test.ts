@@ -1,6 +1,7 @@
 import {afterEach, describe, expect, it, vi} from 'vitest'
 
 import {
+  clearTourStatus,
   getTourStatus,
   getUserProgress,
   hasOpenedMenu,
@@ -107,6 +108,23 @@ describe('resetting', () => {
     resetTourStatus('user-1', 'essentials')
 
     expect(getTourStatus('user-1', 'publishing')).toBe('dismissed')
+  })
+})
+
+describe('clearing one guide', () => {
+  it('reads as never seen, so it can start on its own again', () => {
+    setTourStatus('user-1', 'essentials', 'completed')
+    clearTourStatus('user-1', 'essentials')
+
+    expect(getTourStatus('user-1', 'essentials')).toBeNull()
+    expect(mayAutoStart('user-1', 'essentials')).toBe(true)
+  })
+
+  // A deletion would not travel; a dated record does.
+  it('leaves a dated record behind for syncing to carry', () => {
+    clearTourStatus('user-1', 'essentials')
+
+    expect(getUserProgress('user-1').tours.essentials?.status).toBe('reset')
   })
 })
 

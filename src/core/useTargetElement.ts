@@ -133,6 +133,29 @@ export function useTargetElement(
   }, [state, selector, tourId, stepIndex])
 
   // Keep the measured box in sync so the spotlight tracks the element.
+  // A resolved target can be swapped out from under the step: Studio
+  // re-renders a document's header while it loads, and moving to another view
+  // removes the target altogether. Found in a live Studio — the step kept
+  // measuring the detached element, whose box is all zeros, and left a ring
+  // in the top-left corner with its popup nowhere to be seen. Follow the
+  // replacement if there is one; otherwise go back to looking, which hides
+  // the step and, after the usual wait, skips it.
+  useEffect(() => {
+    if (state !== 'resolved' || !element || !selector) return undefined
+
+    const observer = new MutationObserver(() => {
+      if (element.isConnected) return
+      const replacement = query(selector)
+      setRect(null)
+      setResolution(
+        replacement ? {state: 'resolved', element: replacement} : {state: 'pending', element: null},
+      )
+    })
+    observer.observe(document.body, {childList: true, subtree: true})
+
+    return () => observer.disconnect()
+  }, [state, element, selector])
+
   useEffect(() => {
     if (!element) return undefined
 

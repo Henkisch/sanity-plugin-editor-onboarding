@@ -11,9 +11,24 @@ import {type TourStatus} from './types'
  * @internal
  */
 
+/**
+ * A tour's status as stored, which adds one value the public type does not
+ * have.
+ *
+ * `reset` marks a single guide someone chose to see again. Deleting the record
+ * instead would not travel: the project's copy, or another browser's, would
+ * hand the old status straight back on the next merge. A dated `reset` wins
+ * over anything older by the same last-write-wins rule as every other record,
+ * and reads as "never seen". A version of this plugin that predates it drops
+ * the record as unrecognised, which also reads as never seen.
+ *
+ * @internal
+ */
+export type RecordedStatus = TourStatus | 'reset'
+
 /** What is recorded about one tour, in either store. @internal */
 export interface TourRecord {
-  status: TourStatus
+  status: RecordedStatus
   /** ISO timestamp. The only thing that decides which of two records wins. */
   updatedAt: string
   stepIndex?: number
@@ -195,7 +210,14 @@ function toRecord(value: unknown, key: unknown): [string, TourRecord] | undefine
   const stepIndex = value.stepIndex
 
   if (typeof key !== 'string' || key.length === 0) return undefined
-  if (status !== 'skipped' && status !== 'dismissed' && status !== 'completed') return undefined
+  if (
+    status !== 'skipped' &&
+    status !== 'dismissed' &&
+    status !== 'completed' &&
+    status !== 'reset'
+  ) {
+    return undefined
+  }
 
   return [
     key,

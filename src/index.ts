@@ -14,15 +14,18 @@ export {
   targetPublishButton,
   targetReleases,
   targetSearch,
+  targetPresence,
   targetTasks,
   targetToolMenu,
 } from './core/targeting'
 export type {
   AutoStart,
   AutoStartContext,
+  ConventionFinderOptions,
   FieldGuide,
   OnboardingConfig,
   OnboardingStep,
+  OnboardingToolOptions,
   OnboardingTour,
   TourStatus,
 } from './core/types'

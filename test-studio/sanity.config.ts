@@ -30,6 +30,9 @@ const seoTour: OnboardingTour = {
   title: studioText('tour.seo.title'),
   description: studioText('tour.seo.description'),
   unavailableMessage: studioText('tour.seo.unavailable'),
+  // The panel is this Studio's own component, which the plugin cannot see
+  // into, so the Onboarding tool needs telling where to open it.
+  documentType: 'post',
   steps: [
     {
       target: targetCustom('seo-panel'),
@@ -87,7 +90,15 @@ export default defineConfig({
     // Phase 1's zero-config library, plus a Phase 2 tour of local components.
     // Progress is synced here so the dataset-backed path gets exercised, not
     // just the localStorage one.
-    onboardingTool({fieldGuides, syncProgress: true, tours: [...coreConcepts(), seoTour]}),
+    onboardingTool({
+      fieldGuides,
+      syncProgress: true,
+      tours: [...coreConcepts(), seoTour],
+      tool: true,
+      // Too little content here to find anything, which is the point: this
+      // exercises the "too few documents" path without spending credits.
+      conventionFinder: true,
+    }),
   ],
 
   // Registers this Studio's own strings alongside the plugin's.

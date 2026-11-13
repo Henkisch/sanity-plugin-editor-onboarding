@@ -133,6 +133,17 @@ export interface OnboardingTour {
    * Without this, starting such a tour would appear to do nothing at all.
    */
   unavailableMessage?: LocalizedText
+  /**
+   * The document type this guide runs in, e.g. `'post'`.
+   *
+   * The Onboarding tool opens the most recently edited document of this type
+   * before starting the guide, so it can be tried from anywhere. Most guides
+   * do not need it: one that names a `field`, or points at a document's
+   * publish button, history or image picker, is matched to a fitting type
+   * from the schema. Set it for a guide that points at your own components,
+   * which the plugin cannot see into.
+   */
+  documentType?: string
   steps: OnboardingStep[]
 }
 
@@ -224,4 +235,57 @@ export interface OnboardingConfig {
    * @defaultValue true
    */
   navbarButton?: boolean
+  /**
+   * Add an "Onboarding" tool for developers: an overview of every guide, field
+   * guide and setting this plugin is running with, and a way to start any
+   * guide on demand.
+   *
+   * Off by default, so upgrading never puts a new entry in anyone's tool menu.
+   * Only users with one of `roles` see it; editors never do.
+   *
+   * @defaultValue false
+   */
+  tool?: boolean | OnboardingToolOptions
+  /**
+   * Add an "Unwritten rules" tab to the Onboarding tool. It finds patterns your
+   * editors already follow in published content and turns the ones you pick
+   * into `fieldGuides` code.
+   *
+   * Off by default: each run sends up to twelve published documents, shortened,
+   * to Sanity's AI and is billed to the project's AI credits. Nothing it finds
+   * reaches an editor until a developer pastes the code into this config.
+   * Turning it on also turns on `tool`.
+   *
+   * @defaultValue false
+   */
+  conventionFinder?: boolean | ConventionFinderOptions
+}
+
+/**
+ * Options for {@link OnboardingConfig.tool}.
+ *
+ * @public
+ */
+export interface OnboardingToolOptions {
+  /**
+   * Role names that see the tool.
+   *
+   * @defaultValue ['administrator', 'developer']
+   */
+  roles?: string[]
+}
+
+/**
+ * Options for {@link OnboardingConfig.conventionFinder}.
+ *
+ * @public
+ */
+export interface ConventionFinderOptions {
+  /**
+   * The language rules are written in, e.g. `'Svenska (sv-SE)'`.
+   *
+   * Defaults to the Studio's current language. Set it when you run the Studio
+   * in English but your editors read it in another language.
+   */
+  language?: string
 }

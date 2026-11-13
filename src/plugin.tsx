@@ -1,10 +1,13 @@
+import {BookIcon} from '@sanity/icons/Book'
 import {definePlugin, SANITY_VERSION, type LayoutProps, type NavbarProps} from 'sanity'
 
-import {fieldGuideActionFor} from './ui/FieldGuideAction'
 import {OnboardingProvider} from './core/OnboardingProvider'
-import {onboardingLocaleBundles} from './i18n/bundles'
 import {type OnboardingConfig} from './core/types'
+import {onboardingLocaleBundles} from './i18n/bundles'
+import {fieldGuideActionFor} from './ui/FieldGuideAction'
 import {HelpMenuButton} from './ui/HelpMenuButton'
+import {OnboardingTool} from './ui/OnboardingTool'
+import {canUseTool, resolveToolSettings} from './ui/toolSettings'
 
 /**
  * Add onboarding tours to a Studio.
@@ -54,6 +57,7 @@ export const onboardingTool = definePlugin<OnboardingConfig>((config) => {
   const fieldGuides = config?.fieldGuides ?? []
   const showNavbarButton = config?.navbarButton !== false
   const syncProgress = config?.syncProgress === true
+  const toolSettings = resolveToolSettings(config)
 
   // Only touch Sanity's unstable field-action API when something would
   // actually appear there. A Studio that declares no field help never
@@ -76,6 +80,26 @@ export const onboardingTool = definePlugin<OnboardingConfig>((config) => {
   return {
     name: 'sanity-plugin-editor-onboarding',
 
+    // The Onboarding tool is opt-in and role-gated: an editor's tool menu is
+    // unchanged unless a developer asked for it and the user is one. The
+    // title is a plain string because a tool's title is, in Sanity's config
+    // API; only the people this is shown to ever read it.
+    tools: toolSettings
+      ? (previous, context) =>
+          canUseTool(context.currentUser, toolSettings.roles)
+            ? [
+                ...previous,
+                {
+                  name: 'editor-onboarding',
+                  title: 'Onboarding',
+                  icon: BookIcon,
+                  component: OnboardingTool,
+                  options: toolSettings,
+                },
+              ]
+            : previous
+      : undefined,
+
     // Registers this plugin's strings. A Studio can override any of them, or
     // add a language we don't ship, by passing a bundle with the same
     // namespace to `i18n.bundles` in sanity.config.ts.
@@ -96,11 +120,7 @@ export const onboardingTool = definePlugin<OnboardingConfig>((config) => {
         // `renderDefault` is always called, so other plugins' layout
         // customisations still apply.
         layout: (props: LayoutProps) => (
-          <OnboardingProvider
-            fieldGuides={fieldGuides}
-            syncProgress={syncProgress}
-            tours={tours}
-          >
+          <OnboardingProvider fieldGuides={fieldGuides} syncProgress={syncProgress} tours={tours}>
             {props.renderDefault(props)}
           </OnboardingProvider>
         ),

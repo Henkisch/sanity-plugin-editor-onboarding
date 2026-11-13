@@ -8,9 +8,9 @@ import {
   targetAssetBrowse,
   targetDocumentHistory,
   targetDocumentStatus,
+  targetPresence,
   targetTasks,
   targetGuidesButton,
-  targetNavbar,
   targetNewDocument,
   targetPerspectiveMenu,
   targetPublishButton,
@@ -154,9 +154,18 @@ function buildTours(options: CoreConceptsOptions): Record<CoreConceptId, Onboard
     icon: UsersIcon,
     steps: [
       {
-        target: targetNavbar(),
+        // Deliberately centred. It used to ring the whole navbar under copy
+        // saying "their avatar appears here", but avatars appear inside a
+        // document, and only while someone else has it open — there is nothing
+        // for this step to point at when an editor is alone, which is when
+        // they see it. The next step points at the presence menu instead.
         title: k('tour.collaboration.presence.title'),
         content: k('tour.collaboration.presence.content'),
+      },
+      {
+        target: targetPresence(),
+        title: k('tour.collaboration.online.title'),
+        content: k('tour.collaboration.online.content'),
       },
       {
         // Was the tool switcher, which has nothing to do with collaboration and

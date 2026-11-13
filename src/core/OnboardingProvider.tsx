@@ -3,6 +3,7 @@ import {SANITY_VERSION, useClient, useCurrentUser} from 'sanity'
 
 import {
   getTourStatus,
+  clearTourStatus,
   getUserProgress,
   resetTourStatus,
   setUserProgress,
@@ -37,10 +38,16 @@ interface OnboardingContextValue {
   markMenuOpened: () => void
   /** Forget every guide's status, so they behave as never seen. */
   resetAll: () => void
+  /** Forget one guide's status, so it behaves as never seen. */
+  resetTour: (tourId: string) => void
   /** The help for one field, if any is declared. Drives the field's book icon. */
   fieldHelpFor: (fieldName: string, documentType: string | undefined) => FieldHelp | undefined
   /** Show one field's help on its own, outside any tour. */
-  showFieldHelp: (help: FieldHelp) => void
+  /**
+   * Show one field's help. `target` is the selector for the exact field that
+   * was clicked; pass it whenever it is known — see `showFieldHelp`.
+   */
+  showFieldHelp: (help: FieldHelp, target?: string) => void
 }
 
 const OnboardingContext = createContext<OnboardingContextValue | null>(null)
@@ -527,9 +534,14 @@ export function OnboardingProvider(props: {
    */
   const fieldHelp = useMemo(() => collectFieldHelp(tours, fieldGuides), [tours, fieldGuides])
 
-  const showFieldHelp = useCallback((help: FieldHelp) => {
+  // The clicked field's own selector beats the one derived from its name.
+  // Inside an array, Studio ids the field by the item's key —
+  // `prices[_key=="…"].durationMin` — so `field-prices.durationMin` matches
+  // nothing and the help closed the moment it opened. A step's explicit
+  // `target` still wins, as it does everywhere else.
+  const showFieldHelp = useCallback((help: FieldHelp, target?: string) => {
     rememberFocus(focusBeforeFieldHelp)
-    setActiveFieldHelp(help)
+    setActiveFieldHelp(target && !help.step.target ? {...help, step: {...help.step, target}} : help)
   }, [])
 
   const closeFieldHelp = useCallback(() => {
@@ -567,6 +579,20 @@ export function OnboardingProvider(props: {
     }
   }, [tours, userId, syncProgress, client])
 
+  /**
+   * Start over for one guide. Mirrored like any other status change, since a
+   * `reset` record is just the newest record for that guide.
+   */
+  const resetTour = useCallback(
+    (tourId: string) => {
+      clearTourStatus(userId, tourId)
+      offeredThisSession.current.delete(tourId)
+      setStatusVersion((version) => version + 1)
+      if (syncProgress && userId) void saveProgress(client, userId, getUserProgress(userId))
+    },
+    [userId, syncProgress, client],
+  )
+
   const markMenuOpened = useCallback(() => {
     setMenuOpened(userId)
     setMenuVersion((version) => version + 1)
@@ -585,6 +611,7 @@ export function OnboardingProvider(props: {
       showMenuHint: !menuOpened && tours.length > 0,
       markMenuOpened,
       resetAll,
+      resetTour,
       fieldHelpFor,
       showFieldHelp,
     }),
@@ -597,6 +624,7 @@ export function OnboardingProvider(props: {
       menuOpened,
       markMenuOpened,
       resetAll,
+      resetTour,
       fieldHelpFor,
       showFieldHelp,
     ],
