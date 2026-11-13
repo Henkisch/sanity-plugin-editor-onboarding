@@ -104,4 +104,31 @@ describe('useTargetElement', () => {
 
     expect(() => probe('#never')).not.toThrow()
   })
+
+  // Found in a live Studio: a document re-rendered its header while loading,
+  // and the step kept pointing at the element that had been replaced.
+  it('follows a target that is replaced, instead of ringing the old one', async () => {
+    document.body.innerHTML = '<div id="here">old</div>'
+    const result = probe('#here')
+    expect(result.last.element?.textContent).toBe('old')
+
+    act(() => {
+      document.body.innerHTML = '<div id="here">new</div>'
+    })
+
+    await waitFor(() => expect(result.last.element?.textContent).toBe('new'))
+    expect(result.last.state).toBe('resolved')
+  })
+
+  it('goes back to looking when the target disappears, so nothing is left on screen', async () => {
+    document.body.innerHTML = '<div id="here"></div>'
+    const result = probe('#here')
+
+    act(() => {
+      document.body.innerHTML = ''
+    })
+
+    await waitFor(() => expect(result.last.state).toBe('pending'))
+    expect(result.last.element).toBeNull()
+  })
 })
