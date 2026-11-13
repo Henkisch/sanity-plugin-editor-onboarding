@@ -31,7 +31,7 @@ Log in as a user with the `administrator` or `developer` role.
 The test Studio has too little content for a pattern, which is the point: it
 exercises every path that must not spend credits.
 
-- [ ] **Conventions** appears in the top tool menu.
+- [ ] **Editor onboarding** appears in the top tool menu.
 - [ ] Open it, pick **Blog post**, click **Find conventions**: a yellow notice
       says the type has 1 published document — singular — and that 3 are needed.
 - [ ] DevTools → Network, filter `agent`: no request was sent.
@@ -43,7 +43,7 @@ exercises every path that must not spend credits.
       rebuild, reload: the tool is gone from the menu. Revert.
 - [ ] Remove `conventionFinder` entirely: the tool is gone, and the book icons
       from `fieldGuides` still work. Revert.
-- [ ] If you can, log in as an `editor`: no Conventions tool.
+- [ ] If you can, log in as an `editor`: no Editor onboarding tool.
 
 ## D. A real Studio (costs one AI request per run)
 
@@ -68,7 +68,7 @@ export default defineConfig([
 ```
 
 The project must allow `http://localhost:3333` as a CORS origin with
-credentials. Open `/real/editor-onboarding-conventions`.
+credentials. Open `/real/editor-onboarding`.
 
 - [ ] Pick the type editors use most and run it. Results arrive in about
       5–15 seconds.

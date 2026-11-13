@@ -106,7 +106,7 @@ better guides than any type-level heuristic can.
 onboardingTool({tours: coreConcepts(), conventionFinder: true})
 ```
 
-Adds a **Conventions** tool for administrators and developers. Pick a document
+Adds an **Editor onboarding** tool for administrators and developers. Pick a document
 type and it reads up to twelve published documents, measures how each field is
 filled in, and asks Sanity's AI for the patterns most of them follow but no
 field description states — every SEO title ending in the brand name,

@@ -94,8 +94,8 @@ export const onboardingTool = definePlugin<OnboardingConfig>((config) => {
             ? [
                 ...previous,
                 {
-                  name: 'editor-onboarding-conventions',
-                  title: 'Conventions',
+                  name: 'editor-onboarding',
+                  title: 'Editor onboarding',
                   component: ConventionsTool,
                   options: {language: finder.language},
                 },

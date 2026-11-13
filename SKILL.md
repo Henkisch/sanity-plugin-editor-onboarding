@@ -114,7 +114,7 @@ from.
 
 ## Finding conventions in existing content
 
-`conventionFinder: true` adds a Conventions tool (administrators and developers
+`conventionFinder: true` adds an Editor onboarding tool (administrators and developers
 only) that reads published documents and suggests guides for patterns editors
 already follow. It runs on Sanity's AI and costs the project AI credits, so
 only turn it on when the developer asks. Its output is `fieldGuides` code for a
