@@ -5,7 +5,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 
 import {getTourStatus, setTourStatus} from './completionStore'
 import {OnboardingProvider, useOnboarding} from './OnboardingProvider'
-import {targetNavbar} from './targeting'
+import {targetField, targetNavbar} from './targeting'
 import {type FieldGuide, type OnboardingTour} from './types'
 
 const theme = buildTheme()
@@ -443,6 +443,21 @@ describe('field help', () => {
     expect(screen.queryByText('Slug help')).toBeNull()
     expect(screen.getByText('Step one')).toBeTruthy()
     expect(getTourStatus('u1', tour.id)).toBeNull()
+  })
+
+  // Found in a live Studio: inside an array, Studio ids a field by its row's
+  // key, so a selector built from the key-free name matched nothing and the
+  // help closed the instant it opened. The icon knows the exact path clicked.
+  it('points at the exact field clicked, so help on a field inside an array row opens', () => {
+    setFixture(`<div data-testid='field-prices[_key=="a1"].minutes'>field</div>`)
+    const guide: FieldGuide = {field: 'prices.minutes', title: 'Quarter hours', content: '…'}
+    const session = renderProvider({tours: [], fieldGuides: [guide]})
+
+    const help = session.onboarding.fieldHelpFor('prices.minutes', undefined)
+    if (!help) throw new Error('expected field help to be registered for "prices.minutes"')
+    act(() => session.onboarding.showFieldHelp(help, targetField('prices[_key=="a1"].minutes')))
+
+    expect(screen.getByText('Quarter hours')).toBeTruthy()
   })
 })
 

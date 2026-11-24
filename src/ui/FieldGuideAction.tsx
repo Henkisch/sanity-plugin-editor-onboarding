@@ -1,10 +1,16 @@
 import {BookIcon} from '@sanity/icons/Book'
 import {useCallback, useMemo} from 'react'
-import {defineDocumentFieldAction, useTranslation, type DocumentFieldAction} from 'sanity'
+import {
+  defineDocumentFieldAction,
+  pathToString,
+  useTranslation,
+  type DocumentFieldAction,
+} from 'sanity'
 
-import {ONBOARDING_NAMESPACE} from '../i18n/index'
 import {pathToFieldName} from '../core/fieldHelp'
 import {useOnboardingOptional} from '../core/OnboardingProvider'
+import {targetField} from '../core/targeting'
+import {ONBOARDING_NAMESPACE} from '../i18n/index'
 
 /**
  * One action per document type, kept so repeated resolver calls hand Sanity the
@@ -56,9 +62,14 @@ export function fieldGuideActionFor(documentType: string): DocumentFieldAction {
 
       const help = onboarding?.fieldHelpFor(pathToFieldName(path), documentType)
 
+      // The full path, array keys included, names the one field that was
+      // clicked. The help itself is looked up by the key-free name so it
+      // applies to every row; the popup has to point at this row.
+      const target = targetField(pathToString(path))
+
       const onAction = useCallback(() => {
-        if (help) onboarding?.showFieldHelp(help)
-      }, [help, onboarding])
+        if (help) onboarding?.showFieldHelp(help, target)
+      }, [help, onboarding, target])
 
       // Sanity re-renders the field when this object's identity changes, so
       // returning a fresh one each render is an infinite loop.

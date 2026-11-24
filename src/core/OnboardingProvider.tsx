@@ -40,7 +40,11 @@ interface OnboardingContextValue {
   /** The help for one field, if any is declared. Drives the field's book icon. */
   fieldHelpFor: (fieldName: string, documentType: string | undefined) => FieldHelp | undefined
   /** Show one field's help on its own, outside any tour. */
-  showFieldHelp: (help: FieldHelp) => void
+  /**
+   * Show one field's help. `target` is the selector for the exact field that
+   * was clicked; pass it whenever it is known — see `showFieldHelp`.
+   */
+  showFieldHelp: (help: FieldHelp, target?: string) => void
 }
 
 const OnboardingContext = createContext<OnboardingContextValue | null>(null)
@@ -527,9 +531,14 @@ export function OnboardingProvider(props: {
    */
   const fieldHelp = useMemo(() => collectFieldHelp(tours, fieldGuides), [tours, fieldGuides])
 
-  const showFieldHelp = useCallback((help: FieldHelp) => {
+  // The clicked field's own selector beats the one derived from its name.
+  // Inside an array, Studio ids the field by the item's key —
+  // `prices[_key=="…"].durationMin` — so `field-prices.durationMin` matches
+  // nothing and the help closed the moment it opened. A step's explicit
+  // `target` still wins, as it does everywhere else.
+  const showFieldHelp = useCallback((help: FieldHelp, target?: string) => {
     rememberFocus(focusBeforeFieldHelp)
-    setActiveFieldHelp(help)
+    setActiveFieldHelp(target && !help.step.target ? {...help, step: {...help.step, target}} : help)
   }, [])
 
   const closeFieldHelp = useCallback(() => {
