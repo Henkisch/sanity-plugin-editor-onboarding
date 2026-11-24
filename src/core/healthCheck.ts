@@ -1,4 +1,5 @@
 import {stepTarget} from './fieldHelp'
+import {isRecord} from './isRecord'
 import {type OnboardingTour} from './types'
 import {query} from './useTargetElement'
 
@@ -22,11 +23,6 @@ import {query} from './useTargetElement'
  *
  * @internal
  */
-
-/** Narrows an unknown to something whose properties can be read. */
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
-}
 
 /**
  * Whether this is a development build.

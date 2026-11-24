@@ -16,6 +16,8 @@ export interface FieldHelp {
   field: string
   documentType?: string
   step: OnboardingStep
+  /** The tour a step came from; absent for a standalone `fieldGuides` entry. */
+  tour?: OnboardingTour
 }
 
 /**
@@ -39,7 +41,7 @@ export function pathToFieldName(path: Path): string {
  */
 export function collectFieldHelp(tours: OnboardingTour[], guides: FieldGuide[]): FieldHelp[] {
   const fromSteps = tours.flatMap((tour) =>
-    tour.steps.flatMap((step) => (step.field ? [{field: step.field, step}] : [])),
+    tour.steps.flatMap((step) => (step.field ? [{field: step.field, step, tour}] : [])),
   )
 
   const fromGuides = guides.map((guide) => ({

@@ -12,7 +12,10 @@ import {
   type UserProgress,
 } from './progressSync'
 
-const at = (iso: string, status: 'skipped' | 'dismissed' | 'completed' = 'completed') => ({
+const at = (
+  iso: string,
+  status: 'skipped' | 'dismissed' | 'completed' | 'reset' = 'completed',
+) => ({
   status,
   updatedAt: iso,
 })
@@ -55,6 +58,21 @@ describe('newerRecord', () => {
 })
 
 describe('mergeProgress', () => {
+  // Resetting one guide from the Onboarding tool must stick: an older
+  // "completed" in the project's copy may not hand it straight back.
+  it('lets a newer reset of one guide beat an older status from elsewhere', () => {
+    const local: UserProgress = {tours: {essentials: at('2026-06-02T00:00:00Z', 'reset')}}
+    const remote: UserProgress = {tours: {essentials: at('2026-06-01T00:00:00Z')}}
+
+    expect(mergeProgress(local, remote).tours.essentials.status).toBe('reset')
+  })
+
+  it('reads a stored reset back from the project, so it survives the round trip', () => {
+    const items = toTourItems({tours: {essentials: at('2026-06-01T00:00:00Z', 'reset')}})
+
+    expect(fromTourItems(items).essentials?.status).toBe('reset')
+  })
+
   it('keeps a guide finished on another machine finished here', () => {
     const local: UserProgress = {tours: {}}
     const remote: UserProgress = {tours: {essentials: at('2026-06-01T00:00:00Z')}}

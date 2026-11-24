@@ -1,17 +1,18 @@
-import {CheckmarkIcon} from '@sanity/icons/Checkmark'
-import {RestoreIcon} from '@sanity/icons/Restore'
-import {EyeClosedIcon} from '@sanity/icons/EyeClosed'
 import {BookIcon} from '@sanity/icons/Book'
-import {Box, Button, Text} from '@sanity/ui'
+import {ResetIcon} from '@sanity/icons/Reset'
+import {RestoreIcon} from '@sanity/icons/Restore'
+import {Box, Button, Flex, Text} from '@sanity/ui'
 import {Menu, MenuButton, MenuDivider, MenuItem} from '@sanity/ui/menu'
 import {useCallback} from 'react'
 import {useTranslation} from 'sanity'
 import {styled} from 'styled-components'
 
-import {ONBOARDING_NAMESPACE} from '../i18n/index'
-import {useLocalizedText} from '../i18n/useLocalizedText'
 import {useOnboarding} from '../core/OnboardingProvider'
 import {type TourStatus} from '../core/types'
+import {ONBOARDING_NAMESPACE} from '../i18n/index'
+import {useLocalizedText} from '../i18n/useLocalizedText'
+import {TOUR_STATUS_DISPLAY} from './tourStatus'
+import {useStartGuide} from './useStartGuide'
 
 /**
  * A 4px dot in the button's top-right corner.
@@ -40,16 +41,6 @@ const DottedButton = styled(Button)<{$hint: boolean}>`
 `
 
 /**
- * A quiet marker for tours the user has finished or hidden, so the menu shows
- * what is left to read without labelling anything as unfinished homework.
- */
-function statusIcon(status: TourStatus | null): typeof CheckmarkIcon | undefined {
-  if (status === 'completed') return CheckmarkIcon
-  if (status === 'dismissed') return EyeClosedIcon
-  return undefined
-}
-
-/**
  * The way back into a tour.
  *
  * A tour a user dismissed once and can never reach again is worse than no tour,
@@ -58,7 +49,8 @@ function statusIcon(status: TourStatus | null): typeof CheckmarkIcon | undefined
  * plugins' navbar customisations.
  */
 export function HelpMenuButton(): React.JSX.Element | null {
-  const {tours, startTour, statuses, showMenuHint, markMenuOpened, resetAll} = useOnboarding()
+  const {tours, statuses, showMenuHint, markMenuOpened, resetAll, resetTour} = useOnboarding()
+  const {start} = useStartGuide()
   const {t} = useTranslation(ONBOARDING_NAMESPACE)
   const localize = useLocalizedText()
 
@@ -98,12 +90,14 @@ export function HelpMenuButton(): React.JSX.Element | null {
           </Box>
           <MenuDivider />
           {tours.map((tour) => (
-            <MenuItem
-              key={tour.id}
+            <TourMenuItem
               icon={tour.icon ?? BookIcon}
-              iconRight={statusIcon(statuses[tour.id] ?? null)}
-              onClick={() => startTour(tour.id)}
-              text={localize(tour.title)}
+              key={tour.id}
+              onReset={() => resetTour(tour.id)}
+              onStart={() => start(tour)}
+              resetLabel={t('menu.reset-one')}
+              status={statusIconFor(statuses[tour.id])}
+              title={localize(tour.title)}
             />
           ))}
           {/*
@@ -128,4 +122,48 @@ export function HelpMenuButton(): React.JSX.Element | null {
       popover={{placement: 'bottom-end', portal: true}}
     />
   )
+}
+
+/**
+ * One guide in the menu, with a way to forget it beside the status marker.
+ *
+ * The reset is a separate button next to the menu item rather than inside it:
+ * a button within a button is invalid, and a click on it would also start the
+ * guide. Only shown once there is something to reset.
+ */
+function TourMenuItem(props: {
+  icon: React.ElementType
+  title: string
+  status: React.ElementType | undefined
+  resetLabel: string
+  onStart: () => void
+  onReset: () => void
+}) {
+  return (
+    <Flex align="center" gap={1}>
+      <Box flex={1}>
+        <MenuItem
+          icon={props.icon}
+          iconRight={props.status}
+          onClick={props.onStart}
+          text={props.title}
+        />
+      </Box>
+      {props.status && (
+        <Button
+          aria-label={props.resetLabel}
+          icon={ResetIcon}
+          mode="bleed"
+          onClick={props.onReset}
+          padding={2}
+          title={props.resetLabel}
+        />
+      )}
+    </Flex>
+  )
+}
+
+/** A quiet marker for a finished or hidden guide, so the menu shows what is left to read. */
+function statusIconFor(status: TourStatus | null | undefined): React.ElementType | undefined {
+  return status ? TOUR_STATUS_DISPLAY[status]?.icon : undefined
 }
