@@ -145,7 +145,8 @@ const enUS = {
   'tool.guides.steps_other': '{{count}} steps',
   'tool.guides.start': 'Start',
   'tool.guides.reset': 'Reset',
-  'tool.guides.reset-hint': 'Forget your progress, so this guide behaves as if you had never seen it.',
+  'tool.guides.reset-hint':
+    'Forget your progress, so this guide behaves as if you had never seen it.',
   'tool.guides.your-status': 'You: {{status}}',
   'tool.autostart.first-login': 'Starts on first login',
   'tool.autostart.manual': 'Starts from the guides menu',
@@ -158,8 +159,7 @@ const enUS = {
   'tool.fields.from-config': 'In fieldGuides',
   'tool.fields.from-tour': 'Step in “{{tour}}”',
   'tool.settings.heading': 'Settings',
-  'tool.settings.intro':
-    'Set in sanity.config.ts. The Studio reads them before anyone signs in, which is why they live in code.',
+  'tool.settings.intro': 'Changed in sanity.config.ts.',
   'tool.settings.on': 'On',
   'tool.settings.off': 'Off',
   'tool.settings.sync': 'Progress follows editors between devices',

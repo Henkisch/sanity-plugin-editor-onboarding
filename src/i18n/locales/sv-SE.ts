@@ -149,7 +149,8 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'tool.guides.steps_other': '{{count}} steg',
   'tool.guides.start': 'Starta',
   'tool.guides.reset': 'Nollställ',
-  'tool.guides.reset-hint': 'Glöm dina framsteg, så att guiden beter sig som om du aldrig sett den.',
+  'tool.guides.reset-hint':
+    'Glöm dina framsteg, så att guiden beter sig som om du aldrig sett den.',
   'tool.guides.your-status': 'Du: {{status}}',
   'tool.autostart.first-login': 'Startar vid första inloggningen',
   'tool.autostart.manual': 'Startas från guidemenyn',
@@ -162,8 +163,7 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'tool.fields.from-config': 'I fieldGuides',
   'tool.fields.from-tour': 'Steg i ”{{tour}}”',
   'tool.settings.heading': 'Inställningar',
-  'tool.settings.intro':
-    'Ställs in i sanity.config.ts. Studion läser dem innan någon har loggat in, och därför ligger de i koden.',
+  'tool.settings.intro': 'Ändras i sanity.config.ts.',
   'tool.settings.on': 'På',
   'tool.settings.off': 'Av',
   'tool.settings.sync': 'Framsteg följer redaktören mellan enheter',

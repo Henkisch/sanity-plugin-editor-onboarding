@@ -187,45 +187,41 @@ export function FieldGuides({settings}: {settings: ToolSettings}) {
 export function Settings({settings}: {settings: ToolSettings}) {
   const {t} = useTranslation(ONBOARDING_NAMESPACE)
 
-  const rows: Array<{label: string; configKey: string; value: string}> = [
-    {
-      label: t('tool.settings.sync'),
-      configKey: 'syncProgress',
-      value: onOff(settings.syncProgress),
-    },
-    {
-      label: t('tool.settings.navbar'),
-      configKey: 'navbarButton',
-      value: onOff(settings.navbarButton),
-    },
-    {
-      label: t('tool.settings.finder'),
-      configKey: 'conventionFinder',
-      value: onOff(!!settings.finder),
-    },
+  // A switch reads as a badge, so on and off are told apart at a glance; the
+  // one setting that is a list stays text.
+  const rows: Array<{label: string; configKey: string; value: boolean | string}> = [
+    {label: t('tool.settings.sync'), configKey: 'syncProgress', value: settings.syncProgress},
+    {label: t('tool.settings.navbar'), configKey: 'navbarButton', value: settings.navbarButton},
+    {label: t('tool.settings.finder'), configKey: 'conventionFinder', value: !!settings.finder},
     {label: t('tool.settings.roles'), configKey: 'tool.roles', value: settings.roles.join(', ')},
   ]
 
-  function onOff(on: boolean): string {
-    return on ? t('tool.settings.on') : t('tool.settings.off')
-  }
-
   return (
-    <Stack gap={3}>
-      {rows.map((row) => (
-        <Flex align="flex-start" gap={3} key={row.configKey}>
-          <Stack flex={1} gap={2}>
-            <Text muted size={1}>
-              {row.label}
-            </Text>
-            <Text muted size={0}>
-              <code>{row.configKey}</code>
-            </Text>
-          </Stack>
-          <Text size={1}>{row.value}</Text>
-        </Flex>
-      ))}
-    </Stack>
+    <Card border radius={2}>
+      <Stack>
+        {rows.map((row, index) => (
+          <Card borderTop={index > 0} key={row.configKey} paddingX={3} paddingY={3}>
+            <Flex align="center" gap={3}>
+              <Stack flex={1} gap={2}>
+                <Text size={1}>{row.label}</Text>
+                <Text muted size={0}>
+                  <code>{row.configKey}</code>
+                </Text>
+              </Stack>
+              {typeof row.value === 'boolean' ? (
+                <Badge fontSize={0} tone={row.value ? 'positive' : 'default'}>
+                  {row.value ? t('tool.settings.on') : t('tool.settings.off')}
+                </Badge>
+              ) : (
+                <Text muted size={1}>
+                  {row.value}
+                </Text>
+              )}
+            </Flex>
+          </Card>
+        ))}
+      </Stack>
+    </Card>
   )
 }
 
