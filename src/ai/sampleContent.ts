@@ -1,3 +1,6 @@
+import {isRecord} from '../core/isRecord'
+import {blockText, isPortableText} from './portableText'
+
 /**
  * Real documents, shrunk to what shows a writer how a field is used.
  *
@@ -12,10 +15,15 @@
 /** Long enough to show what kind of text a field holds, short enough to keep a prompt small. */
 export const MAX_STRING_LENGTH = 200
 
-/** Published documents only: a half-written draft would teach the writer someone's mistake. */
-export const SAMPLE_QUERY = `*[_type == $type && !(_id in path("drafts.**")) && !(_id in path("versions.**"))] | order(_updatedAt desc)[0...$limit]`
+/**
+ * Published documents only: a half-written draft would teach the writer
+ * someone's mistake, and a release version is not live yet.
+ *
+ * @internal
+ */
+export const PUBLISHED_FILTER = '!(_id in path("drafts.**")) && !(_id in path("versions.**"))'
 
-export const SAMPLE_LIMIT = 3
+export const SAMPLE_QUERY = `*[_type == $type && ${PUBLISHED_FILTER}] | order(_updatedAt desc)[0...$limit]`
 
 /** A document with system fields removed and every value shortened. @internal */
 export function summarizeDocument(document: unknown): unknown {
@@ -50,28 +58,16 @@ function summarize(value: unknown, depth: number): unknown {
  * enough to show it is prose without sending the article.
  */
 function summarizeArray(items: unknown[], depth: number): unknown {
-  const blocks = items.filter((item) => isRecord(item) && item._type === 'block')
-  if (blocks.length > 0 && blocks.length === items.length) {
-    return `[${blocks.length} paragraph(s): ${truncate(blockText(blocks[0]))}]`
+  if (isPortableText(items)) {
+    return `[${items.length} paragraph(s): ${truncate(blockText(items[0]))}]`
   }
 
   const shown = items.slice(0, 3).map((item) => summarize(item, depth + 1))
   return items.length > 3 ? [...shown, `[+${items.length - 3} more]`] : shown
 }
 
-function blockText(block: unknown): string {
-  if (!isRecord(block) || !Array.isArray(block.children)) return ''
-  return block.children
-    .map((child: unknown) => (isRecord(child) && typeof child.text === 'string' ? child.text : ''))
-    .join('')
-}
-
 function truncate(text: string): string {
   return text.length > MAX_STRING_LENGTH ? `${text.slice(0, MAX_STRING_LENGTH)}…` : text
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
 }
 
 /**
@@ -86,7 +82,7 @@ export function countQuery(types: string[]): {query: string; params: Record<stri
   const params: Record<string, string> = {}
   const fields = types.map((type, index) => {
     params[`t${index}`] = type
-    return `"t${index}": count(*[_type == $t${index} && !(_id in path("drafts.**")) && !(_id in path("versions.**"))])`
+    return `"t${index}": count(*[_type == $t${index} && ${PUBLISHED_FILTER}])`
   })
   return {query: `{${fields.join(', ')}}`, params}
 }

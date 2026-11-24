@@ -449,15 +449,15 @@ describe('field help', () => {
   // key, so a selector built from the key-free name matched nothing and the
   // help closed the instant it opened. The icon knows the exact path clicked.
   it('points at the exact field clicked, so help on a field inside an array row opens', () => {
-    setFixture(`<div data-testid='field-prices[_key=="a1"].minutes'>field</div>`)
-    const guide: FieldGuide = {field: 'prices.minutes', title: 'Quarter hours', content: '…'}
+    setFixture(`<div data-testid='field-ingredients[_key=="a1"].amount'>field</div>`)
+    const guide: FieldGuide = {field: 'ingredients.amount', title: 'Amounts in grams', content: '…'}
     const session = renderProvider({tours: [], fieldGuides: [guide]})
 
-    const help = session.onboarding.fieldHelpFor('prices.minutes', undefined)
-    if (!help) throw new Error('expected field help to be registered for "prices.minutes"')
-    act(() => session.onboarding.showFieldHelp(help, targetField('prices[_key=="a1"].minutes')))
+    const help = session.onboarding.fieldHelpFor('ingredients.amount', undefined)
+    if (!help) throw new Error('expected field help to be registered for "ingredients.amount"')
+    act(() => session.onboarding.showFieldHelp(help, targetField('ingredients[_key=="a1"].amount')))
 
-    expect(screen.getByText('Quarter hours')).toBeTruthy()
+    expect(screen.getByText('Amounts in grams')).toBeTruthy()
   })
 })
 

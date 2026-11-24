@@ -122,8 +122,8 @@ same Start behaviour and a per-guide reset are in the editors' guides menu.
 on). Pick a document type and it reads up to twelve published documents,
 measures how each field is filled in, and asks Sanity's AI for the patterns
 most of them follow but no field description states — every SEO title ending in
-the brand name, durations always in quarter hours, price variants always
-ordered small to large. Tick the ones worth telling a new editor and copy them
+the brand name, cooking times always in whole minutes, ingredients always
+listed in the order they are used. Tick the ones worth telling a new editor and copy them
 as `fieldGuides` code.
 
 It deliberately does not explain fields. An earlier version tried, and on a

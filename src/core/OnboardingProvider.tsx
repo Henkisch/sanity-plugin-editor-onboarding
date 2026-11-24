@@ -536,7 +536,7 @@ export function OnboardingProvider(props: {
 
   // The clicked field's own selector beats the one derived from its name.
   // Inside an array, Studio ids the field by the item's key —
-  // `prices[_key=="…"].durationMin` — so `field-prices.durationMin` matches
+  // `ingredients[_key=="…"].amount` — so `field-ingredients.amount` matches
   // nothing and the help closed the moment it opened. A step's explicit
   // `target` still wins, as it does everywhere else.
   const showFieldHelp = useCallback((help: FieldHelp, target?: string) => {

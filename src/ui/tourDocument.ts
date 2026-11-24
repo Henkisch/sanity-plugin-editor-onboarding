@@ -1,3 +1,4 @@
+import {PUBLISHED_FILTER} from '../ai/sampleContent'
 import {type SerializedDocumentType} from '../ai/serializeSchema'
 import {
   targetAssetBrowse,
@@ -50,8 +51,15 @@ export function documentTypesFor(tour: OnboardingTour, types: SerializedDocument
 
 const DOCUMENT_TARGETS = [targetPublishButton(), targetDocumentStatus(), targetDocumentHistory()]
 
-/** The most recently edited document of any of these types, drafts included. @internal */
-export const LATEST_DOCUMENT_QUERY = `*[_type in $types && !(_id in path("versions.**"))] | order(_updatedAt desc)[0]{_id, _type}`
+/**
+ * The most recently edited published document of any of these types.
+ *
+ * Published only: a guide that walks someone through publishing should not
+ * land them in a colleague's half-written draft.
+ *
+ * @internal
+ */
+export const LATEST_DOCUMENT_QUERY = `*[_type in $types && ${PUBLISHED_FILTER}] | order(_updatedAt desc)[0]{_id, _type}`
 
 /**
  * Resolve once `selector` has matched the same, visible element for

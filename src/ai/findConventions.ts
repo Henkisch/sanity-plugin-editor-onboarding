@@ -1,5 +1,6 @@
 import {type SanityClient} from 'sanity'
 
+import {QUERY_API_VERSION} from '../core/apiVersion'
 import {
   CONVENTION_INSTRUCTION,
   CONVENTION_SAMPLE_LIMIT,
@@ -7,6 +8,7 @@ import {
   MIN_EVIDENCE,
   validateConventions,
   type Convention,
+  type DroppedConvention,
 } from './conventions'
 import {fieldStats} from './fieldStats'
 import {SAMPLE_QUERY, summarizeDocument} from './sampleContent'
@@ -18,9 +20,6 @@ import {type SerializedDocumentType} from './serializeSchema'
  * @internal
  */
 
-/** Pinned so a Studio's own API version cannot change what the sample query returns. */
-const QUERY_API_VERSION = '2024-01-01'
-
 /** Agent Actions answer on this version only; a dated one is rejected with a 400. */
 const AGENT_API_VERSION = 'vX'
 
@@ -31,7 +30,7 @@ export type ConventionResult =
       status: 'done'
       documentCount: number
       kept: Convention[]
-      dropped: Array<{item: unknown; reason: string}>
+      dropped: DroppedConvention[]
     }
 
 /**

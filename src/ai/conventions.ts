@@ -1,3 +1,4 @@
+import {isRecord} from '../core/isRecord'
 import {type FieldStats} from './fieldStats'
 import {type SerializedDocumentType} from './serializeSchema'
 
@@ -36,9 +37,9 @@ Published documents of this type (JSON, shortened to save space; trust the measu
 $samples
 
 Find patterns that most of these documents follow but that no field description states. Examples of what counts:
-- A recurring format, e.g. every SEO title is "Topic | Brand, Town".
+- A recurring format, e.g. every SEO title is "Topic | Brand".
 - A consistent length, taken from the measured facts, e.g. answers are 60 to 130 characters.
-- Consistent wording or naming, e.g. prices always written "från 450 kr".
+- Consistent wording or naming, e.g. amounts always written "2 dl", never "two decilitres".
 - A consistent order or set of entries in a list.
 
 Rules:
@@ -78,6 +79,12 @@ export interface Convention {
   examples: string[]
 }
 
+/** A suggestion that was thrown out, and why — for the developer's console. @internal */
+export interface DroppedConvention {
+  item: unknown
+  reason: string
+}
+
 /**
  * Keep only conventions that name a real field and claim enough evidence.
  *
@@ -89,12 +96,12 @@ export function validateConventions(
   response: unknown,
   type: SerializedDocumentType,
   sampleCount: number,
-): {kept: Convention[]; dropped: Array<{item: unknown; reason: string}>} {
+): {kept: Convention[]; dropped: DroppedConvention[]} {
   const paths = new Set(type.fields.map((field) => field.path))
   const items =
     isRecord(response) && Array.isArray(response.conventions) ? response.conventions : []
   const kept: Convention[] = []
-  const dropped: Array<{item: unknown; reason: string}> = []
+  const dropped: DroppedConvention[] = []
 
   for (const item of items) {
     if (!isRecord(item)) {
@@ -120,8 +127,4 @@ export function validateConventions(
   }
 
   return {kept, dropped}
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
 }

@@ -3,14 +3,12 @@ import {getPublishedId, useClient, useSchema} from 'sanity'
 import {useRouter} from 'sanity/router'
 
 import {serializeSchema} from '../ai/serializeSchema'
+import {QUERY_API_VERSION} from '../core/apiVersion'
 import {stepTarget} from '../core/fieldHelp'
 import {useOnboardingOptional} from '../core/OnboardingProvider'
 import {type OnboardingTour} from '../core/types'
 import {query} from '../core/useTargetElement'
 import {documentTypesFor, LATEST_DOCUMENT_QUERY, waitForElement} from './tourDocument'
-
-/** Pinned like every other read this plugin makes. */
-const QUERY_API_VERSION = '2024-01-01'
 
 /**
  * Start a guide where it can run, opening a document first if it needs one.

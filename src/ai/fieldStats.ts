@@ -1,3 +1,5 @@
+import {isRecord} from '../core/isRecord'
+import {blockText, isPortableText} from './portableText'
 import {type SerializedDocumentType} from './serializeSchema'
 
 /**
@@ -77,27 +79,11 @@ function valuesAt(value: unknown, segments: string[]): unknown[] {
 
 function textOf(value: unknown): string | undefined {
   if (typeof value === 'string') return value
-  if (Array.isArray(value) && isPortableText(value)) {
-    return value
-      .map((block: unknown) =>
-        isRecord(block) && Array.isArray(block.children)
-          ? block.children
-              .map((child: unknown) =>
-                isRecord(child) && typeof child.text === 'string' ? child.text : '',
-              )
-              .join('')
-          : '',
-      )
-      .join('\n')
-  }
+  if (Array.isArray(value) && isPortableText(value)) return value.map(blockText).join('\n')
   if (isRecord(value) && value._type === 'slug' && typeof value.current === 'string') {
     return value.current
   }
   return undefined
-}
-
-function isPortableText(value: unknown[]): boolean {
-  return value.length > 0 && value.every((item) => isRecord(item) && item._type === 'block')
 }
 
 /** Empty strings and empty arrays are not filled in, whatever the Content Lake thinks. */
@@ -118,8 +104,4 @@ function median(values: number[]): number {
   const value =
     sorted.length % 2 ? sorted[middle] : ((sorted[middle - 1] ?? 0) + (sorted[middle] ?? 0)) / 2
   return Math.round(value ?? 0)
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
 }

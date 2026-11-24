@@ -247,9 +247,9 @@ export interface OnboardingConfig {
    */
   tool?: boolean | OnboardingToolOptions
   /**
-   * Add an "Unwritten rules" tab to the Onboarding tool. It finds patterns your
-   * editors already follow in published content and turns the ones you pick
-   * into `fieldGuides` code.
+   * Add "Suggest more" to the Onboarding tool's field guides. It finds
+   * patterns your editors already follow in published content and turns the
+   * ones you pick into `fieldGuides` code.
    *
    * Off by default: each run sends up to twelve published documents, shortened,
    * to Sanity's AI and is billed to the project's AI credits. Nothing it finds

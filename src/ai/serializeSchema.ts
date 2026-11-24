@@ -1,5 +1,7 @@
 import {type Schema} from 'sanity'
 
+import {isRecord} from '../core/isRecord'
+
 /**
  * The Studio's compiled schema, reduced to what a writer needs to explain a
  * field to an editor.
@@ -337,56 +339,4 @@ function text(value: unknown): string | undefined {
  */
 function isCompiledType(value: unknown): value is CompiledType {
   return isRecord(value) && typeof value.name === 'string'
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
-}
-
-/**
- * A short, stable hash of what a field *means*.
- *
- * Stored on a generated guide so a later visit can tell the field has changed
- * underneath it. Only the parts a guide's wording depends on are hashed —
- * moving a field to another group does not make its explanation wrong.
- *
- * FNV-1a rather than SubtleCrypto: this needs to be synchronous and
- * collision-resistant only against accidental change, and the plugin takes no
- * runtime dependencies.
- *
- * @internal
- */
-export function fingerprint(field: SerializedField): string {
-  const relevant = {
-    title: field.title,
-    description: field.description,
-    type: field.type,
-    to: field.to,
-    of: field.of,
-    list: field.list,
-    validation: field.validation,
-  }
-  return fnv1a(stableStringify(relevant))
-}
-
-/** JSON with sorted keys, so property order never changes a hash. */
-export function stableStringify(value: unknown): string {
-  if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`
-  if (isRecord(value)) {
-    const entries = Object.keys(value)
-      .filter((key) => value[key] !== undefined)
-      .sort()
-      .map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`)
-    return `{${entries.join(',')}}`
-  }
-  return JSON.stringify(value) ?? 'null'
-}
-
-function fnv1a(input: string): string {
-  let hash = 0x811c9dc5
-  for (let index = 0; index < input.length; index++) {
-    hash ^= input.charCodeAt(index)
-    hash = Math.imul(hash, 0x01000193)
-  }
-  return (hash >>> 0).toString(16).padStart(8, '0')
 }

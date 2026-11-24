@@ -1,3 +1,4 @@
+import {collectFieldHelp} from '../core/fieldHelp'
 import {type AutoStart, type FieldGuide, type OnboardingTour} from '../core/types'
 import {type LocalizedText} from '../i18n/useLocalizedText'
 
@@ -22,31 +23,23 @@ export interface FieldGuideRow {
 /**
  * Every field with help, standalone guides and tour steps alike.
  *
- * Mirrors `collectFieldHelp`, but keeps which tour a step came from: a
- * developer reading the overview needs to know where to go to change the text.
+ * Read from `collectFieldHelp`, the list the field action itself uses, so the
+ * overview can never show a guide editors do not get, or miss one they do.
+ * Keeps which tour a step came from: that is where its text is changed.
  */
 export function fieldGuideRows(tours: OnboardingTour[], guides: FieldGuide[]): FieldGuideRow[] {
-  const fromSteps = tours.flatMap((tour) =>
-    tour.steps.flatMap((step) =>
-      step.field
-        ? [
-            {
-              id: `tour:${tour.id}:${step.field}`,
-              field: step.field,
-              title: step.title,
-              tourTitle: tour.title,
-            },
-          ]
-        : [],
-    ),
-  )
-  const fromGuides = guides.map((guide) => ({
-    id: `guide:${guide.documentType ?? '*'}:${guide.field}`,
-    field: guide.field,
-    title: guide.title,
-    ...(guide.documentType ? {documentType: guide.documentType} : {}),
-  }))
-  return [...fromGuides, ...fromSteps]
+  return collectFieldHelp(tours, guides).map((help) => {
+    const row: FieldGuideRow = {
+      id: help.tour
+        ? `tour:${help.tour.id}:${help.field}`
+        : `guide:${help.documentType ?? '*'}:${help.field}`,
+      field: help.field,
+      title: help.step.title,
+    }
+    if (help.documentType) row.documentType = help.documentType
+    if (help.tour) row.tourTitle = help.tour.title
+    return row
+  })
 }
 
 /** The i18n key describing when a tour starts by itself. @internal */

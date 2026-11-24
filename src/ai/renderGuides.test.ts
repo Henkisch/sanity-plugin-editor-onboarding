@@ -3,30 +3,30 @@ import {describe, expect, it} from 'vitest'
 import {renderConventionGuides} from './renderGuides'
 
 const convention = {
-  field: 'prices.durationMin',
-  title: 'Ange tider i hela kvartar',
-  content: "Alla tider är multiplar av 15 minuter, t.ex. 135. It's consistent.",
+  field: 'ingredients.amount',
+  title: 'Ange mängder i gram',
+  content: "Alla mängder anges i gram, t.ex. 250. It's consistent.",
   seenIn: 8,
   examples: [],
 }
 
 describe('renderConventionGuides', () => {
   it('writes entries a developer can paste straight into `fieldGuides`', () => {
-    const code = renderConventionGuides('service', [convention])
-    expect(code).toContain("field: 'prices.durationMin',")
-    expect(code).toContain("documentType: 'service',")
-    expect(code).toContain("title: 'Ange tider i hela kvartar',")
+    const code = renderConventionGuides('recipe', [convention])
+    expect(code).toContain("field: 'ingredients.amount',")
+    expect(code).toContain("documentType: 'recipe',")
+    expect(code).toContain("title: 'Ange mängder i gram',")
   })
 
   it('escapes quotes, so a guide with an apostrophe still compiles', () => {
-    expect(renderConventionGuides('service', [convention])).toContain("It\\'s consistent.")
+    expect(renderConventionGuides('recipe', [convention])).toContain("It\\'s consistent.")
   })
 
   it('carries the evidence as a comment, so the reviewer can judge it without rerunning', () => {
-    expect(renderConventionGuides('service', [convention])).toContain('Seen in 8 published')
+    expect(renderConventionGuides('recipe', [convention])).toContain('Seen in 8 published')
   })
 
   it('writes nothing when nothing was chosen', () => {
-    expect(renderConventionGuides('service', [])).toBe('')
+    expect(renderConventionGuides('recipe', [])).toBe('')
   })
 })

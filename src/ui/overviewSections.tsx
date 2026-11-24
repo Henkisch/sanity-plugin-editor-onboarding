@@ -2,6 +2,7 @@ import {BookIcon} from '@sanity/icons/Book'
 import {Badge, Box, Button, Card, Flex, Stack, Text} from '@sanity/ui'
 import {useMemo} from 'react'
 import {useSchema, useTranslation} from 'sanity'
+import {styled} from 'styled-components'
 
 import {useOnboardingOptional} from '../core/OnboardingProvider'
 import {ONBOARDING_NAMESPACE} from '../i18n/index'
@@ -9,6 +10,7 @@ import {useLocalizedText} from '../i18n/useLocalizedText'
 import {Collapsible} from './Collapsible'
 import {autoStartKey, fieldGuideRows, groupFieldGuides} from './overview'
 import {type ToolSettings} from './toolSettings'
+import {TOUR_STATUS_DISPLAY} from './tourStatus'
 import {useStartGuide} from './useStartGuide'
 
 /**
@@ -57,72 +59,65 @@ export function Guides() {
   if (tours.length === 0) return <Empty text={t('tool.guides.empty')} />
 
   return (
-    <Card border radius={2}>
-      <Stack>
-        {tours.map((tour, index) => {
-          const Icon = tour.icon ?? BookIcon
-          const status = onboarding?.statuses[tour.id]
-          const statusText =
-            status === 'completed'
-              ? t('menu.status.completed')
-              : status === 'dismissed'
-                ? t('menu.status.dismissed')
-                : undefined
-          // Starting from the menu is what nearly every guide does, so only
-          // the exceptions are worth a line.
-          const startsItself = tour.autoStart !== undefined && tour.autoStart !== 'manual'
+    <ListCard>
+      {tours.map((tour) => {
+        const Icon = tour.icon ?? BookIcon
+        const status = onboarding?.statuses[tour.id]
+        const display = status ? TOUR_STATUS_DISPLAY[status] : undefined
+        // Starting from the menu is what nearly every guide does, so only
+        // the exceptions are worth a line.
+        const startsItself = tour.autoStart !== undefined && tour.autoStart !== 'manual'
 
-          return (
-            <Card borderTop={index > 0} key={tour.id} paddingX={3} paddingY={2}>
-              <Flex align="center" gap={3}>
-                <Text muted size={1}>
-                  <Icon />
+        return (
+          <ListRow compact key={tour.id}>
+            <Flex align="center" gap={3}>
+              <Text muted size={1}>
+                <Icon />
+              </Text>
+              <Stack flex={1} gap={2}>
+                <Text size={1} weight="medium">
+                  {localize(tour.title)}
                 </Text>
-                <Stack flex={1} gap={2}>
-                  <Text size={1} weight="medium">
-                    {localize(tour.title)}
+                <Flex gap={3} wrap="wrap">
+                  <Text muted size={0}>
+                    <code>{tour.id}</code>
                   </Text>
-                  <Flex gap={3} wrap="wrap">
+                  {startsItself && (
                     <Text muted size={0}>
-                      <code>{tour.id}</code>
+                      {t(autoStartKey(tour.autoStart))}
                     </Text>
-                    {startsItself && (
-                      <Text muted size={0}>
-                        {t(autoStartKey(tour.autoStart))}
-                      </Text>
-                    )}
-                  </Flex>
-                </Stack>
-                {statusText && (
-                  <Badge fontSize={0} tone={status === 'completed' ? 'positive' : 'default'}>
-                    {statusText}
-                  </Badge>
-                )}
-                {statusText && (
-                  <Button
-                    fontSize={1}
-                    mode="bleed"
-                    onClick={() => onboarding?.resetTour(tour.id)}
-                    padding={2}
-                    text={t('tool.guides.reset')}
-                    title={t('tool.guides.reset-hint')}
-                  />
-                )}
+                  )}
+                </Flex>
+              </Stack>
+              {display && (
+                <Badge fontSize={0} tone={display.tone}>
+                  {t(display.labelKey)}
+                </Badge>
+              )}
+              {display && (
                 <Button
-                  disabled={starting !== null}
                   fontSize={1}
-                  loading={starting === tour.id}
                   mode="bleed"
-                  onClick={() => start(tour)}
+                  onClick={() => onboarding?.resetTour(tour.id)}
                   padding={2}
-                  text={t('tool.guides.start')}
+                  text={t('tool.guides.reset')}
+                  title={t('tool.guides.reset-hint')}
                 />
-              </Flex>
-            </Card>
-          )
-        })}
-      </Stack>
-    </Card>
+              )}
+              <Button
+                disabled={starting !== null}
+                fontSize={1}
+                loading={starting === tour.id}
+                mode="bleed"
+                onClick={() => start(tour)}
+                padding={2}
+                text={t('tool.guides.start')}
+              />
+            </Flex>
+          </ListRow>
+        )
+      })}
+    </ListCard>
   )
 }
 
@@ -192,38 +187,69 @@ export function Settings({settings}: {settings: ToolSettings}) {
   const rows: Array<{label: string; configKey: string; value: boolean | string}> = [
     {label: t('tool.settings.sync'), configKey: 'syncProgress', value: settings.syncProgress},
     {label: t('tool.settings.navbar'), configKey: 'navbarButton', value: settings.navbarButton},
-    {label: t('tool.settings.finder'), configKey: 'conventionFinder', value: !!settings.finder},
+    {
+      label: t('tool.settings.convention-finder'),
+      configKey: 'conventionFinder',
+      value: !!settings.conventionFinder,
+    },
     {label: t('tool.settings.roles'), configKey: 'tool.roles', value: settings.roles.join(', ')},
   ]
 
   return (
-    <Card border radius={2}>
-      <Stack>
-        {rows.map((row, index) => (
-          <Card borderTop={index > 0} key={row.configKey} paddingX={3} paddingY={3}>
-            <Flex align="center" gap={3}>
-              <Stack flex={1} gap={2}>
-                <Text size={1}>{row.label}</Text>
-                <Text muted size={0}>
-                  <code>{row.configKey}</code>
-                </Text>
-              </Stack>
-              {typeof row.value === 'boolean' ? (
-                <Badge fontSize={0} tone={row.value ? 'positive' : 'default'}>
-                  {row.value ? t('tool.settings.on') : t('tool.settings.off')}
-                </Badge>
-              ) : (
-                <Text muted size={1}>
-                  {row.value}
-                </Text>
-              )}
-            </Flex>
-          </Card>
-        ))}
-      </Stack>
+    <ListCard>
+      {rows.map((row) => (
+        <ListRow key={row.configKey}>
+          <Flex align="center" gap={3}>
+            <Stack flex={1} gap={2}>
+              <Text size={1}>{row.label}</Text>
+              <Text muted size={0}>
+                <code>{row.configKey}</code>
+              </Text>
+            </Stack>
+            {typeof row.value === 'boolean' ? (
+              <Badge fontSize={0} tone={row.value ? 'positive' : 'default'}>
+                {row.value ? t('tool.settings.on') : t('tool.settings.off')}
+              </Badge>
+            ) : (
+              <Text muted size={1}>
+                {row.value}
+              </Text>
+            )}
+          </Flex>
+        </ListRow>
+      ))}
+    </ListCard>
+  )
+}
+
+/**
+ * A bordered list with a rule between rows, for the guides and the settings.
+ *
+ * The rule is drawn on every row but the first by CSS rather than by index, so
+ * a row needs no idea of where it sits.
+ */
+function ListCard({children}: {children: React.ReactNode}) {
+  return (
+    <Card border radius={2} style={{overflow: 'hidden'}}>
+      <Stack>{children}</Stack>
     </Card>
   )
 }
+
+/** `compact` for rows that hold buttons, which bring their own padding. */
+function ListRow({children, compact}: {children: React.ReactNode; compact?: boolean}) {
+  return (
+    <ListRowCard paddingX={3} paddingY={compact ? 2 : 3}>
+      {children}
+    </ListRowCard>
+  )
+}
+
+const ListRowCard = styled(Card)`
+  & + & {
+    border-top: 1px solid var(--card-border-color);
+  }
+`
 
 function Empty({text}: {text: string}) {
   return (

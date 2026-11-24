@@ -7,6 +7,7 @@ import {classifyError, findConventions, type ConventionError} from '../ai/findCo
 import {renderConventionGuides} from '../ai/renderGuides'
 import {countQuery, readCounts} from '../ai/sampleContent'
 import {serializeSchema, type SerializedDocumentType} from '../ai/serializeSchema'
+import {QUERY_API_VERSION} from '../core/apiVersion'
 import {ONBOARDING_NAMESPACE} from '../i18n/index'
 import {Collapsible} from './Collapsible'
 
@@ -44,7 +45,7 @@ const STRONG_EVIDENCE = 0.75
 export function ConventionsPanel(props: {language?: string}) {
   const {t} = useTranslation(ONBOARDING_NAMESPACE)
   const schema = useSchema()
-  const client = useClient({apiVersion: '2024-01-01'})
+  const client = useClient({apiVersion: QUERY_API_VERSION})
   const locale = useCurrentLocale()
   const types = useMemo(() => serializeSchema(schema), [schema])
 

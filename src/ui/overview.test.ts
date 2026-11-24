@@ -18,8 +18,8 @@ describe('fieldGuideRows', () => {
       [{field: 'bio', documentType: 'author', title: 'Bio', content: '…'}],
     )
     expect(rows).toEqual([
-      {id: 'guide:author:bio', field: 'bio', documentType: 'author', title: 'Bio'},
       {id: 'tour:publishing:slug', field: 'slug', title: 'Slug', tourTitle: 'Publishing'},
+      {id: 'guide:author:bio', field: 'bio', documentType: 'author', title: 'Bio'},
     ])
   })
 

@@ -1,18 +1,17 @@
-import {CheckmarkIcon} from '@sanity/icons/Checkmark'
-import {EyeClosedIcon} from '@sanity/icons/EyeClosed'
+import {BookIcon} from '@sanity/icons/Book'
 import {ResetIcon} from '@sanity/icons/Reset'
 import {RestoreIcon} from '@sanity/icons/Restore'
-import {BookIcon} from '@sanity/icons/Book'
 import {Box, Button, Flex, Text} from '@sanity/ui'
 import {Menu, MenuButton, MenuDivider, MenuItem} from '@sanity/ui/menu'
 import {useCallback} from 'react'
 import {useTranslation} from 'sanity'
 import {styled} from 'styled-components'
 
-import {ONBOARDING_NAMESPACE} from '../i18n/index'
-import {useLocalizedText} from '../i18n/useLocalizedText'
 import {useOnboarding} from '../core/OnboardingProvider'
 import {type TourStatus} from '../core/types'
+import {ONBOARDING_NAMESPACE} from '../i18n/index'
+import {useLocalizedText} from '../i18n/useLocalizedText'
+import {TOUR_STATUS_DISPLAY} from './tourStatus'
 import {useStartGuide} from './useStartGuide'
 
 /**
@@ -40,16 +39,6 @@ const DottedButton = styled(Button)<{$hint: boolean}>`
     box-shadow: 0 0 0 1px var(--card-bg-color);
   }
 `
-
-/**
- * A quiet marker for tours the user has finished or hidden, so the menu shows
- * what is left to read without labelling anything as unfinished homework.
- */
-function statusIcon(status: TourStatus | null): typeof CheckmarkIcon | undefined {
-  if (status === 'completed') return CheckmarkIcon
-  if (status === 'dismissed') return EyeClosedIcon
-  return undefined
-}
 
 /**
  * The way back into a tour.
@@ -107,7 +96,7 @@ export function HelpMenuButton(): React.JSX.Element | null {
               onReset={() => resetTour(tour.id)}
               onStart={() => start(tour)}
               resetLabel={t('menu.reset-one')}
-              status={statusIcon(statuses[tour.id] ?? null)}
+              status={statusIconFor(statuses[tour.id])}
               title={localize(tour.title)}
             />
           ))}
@@ -172,4 +161,9 @@ function TourMenuItem(props: {
       )}
     </Flex>
   )
+}
+
+/** A quiet marker for a finished or hidden guide, so the menu shows what is left to read. */
+function statusIconFor(status: TourStatus | null | undefined): React.ElementType | undefined {
+  return status ? TOUR_STATUS_DISPLAY[status]?.icon : undefined
 }

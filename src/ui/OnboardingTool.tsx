@@ -12,10 +12,10 @@ import {type ToolSettings} from './toolSettings'
  * Field guides get the wide column: first the way to find more, since that
  * is what a developer comes here to do, then the ones that already exist —
  * a list that can run long, so it goes below rather than pushing the action
- * off screen. That is the only
- * action on the page that costs anything, so it holds the only primary
- * button. Registered guides and settings sit to the side as reference;
- * settings last, since they are changed in code and only ever looked up.
+ * off screen. Finding more is also the only action on the page that costs
+ * anything, so it holds the only primary button. Registered guides and
+ * settings sit to the side as reference; settings last, since they are
+ * changed in code and only ever looked up.
  *
  * On a narrow window the columns stack in the same order.
  *
@@ -43,13 +43,13 @@ export function OnboardingTool({tool}: {tool: Tool<ToolSettings>}) {
               size="primary"
             >
               <Stack gap={4}>
-                {settings.finder && (
+                {settings.conventionFinder && (
                   <Card border padding={[3, 3, 4]} radius={2}>
                     <Stack gap={4}>
                       <Text as="h3" size={2} weight="semibold">
                         {t('conventions.heading')}
                       </Text>
-                      <ConventionsPanel language={settings.finder.language} />
+                      <ConventionsPanel language={settings.conventionFinder.language} />
                     </Stack>
                   </Card>
                 )}

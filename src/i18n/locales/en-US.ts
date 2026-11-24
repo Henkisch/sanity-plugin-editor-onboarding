@@ -107,9 +107,9 @@ const enUS = {
   'conventions.intro':
     'Reads your published content and suggests field guides based on how editors already fill in each field. You choose which ones editors see.',
   'conventions.examples-heading': 'It might suggest',
-  'conventions.example-1': 'Give times in whole quarter hours',
+  'conventions.example-1': 'Give cooking times in whole minutes',
   'conventions.example-2': 'End SEO titles with the company name',
-  'conventions.example-3': 'List price variants smallest first',
+  'conventions.example-3': 'List ingredients in the order they are used',
   'conventions.type-label': 'Document type',
   'conventions.run': 'Find suggestions',
   'conventions.running': 'Reading documents and looking for patterns. This takes 5 to 15 seconds.',
@@ -141,13 +141,10 @@ const enUS = {
   'tool.heading': 'Onboarding',
   'tool.guides.heading': 'Guides',
   'tool.guides.empty': 'No guides are registered.',
-  'tool.guides.steps_one': '{{count}} step',
-  'tool.guides.steps_other': '{{count}} steps',
   'tool.guides.start': 'Start',
   'tool.guides.reset': 'Reset',
   'tool.guides.reset-hint':
     'Forget your progress, so this guide behaves as if you had never seen it.',
-  'tool.guides.your-status': 'You: {{status}}',
   'tool.autostart.first-login': 'Starts on first login',
   'tool.autostart.manual': 'Starts from the guides menu',
   'tool.autostart.custom': 'Starts by a custom rule',
@@ -156,7 +153,6 @@ const enUS = {
   'tool.fields.existing': 'Existing field guides',
   'tool.fields.empty': 'No field has a guide yet.',
   'tool.fields.all-types': 'All document types',
-  'tool.fields.from-config': 'In fieldGuides',
   'tool.fields.from-tour': 'Step in “{{tour}}”',
   'tool.settings.heading': 'Settings',
   'tool.settings.intro': 'Changed in sanity.config.ts.',
@@ -164,9 +160,8 @@ const enUS = {
   'tool.settings.off': 'Off',
   'tool.settings.sync': 'Progress follows editors between devices',
   'tool.settings.navbar': 'Guides button in the top bar',
-  'tool.settings.finder': 'Field guide suggestions (uses AI credits)',
+  'tool.settings.convention-finder': 'Field guide suggestions (uses AI credits)',
   'tool.settings.roles': 'This tool is shown to',
-  'tool.settings.language': 'Studio language',
 }
 
 export default enUS

@@ -111,9 +111,9 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'conventions.intro':
     'Läser ert publicerade innehåll och föreslår fältguider utifrån hur redaktörerna redan fyller i fälten. Du väljer vilka som ska visas.',
   'conventions.examples-heading': 'Den kan till exempel föreslå',
-  'conventions.example-1': 'Ange tider i hela kvartar',
+  'conventions.example-1': 'Ange tillagningstider i hela minuter',
   'conventions.example-2': 'Avsluta SEO-titlar med företagets namn',
-  'conventions.example-3': 'Lista prisvarianter med den minsta först',
+  'conventions.example-3': 'Lista ingredienser i den ordning de används',
   'conventions.type-label': 'Dokumenttyp',
   'conventions.run': 'Hitta förslag',
   'conventions.running': 'Läser dokument och letar efter mönster. Det tar 5 till 15 sekunder.',
@@ -145,13 +145,10 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'tool.heading': 'Onboarding',
   'tool.guides.heading': 'Guider',
   'tool.guides.empty': 'Inga guider är registrerade.',
-  'tool.guides.steps_one': '{{count}} steg',
-  'tool.guides.steps_other': '{{count}} steg',
   'tool.guides.start': 'Starta',
   'tool.guides.reset': 'Nollställ',
   'tool.guides.reset-hint':
     'Glöm dina framsteg, så att guiden beter sig som om du aldrig sett den.',
-  'tool.guides.your-status': 'Du: {{status}}',
   'tool.autostart.first-login': 'Startar vid första inloggningen',
   'tool.autostart.manual': 'Startas från guidemenyn',
   'tool.autostart.custom': 'Startar enligt en egen regel',
@@ -160,7 +157,6 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'tool.fields.existing': 'Befintliga fältguider',
   'tool.fields.empty': 'Inget fält har en guide än.',
   'tool.fields.all-types': 'Alla dokumenttyper',
-  'tool.fields.from-config': 'I fieldGuides',
   'tool.fields.from-tour': 'Steg i ”{{tour}}”',
   'tool.settings.heading': 'Inställningar',
   'tool.settings.intro': 'Ändras i sanity.config.ts.',
@@ -168,9 +164,8 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'tool.settings.off': 'Av',
   'tool.settings.sync': 'Framsteg följer redaktören mellan enheter',
   'tool.settings.navbar': 'Guideknapp i toppmenyn',
-  'tool.settings.finder': 'Förslag på fältguider (använder AI-krediter)',
+  'tool.settings.convention-finder': 'Förslag på fältguider (använder AI-krediter)',
   'tool.settings.roles': 'Verktyget visas för',
-  'tool.settings.language': 'Studions språk',
 }
 
 export default svSE

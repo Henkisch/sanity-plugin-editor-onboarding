@@ -27,8 +27,8 @@ describe('summarizeDocument', () => {
   })
 
   it('reads a slug as its text, since its format is often the convention', () => {
-    expect(summarizeDocument({slug: {_type: 'slug', current: 'klipp-och-farg'}})).toEqual({
-      slug: 'klipp-och-farg',
+    expect(summarizeDocument({slug: {_type: 'slug', current: 'oat-pancakes'}})).toEqual({
+      slug: 'oat-pancakes',
     })
   })
 

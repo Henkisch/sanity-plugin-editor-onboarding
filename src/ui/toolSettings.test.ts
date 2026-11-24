@@ -13,21 +13,21 @@ describe('resolveToolSettings', () => {
     expect(resolveToolSettings({tours: [], tool: true})).toMatchObject({
       roles: DEFAULT_TOOL_ROLES,
     })
-    expect(resolveToolSettings({tours: [], tool: true})?.finder).toBeUndefined()
+    expect(resolveToolSettings({tours: [], tool: true})?.conventionFinder).toBeUndefined()
   })
 
   it('turns on with `conventionFinder` alone — the tab has nowhere else to live', () => {
-    expect(resolveToolSettings({tours: [], conventionFinder: true})?.finder).toEqual({})
+    expect(resolveToolSettings({tours: [], conventionFinder: true})?.conventionFinder).toEqual({})
   })
 
-  it('passes the finder language and tool roles through', () => {
+  it('passes the convention finder language and tool roles through', () => {
     const settings = resolveToolSettings({
       tours: [],
       tool: {roles: ['lead']},
       conventionFinder: {language: 'Svenska (sv-SE)'},
     })
     expect(settings?.roles).toEqual(['lead'])
-    expect(settings?.finder).toEqual({language: 'Svenska (sv-SE)'})
+    expect(settings?.conventionFinder).toEqual({language: 'Svenska (sv-SE)'})
   })
 
   it('mirrors the settings the overview reports, with the same defaults the plugin uses', () => {

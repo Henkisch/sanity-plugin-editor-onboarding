@@ -18,8 +18,8 @@ export const DEFAULT_TOOL_ROLES = ['administrator', 'developer']
 /** What the tool needs to know, as passed through Sanity's tool `options`. @internal */
 export interface ToolSettings {
   roles: string[]
-  /** Present when the "Unwritten rules" tab is on. */
-  finder?: {language?: string}
+  /** Present when the "Suggest more" field guide finder is on. */
+  conventionFinder?: {language?: string}
   /** Mirrored from the config so the overview can show what is running. */
   fieldGuides: FieldGuide[]
   syncProgress: boolean
@@ -41,7 +41,9 @@ export function resolveToolSettings(
 
   return {
     roles: (typeof tool === 'object' && tool.roles) || DEFAULT_TOOL_ROLES,
-    ...(finder ? {finder: typeof finder === 'object' ? {language: finder.language} : {}} : {}),
+    ...(finder
+      ? {conventionFinder: typeof finder === 'object' ? {language: finder.language} : {}}
+      : {}),
     fieldGuides: config?.fieldGuides ?? [],
     syncProgress: config?.syncProgress === true,
     navbarButton: config?.navbarButton !== false,

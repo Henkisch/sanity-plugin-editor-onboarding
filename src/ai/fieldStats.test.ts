@@ -11,20 +11,24 @@ const faq: SerializedDocumentType = {
     {path: 'question', type: 'string'},
     {path: 'answer', type: 'portableText'},
     {path: 'note', type: 'string'},
-    {path: 'prices', type: 'array'},
-    {path: 'prices.minutes', type: 'number'},
+    {path: 'ingredients', type: 'array'},
+    {path: 'ingredients.grams', type: 'number'},
   ],
 }
 
 const docs = [
   {
-    question: 'Ingår hårtvätt?',
-    answer: [block('Ja.')],
+    question: 'Does it freeze?',
+    answer: [block('Yes')],
     note: '',
-    prices: [{minutes: 30}, {minutes: 45}],
+    ingredients: [{grams: 30}, {grams: 45}],
   },
-  {question: 'Har ni öppet på helger?', answer: [block('Nej, vardagar.')], prices: [{minutes: 90}]},
-  {question: 'Var?', answer: [block('Storgatan 12A.')]},
+  {
+    question: 'Is it free from gluten?',
+    answer: [block('No, use wheat.')],
+    ingredients: [{grams: 90}],
+  },
+  {question: 'How?', answer: [block('Four servings.')]},
 ]
 
 function stat(path: string) {
@@ -45,11 +49,11 @@ describe('fieldStats', () => {
   })
 
   it('counts array items, so "always two to four" can be seen', () => {
-    expect(stat('prices')?.items).toEqual({min: 1, max: 2})
+    expect(stat('ingredients')?.items).toEqual({min: 1, max: 2})
   })
 
   it('reads values through arrays, matching how field paths drop array segments', () => {
-    expect(stat('prices.minutes')).toMatchObject({filled: 2, range: {min: 30, max: 90}})
+    expect(stat('ingredients.grams')).toMatchObject({filled: 2, range: {min: 30, max: 90}})
   })
 
   it('leaves out measurements that have nothing to measure', () => {

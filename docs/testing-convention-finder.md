@@ -10,7 +10,6 @@ billed to that project's AI credits — one request per run.
 ## Setup
 
 ```bash
-git checkout feat/convention-finder
 npm install
 npm run build        # test-studio consumes dist/, not src/
 npm run dev          # http://localhost:3333

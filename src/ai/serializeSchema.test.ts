@@ -2,10 +2,8 @@ import {createSchema, type Rule} from 'sanity'
 import {describe, expect, it} from 'vitest'
 
 import {
-  fingerprint,
   MAX_DEPTH,
   serializeSchema,
-  stableStringify,
   summarizeValidation,
   type SerializedField,
 } from './serializeSchema'
@@ -284,31 +282,5 @@ describe('summarizeValidation', () => {
     expect(summarizeValidation(undefined)).toEqual([])
     expect(summarizeValidation(() => true)).toEqual([])
     expect(summarizeValidation([{unexpected: true}])).toEqual([])
-  })
-})
-
-describe('fingerprint', () => {
-  const base: SerializedField = {path: 'title', title: 'Title', type: 'string'}
-
-  it('is stable for the same definition', () => {
-    expect(fingerprint(base)).toBe(fingerprint({...base}))
-  })
-
-  it('changes when the meaning changes, which is what marks a guide outdated', () => {
-    expect(fingerprint({...base, description: 'New'})).not.toBe(fingerprint(base))
-    expect(fingerprint({...base, validation: ['required']})).not.toBe(fingerprint(base))
-    expect(fingerprint({...base, type: 'text'})).not.toBe(fingerprint(base))
-  })
-
-  it('ignores where the field sits — moving it to another tab does not make its guide wrong', () => {
-    expect(fingerprint({...base, group: 'meta', hidden: 'conditional'})).toBe(fingerprint(base))
-  })
-})
-
-describe('stableStringify', () => {
-  it('ignores key order', () => {
-    expect(stableStringify({a: 1, b: [2, {d: 3, c: 4}]})).toBe(
-      stableStringify({b: [2, {c: 4, d: 3}], a: 1}),
-    )
   })
 })
