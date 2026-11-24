@@ -140,6 +140,7 @@ const enUS = {
   // — Onboarding tool —
   'tool.heading': 'Onboarding',
   'tool.guides.heading': 'Guides',
+  'tool.guides.intro': 'Tours editors start from the Guides menu in the top bar.',
   'tool.guides.empty': 'No guides are registered.',
   'tool.guides.start': 'Start',
   'tool.guides.reset': 'Reset',

@@ -1,4 +1,5 @@
 import {BookIcon} from '@sanity/icons/Book'
+import {ResetIcon} from '@sanity/icons/Reset'
 import {Badge, Box, Button, Card, Flex, Stack, Text} from '@sanity/ui'
 import {useMemo} from 'react'
 import {useSchema, useTranslation} from 'sanity'
@@ -27,16 +28,16 @@ import {useStartGuide} from './useStartGuide'
  *
  * @internal
  */
-export function Section(props: {
-  heading: string
-  intro?: string
-  size?: 'primary' | 'secondary'
-  children: React.ReactNode
-}) {
-  const primary = props.size === 'primary'
+/**
+ * A heading, a one-line intro and its content.
+ *
+ * Every section uses the same sizes, so sections side by side start their
+ * boxes on the same line; which one matters most is said by its width.
+ */
+export function Section(props: {heading: string; intro?: string; children: React.ReactNode}) {
   return (
     <Stack gap={3}>
-      <Text as="h2" size={primary ? 3 : 2} weight="semibold">
+      <Text as="h2" size={2} weight="semibold">
         {props.heading}
       </Text>
       {props.intro && (
@@ -69,7 +70,7 @@ export function Guides() {
         const startsItself = tour.autoStart !== undefined && tour.autoStart !== 'manual'
 
         return (
-          <ListRow compact key={tour.id}>
+          <ListRow key={tour.id}>
             <Flex align="center" gap={3}>
               <Text muted size={1}>
                 <Icon />
@@ -95,12 +96,14 @@ export function Guides() {
                 </Badge>
               )}
               {display && (
+                // An icon, as in the editors' menu: the badge beside it already
+                // says what would be reset.
                 <Button
-                  fontSize={1}
+                  aria-label={t('tool.guides.reset')}
+                  icon={ResetIcon}
                   mode="bleed"
                   onClick={() => onboarding?.resetTour(tour.id)}
                   padding={2}
-                  text={t('tool.guides.reset')}
                   title={t('tool.guides.reset-hint')}
                 />
               )}
@@ -108,7 +111,7 @@ export function Guides() {
                 disabled={starting !== null}
                 fontSize={1}
                 loading={starting === tour.id}
-                mode="bleed"
+                mode="ghost"
                 onClick={() => start(tour)}
                 padding={2}
                 text={t('tool.guides.start')}
@@ -142,18 +145,18 @@ export function FieldGuides({settings}: {settings: ToolSettings}) {
       <Text as="h3" size={1} weight="semibold">
         {t('tool.fields.existing')}
       </Text>
-      <Stack gap={2}>
+      <ListCard>
         {groups.map((group) => {
           const typeTitle = group.documentType
             ? (schema.get(group.documentType)?.title ?? group.documentType)
             : t('tool.fields.all-types')
 
           return (
-            <Card border key={group.documentType ?? '*'} padding={1} radius={2}>
-              <Collapsible label={`${typeTitle} (${group.rows.length})`}>
+            <ListRowCard key={group.documentType ?? '*'}>
+              <Collapsible label={`${typeTitle} (${group.rows.length})`} padding={3}>
                 <Stack>
                   {group.rows.map((row) => (
-                    <Card borderTop key={row.id} paddingX={3} paddingY={2}>
+                    <Card borderTop key={row.id} padding={3}>
                       <Stack gap={2}>
                         <Text size={1}>{localize(row.title)}</Text>
                         <Flex gap={3} wrap="wrap">
@@ -171,10 +174,10 @@ export function FieldGuides({settings}: {settings: ToolSettings}) {
                   ))}
                 </Stack>
               </Collapsible>
-            </Card>
+            </ListRowCard>
           )
         })}
-      </Stack>
+      </ListCard>
     </Stack>
   )
 }
@@ -236,13 +239,9 @@ function ListCard({children}: {children: React.ReactNode}) {
   )
 }
 
-/** `compact` for rows that hold buttons, which bring their own padding. */
-function ListRow({children, compact}: {children: React.ReactNode; compact?: boolean}) {
-  return (
-    <ListRowCard paddingX={3} paddingY={compact ? 2 : 3}>
-      {children}
-    </ListRowCard>
-  )
+/** One row; every list on the page shares this padding, so their left edges line up. */
+function ListRow({children}: {children: React.ReactNode}) {
+  return <ListRowCard padding={3}>{children}</ListRowCard>
 }
 
 const ListRowCard = styled(Card)`

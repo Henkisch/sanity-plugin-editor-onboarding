@@ -34,15 +34,13 @@ export function OnboardingTool({tool}: {tool: Tool<ToolSettings>}) {
         </Text>
 
         {/* A grid rather than flex: stacked flex children with a grow factor
-            stretch to fill the column's height on a narrow screen. */}
-        <Grid gap={[5, 5, 5, 6]} gridTemplateColumns={[1, 1, 1, 5]}>
+            stretch to fill the column's height on a narrow screen. One gap,
+            used between columns and between sections in a column, so the page
+            reads as one grid rather than two stacks. */}
+        <Grid gap={5} gridTemplateColumns={[1, 1, 1, 5]}>
           <Box gridColumn={[1, 1, 1, 3]}>
-            <Section
-              heading={t('tool.fields.heading')}
-              intro={t('tool.fields.intro')}
-              size="primary"
-            >
-              <Stack gap={4}>
+            <Section heading={t('tool.fields.heading')} intro={t('tool.fields.intro')}>
+              <Stack gap={5}>
                 {settings.conventionFinder && (
                   <Card border padding={[3, 3, 4]} radius={2}>
                     <Stack gap={4}>
@@ -59,7 +57,7 @@ export function OnboardingTool({tool}: {tool: Tool<ToolSettings>}) {
           </Box>
           <Box gridColumn={[1, 1, 1, 2]}>
             <Stack gap={5}>
-              <Section heading={t('tool.guides.heading')}>
+              <Section heading={t('tool.guides.heading')} intro={t('tool.guides.intro')}>
                 <Guides />
               </Section>
               <Section heading={t('tool.settings.heading')} intro={t('tool.settings.intro')}>

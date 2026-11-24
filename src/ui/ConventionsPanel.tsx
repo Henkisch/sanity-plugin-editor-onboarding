@@ -157,14 +157,16 @@ export function ConventionsPanel(props: {language?: string}) {
             ))}
           </Select>
         </Stack>
+        {/* Same type size as the select, so the two stand the same height. */}
         <Button
           disabled={!selected || view.kind === 'running'}
+          fontSize={2}
           onClick={run}
           text={t('conventions.run')}
           tone="primary"
         />
       </Flex>
-      <Text muted size={0}>
+      <Text muted size={1}>
         {t('conventions.cost', {limit: CONVENTION_SAMPLE_LIMIT})}
       </Text>
 
@@ -211,8 +213,9 @@ export function ConventionsPanel(props: {language?: string}) {
 function Explanation() {
   const {t} = useTranslation(ONBOARDING_NAMESPACE)
   return (
-    // A tinted panel, not another bordered card: it already sits inside one.
-    <Card padding={3} radius={2} tone="transparent">
+    // No panel of its own: it sits inside a card already, and a second
+    // background inside that read as a hole in the page.
+    <Box>
       <Stack gap={3}>
         <Text size={1} weight="medium">
           {t('conventions.examples-heading')}
@@ -240,7 +243,7 @@ function Explanation() {
           ))}
         </Stack>
       </Stack>
-    </Card>
+    </Box>
   )
 }
 

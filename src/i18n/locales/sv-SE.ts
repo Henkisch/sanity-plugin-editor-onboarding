@@ -144,6 +144,7 @@ const svSE: Record<OnboardingResourceKey, string> = {
   // — Onboarding-verktyget —
   'tool.heading': 'Onboarding',
   'tool.guides.heading': 'Guider',
+  'tool.guides.intro': 'Rundturer som redaktörer startar från Guider-menyn i toppmenyn.',
   'tool.guides.empty': 'Inga guider är registrerade.',
   'tool.guides.start': 'Starta',
   'tool.guides.reset': 'Nollställ',

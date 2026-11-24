@@ -15,6 +15,8 @@ export function Collapsible(props: {
   label: string
   defaultOpen?: boolean
   fontSize?: number
+  /** Matches the header to the rows around it; defaults to a compact inline toggle. */
+  padding?: number
   children: React.ReactNode
 }) {
   const [open, setOpen] = useState(props.defaultOpen ?? false)
@@ -30,7 +32,8 @@ export function Collapsible(props: {
         justify="flex-start"
         mode="bleed"
         onClick={() => setOpen(!open)}
-        padding={2}
+        padding={props.padding ?? 2}
+        radius={props.padding ? 0 : undefined}
         text={props.label}
       />
       <div hidden={!open} id={id}>
