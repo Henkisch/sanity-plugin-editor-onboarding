@@ -492,7 +492,7 @@ while a guide is open, which is why `aria-modal` is `false`.
   checked weekly in CI (`npm run check:links`), but a link can still be dead for
   up to a week. Point them at your own documentation instead — see below.
 
-Verified against `sanity@6.12.0`. On a newer Studio major the plugin logs one
+Verified against `sanity@6.16.0`. On a newer Studio major the plugin logs one
 console warning to the developer; nothing is shown to editors, and steps whose
 targets have moved skip themselves as usual.
 
@@ -506,7 +506,7 @@ So in development, once per session, the plugin reports what it found:
 
 ```
 [sanity-plugin-editor-onboarding] 14 of 18 anchored steps found their target on
-this view (Sanity 6.12.0).
+this view (Sanity 6.16.0).
 ```
 
 Misses are listed, separated into selectors that can never match — invalid CSS —
