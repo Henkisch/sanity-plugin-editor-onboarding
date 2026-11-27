@@ -18,6 +18,7 @@ import {
   targetPresence,
   targetTasks,
   targetGuidesButton,
+  targetImageAltText,
   targetImageCrop,
   targetNewDocument,
   targetPerspectiveMenu,
@@ -82,6 +83,7 @@ const ALL_CONCEPTS: CoreConceptId[] = [
 
 function buildTours(options: CoreConceptsOptions): Record<CoreConceptId, OnboardingTour> {
   const slugField = options.slugField ?? 'slug'
+  const altFields = options.altFields
 
   return {
   essentials: {
@@ -346,6 +348,14 @@ function buildTours(options: CoreConceptsOptions): Record<CoreConceptId, Onboard
         learnMoreUrl: docs.mediaLibrary,
       },
       {
+        // Alt text is the field editors most often leave empty, and the one
+        // whose absence nobody on the team notices: the page looks the same to
+        // anyone who can see it. Only present on image fields that have one.
+        target: targetImageAltText(altFields),
+        title: k('tour.media.alt.title'),
+        content: k('tour.media.alt.content'),
+      },
+      {
         // Editors upload a photo, see it cropped badly on the site, and do not
         // know the Studio decides that. Only present once the field holds an
         // image with hotspot enabled, which is exactly when it can be set.
@@ -384,6 +394,17 @@ export interface CoreConceptsOptions {
    * @defaultValue 'slug'
    */
   slugField?: string
+  /**
+   * The names your image fields use for alt text, if not the usual ones.
+   *
+   * The images guide explains why alt text matters, pointing at the alt field
+   * inside whichever image field is open. It matches the field's own name, so
+   * `coverImage.alt` and `gallery[...].alt` are both found. Leave it out and the
+   * common names are tried; with no match the step drops out with a warning.
+   *
+   * @defaultValue ['alt', 'altText', 'alternativeText']
+   */
+  altFields?: string[]
 }
 
 /**

@@ -320,6 +320,37 @@ export const targetAssetBrowse = (): string =>
 export const targetImageCrop = (): string => '[data-testid="options-menu-edit-details"]'
 
 /**
+ * The alt-text names {@link targetImageAltText} looks for when a Studio does not
+ * name its own: the ones Sanity's docs and starters use.
+ *
+ * @internal
+ */
+export const DEFAULT_ALT_FIELDS = ['alt', 'altText', 'alternativeText']
+
+/**
+ * The alt-text field inside an image field, whatever the image field is called.
+ *
+ * Studio keys a nested field by its path, `field-coverImage.alt`, so this
+ * matches on the last segment and scopes it to `image-input`: an `alt` on some
+ * other object is not alt text. It excludes `field-actions-menu-…`, the field's
+ * own menu, whose test id ends in the same path and would otherwise match
+ * first. Verified against a live Studio 6.16.
+ *
+ * @param names - Possible names of the alt field. Defaults to
+ *   {@link DEFAULT_ALT_FIELDS}.
+ * @public
+ */
+export const targetImageAltText = (names: string[] = DEFAULT_ALT_FIELDS): string =>
+  names
+    .map(
+      (name) =>
+        '[data-testid="image-input"] [data-testid^="field-"]' +
+        ':not([data-testid^="field-actions"])' +
+        `[data-testid$=".${escapeAttributeValue(name)}"]`,
+    )
+    .join(',')
+
+/**
  * A document type's entry in the structure tool's list.
  *
  * Note that Studio keys these by the type's **title**, not its schema name — so

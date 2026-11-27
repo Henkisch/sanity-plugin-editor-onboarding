@@ -147,6 +147,9 @@ const enUS = {
   'tour.media.assets.title': 'Upload once, use anywhere',
   'tour.media.assets.content':
     'Images and files live in a shared library rather than inside the document you uploaded them to, so the same asset can be reused across the site without a second copy. Select picks one that is already there; once a field has an image, Select is in the … menu.',
+  'tour.media.alt.title': 'Describe the image in words',
+  'tour.media.alt.content':
+    'Alt text is read aloud to people who cannot see the image, shown when it fails to load, and read by search engines. Say what the image shows and why it is there. Leave it empty and the image says nothing to them.',
   'tour.media.crop.title': 'Choose what must always show',
   'tour.media.crop.content':
     'The site crops images differently depending on where they appear. Click here and mark the part that matters, such as a face, and it stays in view whenever the image is cropped.',

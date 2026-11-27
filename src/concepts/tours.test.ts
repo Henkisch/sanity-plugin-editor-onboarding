@@ -81,7 +81,16 @@ describe('the media guide', () => {
   // Only present once an image is in the field, which is exactly when an
   // editor can set what must survive cropping.
   it('shows where to set the hotspot once an image is in place', () => {
-    expect(media().steps[1].target).toBe('[data-testid="options-menu-edit-details"]')
+    expect(media().steps[2].target).toBe('[data-testid="options-menu-edit-details"]')
+  })
+
+  it('explains alt text before cropping, so it is not lost at the end', () => {
+    expect(media().steps[1].target).toContain('.alt"]')
+  })
+
+  it('follows a project whose alt field has another name', () => {
+    const [, alt] = coreConcepts({include: ['media'], altFields: ['bildtext']})[0].steps
+    expect(alt.target).toContain('.bildtext"]')
   })
 
   it('says so rather than doing nothing when no image field is open', () => {

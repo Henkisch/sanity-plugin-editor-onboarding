@@ -151,6 +151,9 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'tour.media.assets.title': 'Ladda upp en gång, använd överallt',
   'tour.media.assets.content':
     'Bilder och filer ligger i ett gemensamt bibliotek i stället för inuti dokumentet du laddade upp dem i, så att samma fil kan återanvändas på hela webbplatsen utan en extra kopia. Med Välj hämtar du en som redan finns. Har fältet redan en bild ligger Välj i menyn …',
+  'tour.media.alt.title': 'Beskriv bilden med ord',
+  'tour.media.alt.content':
+    'Alt-texten läses upp för den som inte kan se bilden, visas om bilden inte laddas och läses av sökmotorer. Skriv vad bilden visar och varför den finns där. Lämnas den tom säger bilden ingenting till dem.',
   'tour.media.crop.title': 'Välj vad som alltid ska synas',
   'tour.media.crop.content':
     'Webbplatsen beskär bilder olika beroende på var de visas. Klicka här och markera det viktigaste i bilden, till exempel ett ansikte, så hålls det med när bilden beskärs.',

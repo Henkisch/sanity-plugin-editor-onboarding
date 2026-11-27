@@ -8,6 +8,7 @@ import {
   targetField,
   targetFieldGroupWithError,
   targetFieldValidationError,
+  targetImageAltText,
   targetPublishButton,
   targetValidationErrors,
 } from './targeting'
@@ -212,5 +213,41 @@ describe('selectors for a document that cannot be published', () => {
     const matches = [...document.querySelectorAll(targetFieldGroupWithError())]
 
     expect(matches.map((m) => m.getAttribute('data-testid'))).toEqual(['group-tab-details'])
+  })
+})
+
+describe('targetImageAltText', () => {
+  // Copied from a running Studio 6.16: the field and its own menu both end in
+  // the field's path.
+  function imageWithAlt(name: string): void {
+    document.body.innerHTML = `
+      <div data-testid="image-input">
+        <div data-testid="field-actions-menu-coverImage.${name}"></div>
+        <div data-testid="field-coverImage.${name}">Alt</div>
+      </div>
+      <div data-testid="field-seo.alt">not an image</div>`
+  }
+
+  it('finds the alt field whatever the image field is called', () => {
+    imageWithAlt('alt')
+
+    expect(document.querySelector(targetImageAltText())?.getAttribute('data-testid')).toBe(
+      'field-coverImage.alt',
+    )
+  })
+
+  it('skips the field menu, whose test id ends in the same path', () => {
+    imageWithAlt('alt')
+
+    const matches = [...document.querySelectorAll(targetImageAltText())]
+
+    expect(matches.map((m) => m.getAttribute('data-testid'))).toEqual(['field-coverImage.alt'])
+  })
+
+  it('follows a project that names the field something else', () => {
+    imageWithAlt('bildtext')
+
+    expect(document.querySelector(targetImageAltText())).toBeNull()
+    expect(document.querySelector(targetImageAltText(['bildtext']))).not.toBeNull()
   })
 })

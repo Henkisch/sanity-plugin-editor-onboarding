@@ -62,7 +62,7 @@ the rest wait in the help menu.
 | `removing` | "How do I take a page down?": Unpublish on the Published chip, and Delete |
 | `collaboration` | Presence, comments and tasks |
 | `releases` | Bundling and scheduling content releases |
-| `media` | How assets are stored and reused, and setting what survives cropping |
+| `media` | How assets are stored and reused, why alt text matters, and setting what survives cropping |
 
 Pick a subset if you want:
 
@@ -82,6 +82,14 @@ coreConcepts({slugField: 'permalink'})
 Point it at a name that isn't in your schema, or leave it out of a project with
 no slug at all, and the step drops out with a console warning like any other
 missing target.
+
+The `media` tour explains why alt text matters, pointing at the alt field inside
+whichever image field is open. It tries `alt`, `altText` and `alternativeText`.
+If your image fields call it something else, say so:
+
+```ts
+coreConcepts({altFields: ['caption']})
+```
 
 ## Drafting guides from your schema
 
@@ -210,6 +218,7 @@ internals:
 | `targetUnpublishButton()` | Unpublish, while the Published chip is selected |
 | `targetDocumentActionsMenu()` | The footer's "…" menu, with Delete |
 | `targetDocumentHistory()` | The open document's context menu |
+| `targetImageAltText(names?)` | The alt-text field inside an image field |
 | `targetImageCrop()` | The crop / hotspot button on a filled image field |
 | `targetDocumentType(title)` | A type in the structure list — by **title**, not schema name |
 | `targetField(name)` | A field in the open document, by schema name |
