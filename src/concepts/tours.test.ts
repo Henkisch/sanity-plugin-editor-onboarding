@@ -4,7 +4,14 @@ import {stepTarget} from '../core/fieldHelp'
 import {docs} from './docs'
 import {coreConcepts, type CoreConceptId} from './tours'
 
-const ALL: CoreConceptId[] = ['essentials', 'publishing', 'collaboration', 'releases', 'media']
+const ALL: CoreConceptId[] = [
+  'essentials',
+  'publishing',
+  'validation',
+  'collaboration',
+  'releases',
+  'media',
+]
 
 describe('coreConcepts', () => {
   it('ships every concept by default, so an unconfigured Studio gets the lot', () => {
@@ -71,6 +78,43 @@ describe('the media guide', () => {
 
   it('says so rather than doing nothing when no image field is open', () => {
     expect(media().unavailableMessage).toBeDefined()
+  })
+})
+
+describe('the validation guide', () => {
+  const validation = () => coreConcepts({include: ['validation']})[0]
+
+  // It exists because an editor could not publish and did not know where
+  // Studio lists the errors. Starting at the button they are stuck on is what
+  // connects the guide to the question they are asking.
+  it('starts at the publish button, where the editor is already stuck', () => {
+    expect(validation().steps[0].target).toContain('[data-testid^="action-"]')
+  })
+
+  it('matches the error list and field markers by shape, since their labels are translated', () => {
+    for (const step of validation().steps) {
+      expect(step.target ?? '').not.toMatch(/aria-label|title=/)
+    }
+  })
+
+  it('says so rather than doing nothing when no document is open', () => {
+    expect(validation().unavailableMessage).toBeDefined()
+  })
+
+  // The publish button's slot holds Unpublish while the Published chip is
+  // selected, and a guide about why publishing is blocked rang it.
+  it('rings Publish only, never the Unpublish button in the same slot', () => {
+    expect(validation().steps[0].target).toContain('[data-sanity-icon="publish"]')
+  })
+
+  // The tab row is `field-group-tabs` and carries its own error icons, so a
+  // plain `field-` prefix rang the tabs instead of the field to fix.
+  it('does not mistake the field-group tab row for a field', () => {
+    expect(validation().steps[2].target).toContain(':not([data-testid^="field-group"])')
+  })
+
+  it('points at a closed tab with an error, where the field itself is out of sight', () => {
+    expect(validation().steps[3].target).toContain('group-tab-')
   })
 })
 

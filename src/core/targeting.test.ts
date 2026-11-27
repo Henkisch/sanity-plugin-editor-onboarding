@@ -6,7 +6,10 @@ import {
   targetDocumentStatus,
   targetDocumentType,
   targetField,
+  targetFieldGroupWithError,
+  targetFieldValidationError,
   targetPublishButton,
+  targetValidationErrors,
 } from './targeting'
 
 /**
@@ -16,13 +19,13 @@ import {
  * document pane but *not* inside `pane-footer`, and it sits among Portable Text
  * toolbar buttons and overflow menus that share its `action-` prefix.
  */
-function documentPane(publishLabel: string): void {
+function documentPane(publishLabel: string, icon = 'publish'): void {
   document.body.innerHTML = `
     <div data-testid="document-pane">
       <button data-testid="action-button-strong" data-ui="Button">B</button>
       <button data-testid="action-menu-auto-collapse-menu" data-ui="Button"></button>
       <div data-testid="pane-footer"></div>
-      <button data-testid="action-${publishLabel}" data-ui="Button">${publishLabel}</button>
+      <button data-testid="action-${publishLabel}" data-ui="Button"><svg data-sanity-icon="${icon}"></svg>${publishLabel}</button>
       <button data-testid="action-menu-button" data-ui="MenuButton"></button>
     </div>
     <button data-testid="action-intent-button" data-ui="Button">New</button>`
@@ -62,6 +65,14 @@ describe('selectors that must not depend on the Studio language', () => {
 
     expect(matches).toHaveLength(1)
     expect(matches[0].getAttribute('data-testid')).toBe('action-publicera')
+  })
+
+  // The same slot holds Unpublish while the Published chip is selected. A guide
+  // explaining why publishing is blocked rang it, in a live Swedish Studio.
+  it('does not mistake Unpublish, in the same slot, for Publish', () => {
+    documentPane('avpublicera', 'unpublish')
+
+    expect(document.querySelector(targetPublishButton())).toBeNull()
   })
 
   it('finds a document status chip in English', () => {
@@ -125,5 +136,65 @@ describe('escaping', () => {
 
   it('survives a custom target id containing quotes', () => {
     expect(() => document.querySelector(targetCustom('say "hi"'))).not.toThrow()
+  })
+})
+
+/**
+ * An open document with errors, copied from a running Studio 6.16: the tab
+ * row is `field-group-tabs` and carries the same error icon as a field, and
+ * the validation button differs from Comments only by its icon and dot.
+ */
+function documentWithErrors(): void {
+  document.body.innerHTML = `
+    <div data-testid="document-pane">
+      <button data-ui="StatusButton" aria-label="Validering">
+        <svg data-sanity-icon="error-outline"></svg><span style="background: var(--card-badge-critical-dot-color)"></span>
+      </button>
+      <button data-ui="StatusButton" aria-label="Kommentarer"><svg data-sanity-icon="comment"></svg></button>
+      <div data-testid="field-group-tabs">
+        <button data-testid="group-tab-all-fields" aria-selected="false">
+          <svg data-testid="input-validation-icon-error" data-sanity-icon="error-outline"></svg>
+        </button>
+        <button data-testid="group-tab-content" aria-selected="true">
+          <svg data-testid="input-validation-icon-error" data-sanity-icon="error-outline"></svg>
+        </button>
+        <button data-testid="group-tab-details" aria-selected="false">
+          <svg data-testid="input-validation-icon-error" data-sanity-icon="error-outline"></svg>
+        </button>
+        <button data-testid="group-tab-media" aria-selected="false"></button>
+      </div>
+      <div data-testid="field-seo">
+        <div data-testid="field-seo.title">
+          <svg data-testid="input-validation-icon-error"></svg>
+        </div>
+      </div>
+    </div>`
+}
+
+describe('selectors for a document that cannot be published', () => {
+  it('finds the validation button by its critical dot, not its translated label', () => {
+    documentWithErrors()
+
+    expect(document.querySelector(targetValidationErrors())?.getAttribute('aria-label')).toBe(
+      'Validering',
+    )
+  })
+
+  // Found in a live Studio: the tab row shares the `field-` prefix and has
+  // error icons of its own, so it was the first "field with an error".
+  it('rings the field to fix, not the tab row and not the object around it', () => {
+    documentWithErrors()
+
+    const matches = [...document.querySelectorAll(targetFieldValidationError())]
+
+    expect(matches.map((m) => m.getAttribute('data-testid'))).toEqual(['field-seo.title'])
+  })
+
+  it('points at a closed tab with an error, never the open one or "All fields"', () => {
+    documentWithErrors()
+
+    const matches = [...document.querySelectorAll(targetFieldGroupWithError())]
+
+    expect(matches.map((m) => m.getAttribute('data-testid'))).toEqual(['group-tab-details'])
   })
 })

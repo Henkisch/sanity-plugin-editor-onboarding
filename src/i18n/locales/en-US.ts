@@ -48,7 +48,7 @@ const enUS = {
     'Search across every document type at once — useful when you know the headline but not where it lives.',
   'tour.essentials.guides.title': 'More guides live here',
   'tour.essentials.guides.content':
-    'Short guides on publishing, comments and tasks, releases, and images are all in this menu. Open it any time — including to run this one again.',
+    'Short guides on publishing, fixing what blocks it, comments and tasks, releases, and images are all in this menu. Open it any time — including to run this one again.',
 
   // — Core concepts: publishing —
   'tour.publishing.title': 'Editing and publishing',
@@ -69,6 +69,24 @@ const enUS = {
   'tour.publishing.history.title': 'Every change is kept',
   'tour.publishing.history.content':
     'This menu holds the document’s history. Compare an earlier version side by side with the current one, and restore it if something went wrong.',
+
+  // — Core concepts: validation —
+  'tour.validation.title': 'Why can’t I publish?',
+  'tour.validation.description': 'Finding and fixing what stops a document from publishing',
+  'tour.validation.unavailable':
+    'This guide points at the document editor. Open the document you can’t publish, then start it again.',
+  'tour.validation.publish.title': 'Something needs fixing first',
+  'tour.validation.publish.content':
+    'If Publish is greyed out, the document has errors — usually a required field that is empty or a value that breaks a rule. Hover the button to see why.',
+  'tour.validation.list.title': 'Every error, in one list',
+  'tour.validation.list.content':
+    'This red button lists everything that is wrong. Click an error and the Studio jumps straight to the field. Yellow warnings are advice; they do not stop you publishing.',
+  'tour.validation.field.title': 'This field needs fixing',
+  'tour.validation.field.content':
+    'Fields with an error have a red icon beside their title. Hover the icon to see what is wrong. Fix it, and Publish turns on again.',
+  'tour.validation.tab.title': 'Errors can hide on another tab',
+  'tour.validation.tab.content':
+    'This document is split into tabs, and a tab with a red icon has a field that needs fixing. Open it to find the field.',
 
   // — Core concepts: collaboration —
   'tour.collaboration.title': 'Working with your team',

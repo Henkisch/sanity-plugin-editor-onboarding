@@ -57,6 +57,7 @@ the rest wait in the help menu.
 | --- | --- |
 | `essentials` | Drafts vs. published, creating documents, search |
 | `publishing` | Autosave, what a slug is, publishing, document history |
+| `validation` | "Why can't I publish?": where errors are listed, the field to fix, errors on another tab |
 | `collaboration` | Presence, comments and tasks |
 | `releases` | Bundling and scheduling content releases |
 | `media` | How assets are stored and reused |
@@ -198,6 +199,9 @@ internals:
 | `targetPerspectiveMenu()` | The draft / published / release switcher |
 | `targetReleases()` | The Content Releases link |
 | `targetPublishButton()` | Publish, in an open document |
+| `targetValidationErrors()` | The red button listing a document's errors, while it has any |
+| `targetFieldValidationError()` | The first field with an error |
+| `targetFieldGroupWithError()` | A closed field-group tab holding an error |
 | `targetDocumentStatus()` | The Draft / Published chips |
 | `targetDocumentHistory()` | The open document's context menu |
 | `targetDocumentType(title)` | A type in the structure list — by **title**, not schema name |

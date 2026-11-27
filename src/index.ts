@@ -7,6 +7,8 @@ export {
   targetDocumentStatus,
   targetDocumentType,
   targetField,
+  targetFieldGroupWithError,
+  targetFieldValidationError,
   targetGuidesButton,
   targetNavbar,
   targetNewDocument,
@@ -17,6 +19,7 @@ export {
   targetPresence,
   targetTasks,
   targetToolMenu,
+  targetValidationErrors,
 } from './core/targeting'
 export type {
   AutoStart,

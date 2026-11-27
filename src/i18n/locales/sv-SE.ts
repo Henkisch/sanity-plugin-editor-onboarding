@@ -50,7 +50,7 @@ const svSE: Record<OnboardingResourceKey, string> = {
     'Sök i alla dokumenttyper samtidigt — användbart när du minns rubriken men inte var den ligger.',
   'tour.essentials.guides.title': 'Fler guider finns här',
   'tour.essentials.guides.content':
-    'Korta guider om publicering, kommentarer och uppgifter, releaser och bilder finns i den här menyn. Öppna den när du vill — även för att köra den här guiden igen.',
+    'Korta guider om publicering, vad som hindrar den, kommentarer och uppgifter, releaser och bilder finns i den här menyn. Öppna den när du vill — även för att köra den här guiden igen.',
 
   // — Core concepts: publishing —
   'tour.publishing.title': 'Redigera och publicera',
@@ -71,6 +71,24 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'tour.publishing.history.title': 'Alla ändringar sparas',
   'tour.publishing.history.content':
     'Den här menyn innehåller dokumentets historik. Jämför en tidigare version sida vid sida med den nuvarande och återställ den om något blev fel.',
+
+  // — Core concepts: validation —
+  'tour.validation.title': 'Varför kan jag inte publicera?',
+  'tour.validation.description': 'Hitta och rätta det som hindrar ett dokument från att publiceras',
+  'tour.validation.unavailable':
+    'Den här guiden pekar på dokumentredigeraren. Öppna dokumentet du inte kan publicera och starta den igen.',
+  'tour.validation.publish.title': 'Något behöver rättas först',
+  'tour.validation.publish.content':
+    'Är Publicera gråmarkerad har dokumentet fel — oftast ett obligatoriskt fält som är tomt eller ett värde som bryter mot en regel. Håll muspekaren över knappen för att se varför.',
+  'tour.validation.list.title': 'Alla fel i en lista',
+  'tour.validation.list.content':
+    'Den röda knappen listar allt som är fel. Klicka på ett fel så hoppar Studion direkt till fältet. Gula varningar är råd och hindrar dig inte från att publicera.',
+  'tour.validation.field.title': 'Det här fältet behöver rättas',
+  'tour.validation.field.content':
+    'Fält med fel har en röd ikon vid rubriken. Håll muspekaren över ikonen för att se vad som är fel. Rätta det, så går det att publicera igen.',
+  'tour.validation.tab.title': 'Fel kan gömma sig på en annan flik',
+  'tour.validation.tab.content':
+    'Dokumentet är uppdelat i flikar, och en flik med röd ikon har ett fält som behöver rättas. Öppna fliken för att hitta fältet.',
 
   // — Core concepts: collaboration —
   'tour.collaboration.title': 'Arbeta tillsammans',

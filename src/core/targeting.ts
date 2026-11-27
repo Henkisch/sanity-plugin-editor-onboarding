@@ -109,13 +109,19 @@ export const targetReleases = (): string => '[data-testid="releases-tool-link"]'
  * (`action-menu*`) and the list pane's create button are excluded. Note that it
  * is **not** inside `pane-footer`, despite appearing at the foot of the pane.
  *
+ * The same slot holds **Unpublish** while the Published chip is selected, so it
+ * is also required to carry the publish icon. Without that, a guide about
+ * publishing rang the Unpublish button. A Studio that replaces Publish with a
+ * custom action drops the step instead.
+ *
  * @public
  */
 export const targetPublishButton = (): string =>
   '[data-testid="document-pane"] [data-testid^="action-"][data-ui="Button"]' +
   ':not([data-testid^="action-button-"])' +
   ':not([data-testid^="action-menu"])' +
-  ':not([data-testid="action-intent-button"])'
+  ':not([data-testid="action-intent-button"])' +
+  ':has([data-sanity-icon="publish"])'
 
 /**
  * The Draft / Published chips at the top of an open document.
@@ -133,6 +139,64 @@ export const targetPublishButton = (): string =>
  */
 export const targetDocumentStatus = (): string =>
   '[data-testid^="document-header-"][data-testid$="-chip"]'
+
+/**
+ * The red status button in an open document's header that opens the list of
+ * validation errors. Clicking an entry in that list jumps to the field.
+ *
+ * Studio gives this button no test id, and its `aria-label` is translated, so
+ * it is matched by shape: the document pane's `StatusButton` whose status dot
+ * is coloured `critical`. Studio renders the button only while the document
+ * has problems, and colours the dot `caution` for warnings alone — which do
+ * not block publishing — so this resolves exactly when publishing is blocked,
+ * and a step pointing here drops out on a valid document.
+ *
+ * @public
+ */
+export const targetValidationErrors = (): string =>
+  '[data-testid="document-pane"] [data-ui="StatusButton"]:has([style*="critical"])'
+
+/**
+ * The first field in the open document that has an error, as a whole.
+ *
+ * Rings the field rather than its red error icon: the icon is not a button —
+ * it only shows a tooltip on hover — so a ring on it alone reads as something
+ * to click that then does nothing. The field is what the editor has to fix.
+ *
+ * The icon's test id names its severity rather than a label, so this is the
+ * same in every language. The `:not(:has(...))` picks the innermost field, so
+ * an error inside an object rings the nested field rather than the whole
+ * object around it. Absent while the document has no errors.
+ *
+ * @public
+ */
+export const targetFieldValidationError = (): string =>
+  `[data-testid="document-pane"] ${FIELD}:has(${ERROR_ICON}):not(:has(${FIELD} ${ERROR_ICON}))`
+
+/**
+ * A field-group tab, other than the open one, that holds a field with an error.
+ *
+ * A required field on a tab nobody has opened is invisible: Publish stays grey
+ * and nothing on screen says why. Studio marks the tab instead. The open tab
+ * and "All fields" are excluded, since the error on those is already in view.
+ * Matched by the tab's schema name prefix and the error icon's name, so it is
+ * the same in every language. On a narrow pane Studio swaps the tabs for a
+ * dropdown, and a step pointing here drops out.
+ *
+ * @public
+ */
+export const targetFieldGroupWithError = (): string =>
+  '[data-testid="document-pane"] [data-testid^="group-tab-"][aria-selected="false"]' +
+  ':not([data-testid="group-tab-all-fields"])' +
+  ':has([data-sanity-icon="error-outline"])'
+
+/**
+ * A form field, but not the field-group tab row: that is `field-group-tabs`,
+ * shares the `field-` prefix, and carries error icons for its tabs, so without
+ * this exclusion it is the first "field with an error" in the document.
+ */
+const FIELD = '[data-testid^="field-"]:not([data-testid^="field-group"])'
+const ERROR_ICON = '[data-testid="input-validation-icon-error"]'
 
 /**
  * The open document's context menu, which holds version history and

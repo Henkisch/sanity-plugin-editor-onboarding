@@ -1,4 +1,5 @@
 import {CalendarIcon} from '@sanity/icons/Calendar'
+import {ErrorOutlineIcon} from '@sanity/icons/ErrorOutline'
 import {ImagesIcon} from '@sanity/icons/Images'
 import {PublishIcon} from '@sanity/icons/Publish'
 import {RocketIcon} from '@sanity/icons/Rocket'
@@ -8,6 +9,8 @@ import {
   targetAssetBrowse,
   targetDocumentHistory,
   targetDocumentStatus,
+  targetFieldGroupWithError,
+  targetFieldValidationError,
   targetPresence,
   targetTasks,
   targetGuidesButton,
@@ -16,6 +19,7 @@ import {
   targetPublishButton,
   targetReleases,
   targetSearch,
+  targetValidationErrors,
 } from '../core/targeting'
 
 /**
@@ -35,7 +39,13 @@ import {type LocalizedText} from '../i18n/useLocalizedText'
  *
  * @public
  */
-export type CoreConceptId = 'essentials' | 'publishing' | 'collaboration' | 'releases' | 'media'
+export type CoreConceptId =
+  | 'essentials'
+  | 'publishing'
+  | 'validation'
+  | 'collaboration'
+  | 'releases'
+  | 'media'
 
 /**
  * Marks a string as a key in this plugin's own locale namespace.
@@ -53,6 +63,7 @@ const k = (key: OnboardingResourceKey): LocalizedText => ({key, ns: ONBOARDING_N
 const ALL_CONCEPTS: CoreConceptId[] = [
   'essentials',
   'publishing',
+  'validation',
   'collaboration',
   'releases',
   'media',
@@ -142,6 +153,47 @@ function buildTours(options: CoreConceptsOptions): Record<CoreConceptId, Onboard
         title: k('tour.publishing.history.title'),
         content: k('tour.publishing.history.content'),
         learnMoreUrl: docs.compareVersions,
+      },
+    ],
+  },
+
+  validation: {
+    // Titled by the question an editor asks at the moment publishing refuses,
+    // not by the concept. Nobody blocked by a disabled button goes looking for
+    // "validation"; they look for why the button is grey.
+    id: 'validation',
+    title: k('tour.validation.title'),
+    sourceUrl: docs.contentOperations,
+    description: k('tour.validation.description'),
+    icon: ErrorOutlineIcon,
+    unavailableMessage: k('tour.validation.unavailable'),
+    steps: [
+      {
+        target: targetPublishButton(),
+        title: k('tour.validation.publish.title'),
+        content: k('tour.validation.publish.content'),
+        placement: 'top',
+      },
+      {
+        // Only exists while the document has errors, which is the only time
+        // this guide is worth opening. On a valid document the step drops out
+        // and the first one alone is still true.
+        target: targetValidationErrors(),
+        title: k('tour.validation.list.title'),
+        content: k('tour.validation.list.content'),
+      },
+      {
+        target: targetFieldValidationError(),
+        title: k('tour.validation.field.title'),
+        content: k('tour.validation.field.content'),
+      },
+      {
+        // Only appears when an error sits on a tab that is not open — the case
+        // where the field step above has nothing to point at, and where an
+        // editor is most likely to give up.
+        target: targetFieldGroupWithError(),
+        title: k('tour.validation.tab.title'),
+        content: k('tour.validation.tab.content'),
       },
     ],
   },
