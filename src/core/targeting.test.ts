@@ -115,6 +115,22 @@ describe('the asset browse button, however many asset sources exist', () => {
     expect(document.querySelector(targetAssetBrowse())).not.toBeNull()
   })
 
+  // Found in a live Studio: with an image set, Select lives in the "…" menu
+  // and the reuse step dropped out of the images guide entirely.
+  it('falls back to the "…" menu on an image, where Select lives once an image is set', () => {
+    document.body.innerHTML =
+      '<div data-testid="image-input"><button data-testid="options-menu-button">…</button></div>'
+
+    expect(document.querySelector(targetAssetBrowse())).not.toBeNull()
+  })
+
+  it('ignores the same menu on a file field, which offers no image to reuse', () => {
+    document.body.innerHTML =
+      '<div data-testid="file-input"><button data-testid="options-menu-button">…</button></div>'
+
+    expect(document.querySelector(targetAssetBrowse())).toBeNull()
+  })
+
   it('matches nothing when Studio renders no browse button at all', () => {
     document.body.innerHTML = '<button data-testid="file-input-upload-button">Upload</button>'
 

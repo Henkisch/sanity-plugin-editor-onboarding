@@ -289,6 +289,12 @@ export const targetDocumentHistory = (): string =>
  *   inserted *before* `browse-button`, so a prefix match on the first form
  *   silently misses it.
  *
+ * Once the field holds an image, Studio moves Select into the "…" menu beside
+ * the crop button, and neither form above is rendered. That menu is matched as
+ * a fallback, scoped to `image-input` because file fields use the same menu
+ * test id. Without it, the reuse step vanished from the images guide on any
+ * document whose image was already set (verified in a live Studio 6.16).
+ *
  * With no asset sources at all Studio renders no button, and the step drops out
  * on its own. Present only while a document with an image field is open, which
  * is exactly when reuse can be demonstrated.
@@ -297,7 +303,8 @@ export const targetDocumentHistory = (): string =>
  */
 export const targetAssetBrowse = (): string =>
   '[data-testid^="image-object-input-browse-button-"],' +
-  '[data-testid="image-object-input-multi-browse-button"]'
+  '[data-testid="image-object-input-multi-browse-button"],' +
+  '[data-testid="image-input"] [data-testid="options-menu-button"]'
 
 /**
  * The crop button on an image field that already holds an image — where an

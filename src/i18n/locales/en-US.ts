@@ -146,7 +146,7 @@ const enUS = {
     'This guide points at an image field. Open a document that has one, then start it again.',
   'tour.media.assets.title': 'Upload once, use anywhere',
   'tour.media.assets.content':
-    'Images and files live in a shared library rather than inside the document you uploaded them to, so the same asset can be reused across the site without a second copy.',
+    'Images and files live in a shared library rather than inside the document you uploaded them to, so the same asset can be reused across the site without a second copy. Select picks one that is already there; once a field has an image, Select is in the … menu.',
   'tour.media.crop.title': 'Choose what must always show',
   'tour.media.crop.content':
     'The site crops images differently depending on where they appear. Click here and mark the part that matters, such as a face, and it stays in view whenever the image is cropped.',

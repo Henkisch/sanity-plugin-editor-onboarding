@@ -150,7 +150,7 @@ const svSE: Record<OnboardingResourceKey, string> = {
     'Den här guiden pekar på ett bildfält. Öppna ett dokument som har ett och försök igen.',
   'tour.media.assets.title': 'Ladda upp en gång, använd överallt',
   'tour.media.assets.content':
-    'Bilder och filer ligger i ett gemensamt bibliotek i stället för inuti dokumentet du laddade upp dem i, så att samma fil kan återanvändas på hela webbplatsen utan en extra kopia.',
+    'Bilder och filer ligger i ett gemensamt bibliotek i stället för inuti dokumentet du laddade upp dem i, så att samma fil kan återanvändas på hela webbplatsen utan en extra kopia. Med Välj hämtar du en som redan finns. Har fältet redan en bild ligger Välj i menyn …',
   'tour.media.crop.title': 'Välj vad som alltid ska synas',
   'tour.media.crop.content':
     'Webbplatsen beskär bilder olika beroende på var de visas. Klicka här och markera det viktigaste i bilden, till exempel ett ansikte, så hålls det med när bilden beskärs.',
