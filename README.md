@@ -264,6 +264,13 @@ A target that can't be found is not a crash and not a silent failure: the step
 is skipped, the tour carries on, and you get a console warning naming the tour,
 the step and the selector that missed.
 
+Next goes straight to the next step whose target is on screen at that moment,
+so an editor never waits on a step that will not appear. The flip side: a step
+whose target only appears a beat *after* Next, say a panel that animates open,
+is skipped. Point steps at UI that is already there when the editor moves on,
+or ask them in the step before to open it, as the built-in "How do I take a
+page down?" guide does with the Published chip.
+
 ### Help on a single field
 
 Editors get stuck on fields, not on tours. Any field can carry a book icon in
