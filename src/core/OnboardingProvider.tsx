@@ -21,7 +21,7 @@ import {Spotlight} from './Spotlight'
 import {StepPopover} from './StepPopover'
 import {targetGuidesButton} from './targeting'
 import {TourErrorBoundary} from './TourErrorBoundary'
-import {type FieldGuide, type OnboardingTour, type TourStatus} from './types'
+import {type FieldGuide, type OnboardingStep, type OnboardingTour, type TourStatus} from './types'
 import {UnavailableNotice} from './UnavailableNotice'
 import {query, useTargetElement} from './useTargetElement'
 
@@ -121,10 +121,30 @@ const AUTO_START_GIVE_UP_MS = 30_000
  * so a single synchronous check is enough.
  */
 function hasAnyVisibleStep(tour: OnboardingTour): boolean {
-  return tour.steps.some((step) => {
-    const target = stepTarget(step)
-    return !target || Boolean(query(target))
-  })
+  return tour.steps.some(isVisibleNow)
+}
+
+/** Whether a step can be shown right now: centred, or its target is on screen. */
+function isVisibleNow(step: OnboardingStep): boolean {
+  const target = stepTarget(step)
+  return !target || Boolean(query(target))
+}
+
+/** The first step after `from` that can be shown now, or -1 if none can. */
+function nextVisibleStep(tour: OnboardingTour, from: number): number {
+  for (let index = from + 1; index < tour.steps.length; index += 1) {
+    if (isVisibleNow(tour.steps[index])) return index
+  }
+  return -1
+}
+
+/** How many steps after `from` can be shown now. */
+function countVisibleAfter(tour: OnboardingTour, from: number): number {
+  let count = 0
+  for (let index = from + 1; index < tour.steps.length; index += 1) {
+    if (isVisibleNow(tour.steps[index])) count += 1
+  }
+  return count
 }
 
 /** Renders one step, and skips itself if its target never shows up. */
@@ -166,10 +186,11 @@ function StepRunner(props: {
   if (!step) return null
   if (state === 'pending' || state === 'missing') return null
 
-  // Both the position and the total shrink together as optional steps drop out,
-  // so the counter stays coherent.
-  const total = tour.steps.length - skippedCount
   const index = stepIndex - skippedCount
+  // Counts only steps that can be shown now, so the last of them says Done.
+  // It can grow if the editor's action brings a later step on screen, e.g.
+  // clicking Published makes Unpublish appear; the next render reflects it.
+  const total = index + 1 + countVisibleAfter(tour, stepIndex)
 
   return (
     <>
@@ -349,7 +370,7 @@ export function OnboardingProvider(props: {
   }, [])
 
   const beginTour = useCallback(
-    (tourId: string) => {
+    (tourId: string, firstStep = 0) => {
       // Picking another guide mid-tour is "not now", the same as closing it:
       // without this the replaced guide leaves no trace, and the editor is
       // never offered it again. Not `dismissed`, since moving on to something
@@ -367,8 +388,10 @@ export function OnboardingProvider(props: {
       setShownSteps([])
       setUnavailableTour(null)
       setActiveTourId(tourId)
-      setStepIndex(0)
-      setSkippedCount(0)
+      // Steps before `firstStep` were never shown, so they count as skipped:
+      // goBack relies on that to keep the counter right.
+      setStepIndex(firstStep)
+      setSkippedCount(firstStep)
     },
     [activeTourId, stepIndex, userId, syncProgress, client],
   )
@@ -387,14 +410,14 @@ export function OnboardingProvider(props: {
         return
       }
 
-      beginTour(tourId)
+      beginTour(tourId, tour ? Math.max(0, tour.steps.findIndex(isVisibleNow)) : 0)
     },
     [tours, beginTour],
   )
 
   const endTour = useCallback(
-    (status: TourStatus) => {
-      if (activeTourId) {
+    (status: TourStatus | null) => {
+      if (activeTourId && status) {
         setTourStatus(userId, activeTourId, status, stepIndex)
         if (syncProgress && userId) void saveProgress(client, userId, getUserProgress(userId))
       }
@@ -412,12 +435,21 @@ export function OnboardingProvider(props: {
 
   const advance = useCallback(() => {
     if (!activeTour) return
-    if (stepIndex >= activeTour.steps.length - 1) {
-      endTour('completed')
+    const next = nextVisibleStep(activeTour, stepIndex)
+    if (next === -1) {
+      // Nothing after this step is on screen. Waiting two seconds per missing
+      // step showed an editor an empty Studio for up to six seconds before the
+      // guide vanished. Ending here is the same outcome without the wait.
+      // Recorded as completed only if this really was the last declared step,
+      // matching skipStep: a guide whose later steps never appeared was not
+      // gone through.
+      endTour(stepIndex === activeTour.steps.length - 1 ? 'completed' : null)
       return
     }
     setShownSteps((shown) => [...shown, stepIndex])
-    setStepIndex((index) => index + 1)
+    // Keep the invariant goBack relies on: steps jumped over count as skipped.
+    setSkippedCount((count) => count + (next - stepIndex - 1))
+    setStepIndex(next)
   }, [activeTour, stepIndex, endTour])
 
   const goBack = useCallback(() => {

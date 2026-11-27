@@ -396,7 +396,7 @@ describe('steps that cannot find their target', () => {
     fireEvent.click(screen.getByText('action.back'))
 
     expect(screen.getByText('Step one')).toBeTruthy()
-    expect(screen.getByText('progress:{"current":1,"total":3}')).toBeTruthy()
+    expect(screen.getByText('progress:{"current":1,"total":2}')).toBeTruthy()
 
     setFixture('<div data-testid="studio-navbar">navbar</div><div id="nothing-here">now here</div>')
     fireEvent.click(screen.getByText('action.next'))
@@ -419,11 +419,56 @@ describe('steps that cannot find their target', () => {
     const {onboarding} = renderProvider({tours: [tour]})
 
     act(() => onboarding.startTour(tour.id))
-    fireEvent.click(screen.getByText('action.next'))
+    // The ghost step is not on screen, so step one is already the last one.
+    fireEvent.click(screen.getByText('action.done'))
     act(() => void vi.advanceTimersByTime(2500))
 
     expect(onboarding.activeTourId).toBeNull()
     expect(getTourStatus('u1', tour.id)).toBeNull()
+  })
+
+  // An editor who clicks Next and sees an empty Studio for two seconds reads
+  // the guide as broken; the look-ahead removes the wait altogether.
+  it('goes straight to the next step on screen, without a blank wait', () => {
+    const tour = makeThreeStepTour()
+    const harness = renderProvider({tours: [tour]})
+
+    act(() => harness.onboarding.startTour(tour.id))
+    fireEvent.click(screen.getByText('action.next'))
+
+    expect(screen.getByText('Step three')).toBeTruthy()
+  })
+
+  it('a manual start opens on the first step that is on screen, without waiting', () => {
+    const tour = makeTour({
+      id: 'late-first',
+      steps: [
+        {target: '#nothing-here', title: 'Ghost step', content: 'a'},
+        {target: targetNavbar(), title: 'Step two', content: 'b'},
+      ],
+    })
+    const harness = renderProvider({tours: [tour]})
+
+    act(() => harness.onboarding.startTour(tour.id))
+
+    expect(screen.getByText('Step two')).toBeTruthy()
+    expect(screen.getByText('progress:{"current":1,"total":1}')).toBeTruthy()
+  })
+
+  it('offers Done on the last step that can be shown', () => {
+    const tour = makeTour({
+      id: 'ghost-last',
+      steps: [
+        {target: targetNavbar(), title: 'Step one', content: 'a'},
+        {target: '#nothing-here', title: 'Ghost step', content: 'b'},
+      ],
+    })
+    const harness = renderProvider({tours: [tour]})
+
+    act(() => harness.onboarding.startTour(tour.id))
+
+    expect(screen.getByText('action.done')).toBeTruthy()
+    expect(screen.queryByText('action.next')).toBeNull()
   })
 })
 
