@@ -1,3 +1,4 @@
+import {svSELocale} from '@sanity/locale-sv-se'
 import {visionTool} from '@sanity/vision'
 import {defineConfig} from 'sanity'
 import {
@@ -87,6 +88,7 @@ export default defineConfig({
   plugins: [
     structureTool(),
     visionTool(),
+    svSELocale(),
     // Phase 1's zero-config library, plus a Phase 2 tour of local components.
     // Progress is synced here so the dataset-backed path gets exercised, not
     // just the localStorage one.
