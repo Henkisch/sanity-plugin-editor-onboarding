@@ -37,6 +37,11 @@ export interface StepPopoverProps {
    */
   standalone?: boolean
   onNext: () => void
+  /**
+   * Shows the step before. Absent on the first step shown, and on a standalone
+   * step, where there is no sequence to move back through.
+   */
+  onBack?: () => void
   onSkip: () => void
   onDismissForever: () => void
 }
@@ -48,8 +53,18 @@ export interface StepPopoverProps {
  * theme means no visible edge at all.
  */
 function StepBody(props: StepPopoverProps & {elevated: boolean}): React.JSX.Element {
-  const {step, index, total, onNext, onSkip, onDismissForever, elevated, sourceUrl, standalone} =
-    props
+  const {
+    step,
+    index,
+    total,
+    onNext,
+    onBack,
+    onSkip,
+    onDismissForever,
+    elevated,
+    sourceUrl,
+    standalone,
+  } = props
   const {t} = useTranslation(ONBOARDING_NAMESPACE)
   const localize = useLocalizedText()
   const titleId = useId()
@@ -136,6 +151,21 @@ function StepBody(props: StepPopoverProps & {elevated: boolean}): React.JSX.Elem
                 onClick={onSkip}
                 padding={2}
                 text={t('action.skip')}
+                tone="default"
+              />
+            )}
+            {/*
+              Mostly for the step that asked the editor to do something first.
+              Clicking Next without doing it drops the step that depended on
+              it, and Back is the only way to try again without restarting.
+            */}
+            {onBack && !standalone && (
+              <Button
+                fontSize={1}
+                mode="ghost"
+                onClick={onBack}
+                padding={2}
+                text={t('action.back')}
                 tone="default"
               />
             )}

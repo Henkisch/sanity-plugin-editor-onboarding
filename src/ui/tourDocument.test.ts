@@ -3,7 +3,7 @@ import {afterEach, describe, expect, it} from 'vitest'
 import {type SerializedDocumentType} from '../ai/serializeSchema'
 import {targetAssetBrowse, targetNavbar, targetPublishButton} from '../core/targeting'
 import {type OnboardingTour} from '../core/types'
-import {documentTypesFor, waitForElement} from './tourDocument'
+import {documentTypesFor, targetsOf, waitForElement} from './tourDocument'
 
 const types: SerializedDocumentType[] = [
   {
@@ -105,5 +105,38 @@ describe('waitForElement', () => {
     await expect(
       waitForElement('#never', {timeoutMs: 30, intervalMs: 10, isVisible}),
     ).resolves.toBeUndefined()
+  })
+})
+
+describe('targetsOf', () => {
+  it('lists each step selector in step order and skips centred steps', () => {
+    const selectors = targetsOf(
+      tour([
+        {title: 'a', content: 'x', target: '[data-testid="a"]'},
+        {title: 'b', content: 'x'},
+        {title: 'c', content: 'x', target: '[data-testid="c"]'},
+      ]),
+    )
+    expect(selectors).toEqual(['[data-testid="a"]', '[data-testid="c"]'])
+  })
+
+  it('lists a selector once when two steps share it, so the wait list stays short', () => {
+    const selectors = targetsOf(
+      tour([
+        {title: 'a', content: 'x', target: '[data-testid="a"]'},
+        {title: 'b', content: 'x', target: '[data-testid="a"]'},
+      ]),
+    )
+    expect(selectors).toEqual(['[data-testid="a"]'])
+  })
+
+  it('drops an invalid selector, because waitForElement would never resolve on it', () => {
+    const selectors = targetsOf(
+      tour([
+        {title: 'a', content: 'x', target: '[data-testid='},
+        {title: 'b', content: 'x', target: '[data-testid="b"]'},
+      ]),
+    )
+    expect(selectors).toEqual(['[data-testid="b"]'])
   })
 })

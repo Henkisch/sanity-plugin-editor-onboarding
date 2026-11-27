@@ -1,5 +1,6 @@
 import {PUBLISHED_FILTER} from '../ai/sampleContent'
 import {type SerializedDocumentType} from '../ai/serializeSchema'
+import {stepTarget} from '../core/fieldHelp'
 import {
   targetAssetBrowse,
   targetDocumentHistory,
@@ -7,6 +8,7 @@ import {
   targetPublishButton,
 } from '../core/targeting'
 import {type OnboardingTour} from '../core/types'
+import {query} from '../core/useTargetElement'
 
 /**
  * Which document types a guide can run in, so the Onboarding tool can open one
@@ -113,4 +115,18 @@ export function waitForElement(
 function hasSize(element: Element): boolean {
   const rect = element.getBoundingClientRect()
   return rect.width > 0 || rect.height > 0
+}
+
+/**
+ * Every selector a guide's steps point at, skipping centred steps and any
+ * selector that is not valid CSS.
+ *
+ * Invalid ones are dropped because `waitForElement` would throw on them on every
+ * tick and never resolve, leaving the guide stuck in "starting" for good.
+ *
+ * @internal
+ */
+export function targetsOf(tour: OnboardingTour): string[] {
+  const selectors = tour.steps.map(stepTarget).filter((target) => target !== undefined)
+  return [...new Set(selectors)].filter((selector) => query(selector) !== undefined)
 }

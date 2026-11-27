@@ -50,16 +50,21 @@ That's the whole setup. Start your Studio and you get:
 
 ## What's included
 
-`coreConcepts()` ships five short tours. Only `essentials` starts on its own;
-the rest wait in the help menu.
+`coreConcepts()` ships eight short tours. Only `essentials` starts on its own;
+the rest wait in the help menu. Three of them are titled by the question an
+editor asks when the Studio stops them, not by the concept behind it, because
+that question is what they will be looking for.
 
 | Tour | Covers |
 | --- | --- |
 | `essentials` | Drafts vs. published, creating documents, search |
 | `publishing` | Autosave, what a slug is, publishing, document history |
+| `validation` | "Why can't I publish?": where errors are listed, the field to fix, errors on another tab |
+| `editing` | "Why can't I edit?": the Draft chip and the Studio-wide perspective switch |
+| `removing` | "How do I take a page down?": Unpublish on the Published chip, and Delete |
 | `collaboration` | Presence, comments and tasks |
 | `releases` | Bundling and scheduling content releases |
-| `media` | How assets are stored and reused |
+| `media` | How assets are stored and reused, why alt text matters, setting what survives cropping, and the Media tool when `sanity-plugin-media` is installed |
 
 Pick a subset if you want:
 
@@ -79,6 +84,14 @@ coreConcepts({slugField: 'permalink'})
 Point it at a name that isn't in your schema, or leave it out of a project with
 no slug at all, and the step drops out with a console warning like any other
 missing target.
+
+The `media` tour explains why alt text matters, pointing at the alt field inside
+whichever image field is open. It tries `alt`, `altText` and `alternativeText`.
+If your image fields call it something else, say so:
+
+```ts
+coreConcepts({altFields: ['caption']})
+```
 
 ## Drafting guides from your schema
 
@@ -198,8 +211,18 @@ internals:
 | `targetPerspectiveMenu()` | The draft / published / release switcher |
 | `targetReleases()` | The Content Releases link |
 | `targetPublishButton()` | Publish, in an open document |
+| `targetValidationErrors()` | The red button listing a document's errors, while it has any |
+| `targetFieldValidationError()` | The first field with an error |
+| `targetFieldGroupWithError()` | A closed field-group tab holding an error |
 | `targetDocumentStatus()` | The Draft / Published chips |
+| `targetDraftChip()` | The Draft chip, the way out of read-only |
+| `targetPublishedChip()` | The Published chip, the way to Unpublish |
+| `targetUnpublishButton()` | Unpublish, while the Published chip is selected |
+| `targetDocumentActionsMenu()` | The footer's "…" menu, with Delete |
 | `targetDocumentHistory()` | The open document's context menu |
+| `targetImageAltText(names?)` | The alt-text field inside an image field |
+| `targetMediaTool()` | The Media tool from `sanity-plugin-media`, in the navbar |
+| `targetImageCrop()` | The crop / hotspot button on a filled image field |
 | `targetDocumentType(title)` | A type in the structure list — by **title**, not schema name |
 | `targetField(name)` | A field in the open document, by schema name |
 
@@ -242,6 +265,13 @@ reach but can't change: `target: '.some-widget'` or `target: '[data-thing]'`.
 A target that can't be found is not a crash and not a silent failure: the step
 is skipped, the tour carries on, and you get a console warning naming the tour,
 the step and the selector that missed.
+
+Next goes straight to the next step whose target is on screen at that moment,
+so an editor never waits on a step that will not appear. The flip side: a step
+whose target only appears a beat *after* Next, say a panel that animates open,
+is skipped. Point steps at UI that is already there when the editor moves on,
+or ask them in the step before to open it, as the built-in "How do I take a
+page down?" guide does with the Published chip.
 
 ### Help on a single field
 
@@ -462,7 +492,7 @@ while a guide is open, which is why `aria-modal` is `false`.
   checked weekly in CI (`npm run check:links`), but a link can still be dead for
   up to a week. Point them at your own documentation instead — see below.
 
-Verified against `sanity@6.12.0`. On a newer Studio major the plugin logs one
+Verified against `sanity@6.16.0`. On a newer Studio major the plugin logs one
 console warning to the developer; nothing is shown to editors, and steps whose
 targets have moved skip themselves as usual.
 
@@ -476,7 +506,7 @@ So in development, once per session, the plugin reports what it found:
 
 ```
 [sanity-plugin-editor-onboarding] 14 of 18 anchored steps found their target on
-this view (Sanity 6.12.0).
+this view (Sanity 6.16.0).
 ```
 
 Misses are listed, separated into selectors that can never match — invalid CSS —

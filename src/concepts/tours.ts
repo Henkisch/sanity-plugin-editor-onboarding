@@ -1,21 +1,34 @@
 import {CalendarIcon} from '@sanity/icons/Calendar'
+import {EditIcon} from '@sanity/icons/Edit'
+import {ErrorOutlineIcon} from '@sanity/icons/ErrorOutline'
 import {ImagesIcon} from '@sanity/icons/Images'
 import {PublishIcon} from '@sanity/icons/Publish'
 import {RocketIcon} from '@sanity/icons/Rocket'
+import {TrashIcon} from '@sanity/icons/Trash'
 import {UsersIcon} from '@sanity/icons/Users'
 
 import {
   targetAssetBrowse,
+  targetDocumentActionsMenu,
   targetDocumentHistory,
   targetDocumentStatus,
+  targetDraftChip,
+  targetFieldGroupWithError,
+  targetFieldValidationError,
   targetPresence,
   targetTasks,
   targetGuidesButton,
+  targetImageAltText,
+  targetImageCrop,
+  targetMediaTool,
   targetNewDocument,
   targetPerspectiveMenu,
   targetPublishButton,
+  targetPublishedChip,
   targetReleases,
   targetSearch,
+  targetUnpublishButton,
+  targetValidationErrors,
 } from '../core/targeting'
 
 /**
@@ -35,7 +48,15 @@ import {type LocalizedText} from '../i18n/useLocalizedText'
  *
  * @public
  */
-export type CoreConceptId = 'essentials' | 'publishing' | 'collaboration' | 'releases' | 'media'
+export type CoreConceptId =
+  | 'essentials'
+  | 'publishing'
+  | 'validation'
+  | 'editing'
+  | 'removing'
+  | 'collaboration'
+  | 'releases'
+  | 'media'
 
 /**
  * Marks a string as a key in this plugin's own locale namespace.
@@ -53,6 +74,9 @@ const k = (key: OnboardingResourceKey): LocalizedText => ({key, ns: ONBOARDING_N
 const ALL_CONCEPTS: CoreConceptId[] = [
   'essentials',
   'publishing',
+  'validation',
+  'editing',
+  'removing',
   'collaboration',
   'releases',
   'media',
@@ -60,6 +84,7 @@ const ALL_CONCEPTS: CoreConceptId[] = [
 
 function buildTours(options: CoreConceptsOptions): Record<CoreConceptId, OnboardingTour> {
   const slugField = options.slugField ?? 'slug'
+  const altFields = options.altFields
 
   return {
   essentials: {
@@ -146,6 +171,111 @@ function buildTours(options: CoreConceptsOptions): Record<CoreConceptId, Onboard
     ],
   },
 
+  validation: {
+    // Titled by the question an editor asks at the moment publishing refuses,
+    // not by the concept. Nobody blocked by a disabled button goes looking for
+    // "validation"; they look for why the button is grey.
+    id: 'validation',
+    title: k('tour.validation.title'),
+    sourceUrl: docs.contentOperations,
+    description: k('tour.validation.description'),
+    icon: ErrorOutlineIcon,
+    unavailableMessage: k('tour.validation.unavailable'),
+    steps: [
+      {
+        target: targetPublishButton(),
+        title: k('tour.validation.publish.title'),
+        content: k('tour.validation.publish.content'),
+        placement: 'top',
+      },
+      {
+        // Only exists while the document has errors, which is the only time
+        // this guide is worth opening. On a valid document the step drops out
+        // and the first one alone is still true.
+        target: targetValidationErrors(),
+        title: k('tour.validation.list.title'),
+        content: k('tour.validation.list.content'),
+      },
+      {
+        target: targetFieldValidationError(),
+        title: k('tour.validation.field.title'),
+        content: k('tour.validation.field.content'),
+      },
+      {
+        // Only appears when an error sits on a tab that is not open — the case
+        // where the field step above has nothing to point at, and where an
+        // editor is most likely to give up.
+        target: targetFieldGroupWithError(),
+        title: k('tour.validation.tab.title'),
+        content: k('tour.validation.tab.content'),
+      },
+    ],
+  },
+
+  editing: {
+    // Studio's read-only state has no banner: the fields just go slightly
+    // grey. An editor who clicked Published once, to check what is live, is
+    // left with a Studio that silently ignores their typing.
+    id: 'editing',
+    title: k('tour.editing.title'),
+    sourceUrl: docs.contentOperations,
+    description: k('tour.editing.description'),
+    icon: EditIcon,
+    unavailableMessage: k('tour.editing.unavailable'),
+    steps: [
+      {
+        target: targetDraftChip(),
+        title: k('tour.editing.versions.title'),
+        content: k('tour.editing.versions.content'),
+      },
+      {
+        // The same state as the chips, seen from the navbar. Without this
+        // step an editor fixes one document and finds the next one locked too.
+        target: targetPerspectiveMenu(),
+        title: k('tour.editing.perspective.title'),
+        content: k('tour.editing.perspective.content'),
+        learnMoreUrl: docs.contentOperations,
+      },
+    ],
+  },
+
+  removing: {
+    // "Delete" is what an editor reaches for, and usually not what they want:
+    // taking a page off the site while keeping it is Unpublish. That action
+    // only exists on the Published chip, which nothing on the Draft chip
+    // hints at, so the guide starts by sending them there. Delete itself is
+    // offered on both chips and removes every version either way, so the
+    // copy must not imply the Published chip is needed to take a page down.
+    id: 'removing',
+    title: k('tour.removing.title'),
+    sourceUrl: docs.contentOperations,
+    description: k('tour.removing.description'),
+    icon: TrashIcon,
+    unavailableMessage: k('tour.removing.unavailable'),
+    steps: [
+      {
+        target: targetPublishedChip(),
+        title: k('tour.removing.published.title'),
+        content: k('tour.removing.published.content'),
+      },
+      {
+        // Resolves only once the editor has clicked Published in the step
+        // before. If they did not, it drops out and the guide moves on to
+        // Delete, which is still true on its own.
+        target: targetUnpublishButton(),
+        title: k('tour.removing.unpublish.title'),
+        content: k('tour.removing.unpublish.content'),
+        placement: 'top',
+      },
+      {
+        target: targetDocumentActionsMenu(),
+        title: k('tour.removing.delete.title'),
+        content: k('tour.removing.delete.content'),
+        placement: 'top',
+      },
+    ],
+  },
+
   collaboration: {
     id: 'collaboration',
     title: k('tour.collaboration.title'),
@@ -218,6 +348,30 @@ function buildTours(options: CoreConceptsOptions): Record<CoreConceptId, Onboard
         content: k('tour.media.assets.content'),
         learnMoreUrl: docs.mediaLibrary,
       },
+      {
+        // Alt text is the field editors most often leave empty, and the one
+        // whose absence nobody on the team notices: the page looks the same to
+        // anyone who can see it. Only present on image fields that have one.
+        target: targetImageAltText(altFields),
+        title: k('tour.media.alt.title'),
+        content: k('tour.media.alt.content'),
+      },
+      {
+        // Editors upload a photo, see it cropped badly on the site, and do not
+        // know the Studio decides that. Only present once the field holds an
+        // image with hotspot enabled, which is exactly when it can be set.
+        target: targetImageCrop(),
+        title: k('tour.media.crop.title'),
+        placement: 'top',
+        content: k('tour.media.crop.content'),
+      },
+      {
+        // Only on Studios with `sanity-plugin-media`. Last, because it leaves
+        // the document: the steps above are about the image in front of them.
+        target: targetMediaTool(),
+        title: k('tour.media.library.title'),
+        content: k('tour.media.library.content'),
+      },
     ],
   },
   }
@@ -248,6 +402,17 @@ export interface CoreConceptsOptions {
    * @defaultValue 'slug'
    */
   slugField?: string
+  /**
+   * The names your image fields use for alt text, if not the usual ones.
+   *
+   * The images guide explains why alt text matters, pointing at the alt field
+   * inside whichever image field is open. It matches the field's own name, so
+   * `coverImage.alt` and `gallery[...].alt` are both found. Leave it out and the
+   * common names are tried; with no match the step drops out with a warning.
+   *
+   * @defaultValue ['alt', 'altText', 'alternativeText']
+   */
+  altFields?: string[]
 }
 
 /**

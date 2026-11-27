@@ -9,6 +9,7 @@
 const enUS = {
   // — Tour chrome —
   'action.next': 'Next',
+  'action.back': 'Back',
   'action.done': 'Done',
   'action.skip': 'Skip',
   'action.close': 'Close',
@@ -35,7 +36,7 @@ const enUS = {
   'tour.essentials.description': 'Drafts, published content, and finding your way around',
   'tour.essentials.intro.title': 'Getting around Sanity Studio',
   'tour.essentials.intro.content':
-    'Four quick steps, and you can leave whenever you like. Everything here stays available ' +
+    'A few quick steps, and you can leave whenever you like. Everything here stays available ' +
     'under the book icon in the top bar.',
   'tour.essentials.drafts.title': 'Drafts and published content',
   'tour.essentials.drafts.content':
@@ -48,7 +49,7 @@ const enUS = {
     'Search across every document type at once — useful when you know the headline but not where it lives.',
   'tour.essentials.guides.title': 'More guides live here',
   'tour.essentials.guides.content':
-    'Short guides on publishing, comments and tasks, releases, and images are all in this menu. Open it any time — including to run this one again.',
+    'Short guides on publishing, fixing what blocks it, comments and tasks, releases, and images are all in this menu. Open it any time — including to run this one again.',
 
   // — Core concepts: publishing —
   'tour.publishing.title': 'Editing and publishing',
@@ -69,6 +70,51 @@ const enUS = {
   'tour.publishing.history.title': 'Every change is kept',
   'tour.publishing.history.content':
     'This menu holds the document’s history. Compare an earlier version side by side with the current one, and restore it if something went wrong.',
+
+  // — Core concepts: validation —
+  'tour.validation.title': 'Why can’t I publish?',
+  'tour.validation.description': 'Finding and fixing what stops a document from publishing',
+  'tour.validation.unavailable':
+    'This guide points at the document editor. Open the document you can’t publish, then start it again.',
+  'tour.validation.publish.title': 'Two reasons Publish is greyed out',
+  'tour.validation.publish.content':
+    'Either everything is already published, or the document has errors to fix first, usually a required field left empty. Hover the button and the Studio tells you which.',
+  'tour.validation.list.title': 'Every error, in one list',
+  'tour.validation.list.content':
+    'This red button lists everything that is wrong. Click an error and the Studio jumps straight to the field. Yellow warnings are advice; they do not stop you publishing.',
+  'tour.validation.field.title': 'This field needs fixing',
+  'tour.validation.field.content':
+    'Fields with an error have a red icon beside their title. Hover the icon to see what is wrong. Fix it, and Publish turns on again.',
+  'tour.validation.tab.title': 'Errors can hide on another tab',
+  'tour.validation.tab.content':
+    'This document is split into tabs, and a tab with a red icon has a field that needs fixing. Open it to find the field.',
+
+  // — Core concepts: editing —
+  'tour.editing.title': 'Why can’t I edit?',
+  'tour.editing.description': 'When fields ignore your typing',
+  'tour.editing.unavailable':
+    'This guide points at the document editor. Open the document you can’t edit, then start it again.',
+  'tour.editing.versions.title': 'You may be looking at the live version',
+  'tour.editing.versions.content':
+    'Published shows what is live on the site, and it can only be read. If it is selected, the fields ignore your typing. Click Draft to edit again.',
+  'tour.editing.perspective.title': 'This applies to the whole Studio',
+  'tour.editing.perspective.content':
+    'If this says Published, every document is read-only, not just this one. Switch it back to Drafts to keep working.',
+
+  // — Core concepts: removing —
+  'tour.removing.title': 'How do I take a page down?',
+  'tour.removing.description': 'Unpublishing versus deleting',
+  'tour.removing.unavailable':
+    'This guide points at the document editor. Open the document you want to take down, then start it again.',
+  'tour.removing.published.title': 'Unpublish lives on the published version',
+  'tour.removing.published.content':
+    'To take the page off the site but keep it here, start by clicking Published. Then click Next.',
+  'tour.removing.unpublish.title': 'Unpublish takes it off the site',
+  'tour.removing.unpublish.content':
+    'The page disappears from the site but stays here as a draft, so you can publish it again later. This is usually what you want.',
+  'tour.removing.delete.title': 'Delete removes it for good',
+  'tour.removing.delete.content':
+    'Delete is in this menu. It removes both the draft and the published version. The Studio first checks whether other documents link here, and shows you which.',
 
   // — Core concepts: collaboration —
   'tour.collaboration.title': 'Working with your team',
@@ -100,7 +146,17 @@ const enUS = {
     'This guide points at an image field. Open a document that has one, then start it again.',
   'tour.media.assets.title': 'Upload once, use anywhere',
   'tour.media.assets.content':
-    'Images and files live in a shared library rather than inside the document you uploaded them to, so the same asset can be reused across the site without a second copy.',
+    'Images and files live in a shared library rather than inside the document you uploaded them to, so the same asset can be reused across the site without a second copy. Select picks one that is already there; once a field has an image, Select is in the … menu.',
+  'tour.media.alt.title': 'Describe the image in words',
+  'tour.media.alt.content':
+    'Alt text is read aloud to people who cannot see the image, shown when it fails to load, and read by search engines. Say what the image shows and why it is there. Leave it empty and the image says nothing to them.',
+  'tour.media.crop.title': 'Choose what must always show',
+  'tour.media.crop.content':
+    'The site crops images differently depending on where they appear. Click here and mark the part that matters, such as a face, and it stays in view whenever the image is cropped.',
+
+  'tour.media.library.title': 'Every image in one place',
+  'tour.media.library.content':
+    'Media shows every image and file in the project. Search and tag them there, and see which documents use an image before you replace or delete it.',
 
   // — Field guide suggestions (developer-only, in the Onboarding tool) —
   'conventions.heading': 'Suggest more',

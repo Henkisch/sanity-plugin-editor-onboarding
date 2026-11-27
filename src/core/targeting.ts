@@ -90,8 +90,18 @@ export const targetPresence = (): string => '#global-presence-menu'
 /** The global search button. @public */
 export const targetSearch = (): string => '[data-testid="studio-search"]'
 
-/** The perspective (draft / published / release) switcher. @public */
-export const targetPerspectiveMenu = (): string => '[data-testid="global-perspective-menu-button"]'
+/**
+ * The perspective (draft / published / release) switcher in the navbar.
+ *
+ * Rings the whole pill, label included. The test id sits on its dropdown
+ * arrow alone, so pointing at that rang a 25px chevron next to the word the
+ * step was talking about. The pill is the `ReleasesNav` component that holds
+ * that button, matched by component name rather than by its translated label.
+ *
+ * @public
+ */
+export const targetPerspectiveMenu = (): string =>
+  '[data-ui="ReleasesNav"]:has([data-testid="global-perspective-menu-button"])'
 
 /** The link to the Content Releases tool. Absent on Studios without it. @public */
 export const targetReleases = (): string => '[data-testid="releases-tool-link"]'
@@ -109,13 +119,19 @@ export const targetReleases = (): string => '[data-testid="releases-tool-link"]'
  * (`action-menu*`) and the list pane's create button are excluded. Note that it
  * is **not** inside `pane-footer`, despite appearing at the foot of the pane.
  *
+ * The same slot holds **Unpublish** while the Published chip is selected, so it
+ * is also required to carry the publish icon. Without that, a guide about
+ * publishing rang the Unpublish button. A Studio that replaces Publish with a
+ * custom action drops the step instead.
+ *
  * @public
  */
 export const targetPublishButton = (): string =>
   '[data-testid="document-pane"] [data-testid^="action-"][data-ui="Button"]' +
   ':not([data-testid^="action-button-"])' +
   ':not([data-testid^="action-menu"])' +
-  ':not([data-testid="action-intent-button"])'
+  ':not([data-testid="action-intent-button"])' +
+  ':has([data-sanity-icon="publish"])'
 
 /**
  * The Draft / Published chips at the top of an open document.
@@ -133,6 +149,120 @@ export const targetPublishButton = (): string =>
  */
 export const targetDocumentStatus = (): string =>
   '[data-testid^="document-header-"][data-testid$="-chip"]'
+
+/**
+ * The red status button in an open document's header that opens the list of
+ * validation errors. Clicking an entry in that list jumps to the field.
+ *
+ * Studio gives this button no test id, and its `aria-label` is translated, so
+ * it is matched by shape: the document pane's `StatusButton` whose status dot
+ * is coloured `critical`. Studio renders the button only while the document
+ * has problems, and colours the dot `caution` for warnings alone — which do
+ * not block publishing — so this resolves exactly when publishing is blocked,
+ * and a step pointing here drops out on a valid document.
+ *
+ * @public
+ */
+export const targetValidationErrors = (): string =>
+  '[data-testid="document-pane"] [data-ui="StatusButton"]:has([style*="critical"])'
+
+/**
+ * The first field in the open document that has an error, as a whole.
+ *
+ * Rings the field rather than its red error icon: the icon is not a button —
+ * it only shows a tooltip on hover — so a ring on it alone reads as something
+ * to click that then does nothing. The field is what the editor has to fix.
+ *
+ * The icon's test id names its severity rather than a label, so this is the
+ * same in every language. The `:not(:has(...))` picks the innermost field, so
+ * an error inside an object rings the nested field rather than the whole
+ * object around it. Absent while the document has no errors.
+ *
+ * @public
+ */
+export const targetFieldValidationError = (): string =>
+  `[data-testid="document-pane"] ${FIELD}:has(${ERROR_ICON}):not(:has(${FIELD} ${ERROR_ICON}))`
+
+/**
+ * A field-group tab, other than the open one, that holds a field with an error.
+ *
+ * A required field on a tab nobody has opened is invisible: Publish stays grey
+ * and nothing on screen says why. Studio marks the tab instead. The open tab
+ * and "All fields" are excluded, since the error on those is already in view.
+ * Matched by the tab's schema name prefix and the error icon's name, so it is
+ * the same in every language. On a narrow pane Studio swaps the tabs for a
+ * dropdown, and a step pointing here drops out.
+ *
+ * @public
+ */
+export const targetFieldGroupWithError = (): string =>
+  '[data-testid="document-pane"] [data-testid^="group-tab-"][aria-selected="false"]' +
+  ':not([data-testid="group-tab-all-fields"])' +
+  ':has([data-sanity-icon="error-outline"])'
+
+/**
+ * A form field, but not the field-group tab row: that is `field-group-tabs`,
+ * shares the `field-` prefix, and carries error icons for its tabs, so without
+ * this exclusion it is the first "field with an error" in the document.
+ */
+const FIELD = '[data-testid^="field-"]:not([data-testid^="field-group"])'
+const ERROR_ICON = '[data-testid="input-validation-icon-error"]'
+
+/**
+ * The Draft chip at the top of an open document — the one to click when the
+ * Studio is showing the published version and every field is read-only.
+ *
+ * Each chip's test id carries its **translated** label (`Draft-chip`,
+ * `Utkast-chip`), so this matches by position instead: Studio always renders
+ * Published first and Draft second, then any releases. Ringing the whole row
+ * was tried and rejected — it stretches across the full header, mostly empty.
+ * A workspace with the draft model turned off has no Draft chip, and the
+ * second position is then a release; such Studios have nothing to switch back
+ * to, so the editing guide does not apply to them anyway.
+ *
+ * @public
+ */
+export const targetDraftChip = (): string =>
+  '[data-testid="document-perspective-list"] > :nth-child(2) ' +
+  '[data-testid^="document-header-"][data-testid$="-chip"]'
+
+/**
+ * The Published chip at the top of an open document. Selecting it is the
+ * only way to reach Unpublish: on the Draft chip that action is not offered.
+ *
+ * Matched by position for the same reason as {@link targetDraftChip}: its test
+ * id carries the translated label. Studio always renders Published first.
+ *
+ * @public
+ */
+export const targetPublishedChip = (): string =>
+  '[data-testid="document-perspective-list"] > :nth-child(1) ' +
+  '[data-testid^="document-header-"][data-testid$="-chip"]'
+
+/**
+ * Unpublish, in an open document's footer. Present only while the Published
+ * chip is selected, where it takes Publish's place.
+ *
+ * Its test id is the translated label (`action-avpublicera` in Swedish), so it
+ * is found by its icon, the way {@link targetPublishButton} tells the two apart.
+ *
+ * @public
+ */
+export const targetUnpublishButton = (): string =>
+  '[data-testid="document-pane"] [data-testid^="action-"][data-ui="Button"]' +
+  ':has([data-sanity-icon="unpublish"])'
+
+/**
+ * The "…" menu beside Publish in an open document's footer, which holds
+ * Delete, Duplicate and Discard changes.
+ *
+ * Not the same as {@link targetDocumentHistory}, the "…" in the document's
+ * header, which holds history and inspectors.
+ *
+ * @public
+ */
+export const targetDocumentActionsMenu = (): string =>
+  '[data-testid="document-pane"] [data-testid="action-menu-button"]'
 
 /**
  * The open document's context menu, which holds version history and
@@ -159,6 +289,12 @@ export const targetDocumentHistory = (): string =>
  *   inserted *before* `browse-button`, so a prefix match on the first form
  *   silently misses it.
  *
+ * Once the field holds an image, Studio moves Select into the "…" menu beside
+ * the crop button, and neither form above is rendered. That menu is matched as
+ * a fallback, scoped to `image-input` because file fields use the same menu
+ * test id. Without it, the reuse step vanished from the images guide on any
+ * document whose image was already set (verified in a live Studio 6.16).
+ *
  * With no asset sources at all Studio renders no button, and the step drops out
  * on its own. Present only while a document with an image field is open, which
  * is exactly when reuse can be demonstrated.
@@ -167,7 +303,66 @@ export const targetDocumentHistory = (): string =>
  */
 export const targetAssetBrowse = (): string =>
   '[data-testid^="image-object-input-browse-button-"],' +
-  '[data-testid="image-object-input-multi-browse-button"]'
+  '[data-testid="image-object-input-multi-browse-button"],' +
+  '[data-testid="image-input"] [data-testid="options-menu-button"]'
+
+/**
+ * The crop button on an image field that already holds an image — where an
+ * editor sets the hotspot and crop.
+ *
+ * Present only when the field has an image and its schema enables
+ * `options.hotspot`, so on an empty field this step drops out and
+ * {@link targetAssetBrowse} has something to show instead. Studio names it by
+ * purpose rather than label, so it is the same in every language.
+ *
+ * @public
+ */
+export const targetImageCrop = (): string => '[data-testid="options-menu-edit-details"]'
+
+/**
+ * The alt-text names {@link targetImageAltText} looks for when a Studio does not
+ * name its own: the ones Sanity's docs and starters use.
+ *
+ * @internal
+ */
+export const DEFAULT_ALT_FIELDS = ['alt', 'altText', 'alternativeText']
+
+/**
+ * The alt-text field inside an image field, whatever the image field is called.
+ *
+ * Studio keys a nested field by its path, `field-coverImage.alt`, so this
+ * matches on the last segment and scopes it to `image-input`: an `alt` on some
+ * other object is not alt text. It excludes `field-actions-menu-…`, the field's
+ * own menu, whose test id ends in the same path and would otherwise match
+ * first. Verified against a live Studio 6.16.
+ *
+ * @param names - Possible names of the alt field. Defaults to
+ *   {@link DEFAULT_ALT_FIELDS}.
+ * @public
+ */
+export const targetImageAltText = (names: string[] = DEFAULT_ALT_FIELDS): string =>
+  names
+    .map(
+      (name) =>
+        '[data-testid="image-input"] [data-testid^="field-"]' +
+        ':not([data-testid^="field-actions"])' +
+        `[data-testid$=".${escapeAttributeValue(name)}"]`,
+    )
+    .join(',')
+
+/**
+ * The Media tool's link in the navbar, added by the community plugin
+ * `sanity-plugin-media`: one place to browse, search and tag every asset.
+ *
+ * Matched by the tool's route, `/media`, because Studio gives tool links no
+ * test id and their label is whatever the plugin calls itself. Absent on a
+ * Studio without that plugin, and the step drops out. Sanity's own Media
+ * Library is not a Studio tool, so this does not cover it; in the image field
+ * it appears as another asset source, which {@link targetAssetBrowse} handles.
+ *
+ * @public
+ */
+export const targetMediaTool = (): string => '[data-testid="studio-navbar"] a[href$="/media"]'
 
 /**
  * A document type's entry in the structure tool's list.

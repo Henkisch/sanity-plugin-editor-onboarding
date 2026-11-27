@@ -173,6 +173,33 @@ describe('running a tour', () => {
     expect(getTourStatus('u1', tour.id)).toBe('skipped')
   })
 
+  it('starting a second tour shows it and records the replaced one as skipped, not lost', () => {
+    const first = makeTour({id: 'first'})
+    const second = makeTour({
+      id: 'second',
+      steps: [{target: targetNavbar(), title: 'Second tour step', content: 'Other content'}],
+    })
+    // Not destructured: `onboarding` is a live getter, and the second start
+    // must see the context the first one produced, not a snapshot of it.
+    const harness = renderProvider({tours: [first, second]})
+
+    act(() => harness.onboarding.startTour(first.id))
+    act(() => harness.onboarding.startTour(second.id))
+
+    expect(screen.getByText('Second tour step')).toBeTruthy()
+    expect(getTourStatus('u1', first.id)).toBe('skipped')
+  })
+
+  it('restarting the tour that is already running records nothing', () => {
+    const tour = makeTour()
+    const harness = renderProvider({tours: [tour]})
+
+    act(() => harness.onboarding.startTour(tour.id))
+    act(() => harness.onboarding.startTour(tour.id))
+
+    expect(getTourStatus('u1', tour.id)).toBeNull()
+  })
+
   it('"don\'t show again" records a permanent dismissal', () => {
     const tour = makeTour()
     const {onboarding} = renderProvider({tours: [tour]})
@@ -347,6 +374,38 @@ describe('steps that cannot find their target', () => {
     expect(screen.getByText('action.done')).toBeTruthy()
   })
 
+  it('offers no Back on the first step, where there is nothing behind it', () => {
+    const tour = makeThreeStepTour()
+    const {onboarding} = renderProvider({tours: [tour]})
+
+    act(() => onboarding.startTour(tour.id))
+
+    expect(screen.queryByText('action.back')).toBeNull()
+  })
+
+  // The removing guide asks the editor to click Published before Next. One who
+  // clicks Next first loses the Unpublish step, and must be able to go back,
+  // do it, and see that step this time rather than restart the guide.
+  it('goes back past a dropped step, and tries it again on the way forward', () => {
+    const tour = makeThreeStepTour()
+    const {onboarding} = renderProvider({tours: [tour]})
+
+    act(() => onboarding.startTour(tour.id))
+    fireEvent.click(screen.getByText('action.next'))
+    act(() => void vi.advanceTimersByTime(2500))
+    fireEvent.click(screen.getByText('action.back'))
+
+    expect(screen.getByText('Step one')).toBeTruthy()
+    expect(screen.getByText('progress:{"current":1,"total":2}')).toBeTruthy()
+
+    setFixture('<div data-testid="studio-navbar">navbar</div><div id="nothing-here">now here</div>')
+    fireEvent.click(screen.getByText('action.next'))
+    act(() => void vi.advanceTimersByTime(300))
+
+    expect(screen.getByText('Ghost step')).toBeTruthy()
+    expect(screen.getByText('progress:{"current":2,"total":3}')).toBeTruthy()
+  })
+
   // A tour that never actually shows its last step must not be recorded as if
   // the user went through it.
   it('does not record a completion when the last step is missing throughout', () => {
@@ -360,11 +419,56 @@ describe('steps that cannot find their target', () => {
     const {onboarding} = renderProvider({tours: [tour]})
 
     act(() => onboarding.startTour(tour.id))
-    fireEvent.click(screen.getByText('action.next'))
+    // The ghost step is not on screen, so step one is already the last one.
+    fireEvent.click(screen.getByText('action.done'))
     act(() => void vi.advanceTimersByTime(2500))
 
     expect(onboarding.activeTourId).toBeNull()
     expect(getTourStatus('u1', tour.id)).toBeNull()
+  })
+
+  // An editor who clicks Next and sees an empty Studio for two seconds reads
+  // the guide as broken; the look-ahead removes the wait altogether.
+  it('goes straight to the next step on screen, without a blank wait', () => {
+    const tour = makeThreeStepTour()
+    const harness = renderProvider({tours: [tour]})
+
+    act(() => harness.onboarding.startTour(tour.id))
+    fireEvent.click(screen.getByText('action.next'))
+
+    expect(screen.getByText('Step three')).toBeTruthy()
+  })
+
+  it('a manual start opens on the first step that is on screen, without waiting', () => {
+    const tour = makeTour({
+      id: 'late-first',
+      steps: [
+        {target: '#nothing-here', title: 'Ghost step', content: 'a'},
+        {target: targetNavbar(), title: 'Step two', content: 'b'},
+      ],
+    })
+    const harness = renderProvider({tours: [tour]})
+
+    act(() => harness.onboarding.startTour(tour.id))
+
+    expect(screen.getByText('Step two')).toBeTruthy()
+    expect(screen.getByText('progress:{"current":1,"total":1}')).toBeTruthy()
+  })
+
+  it('offers Done on the last step that can be shown', () => {
+    const tour = makeTour({
+      id: 'ghost-last',
+      steps: [
+        {target: targetNavbar(), title: 'Step one', content: 'a'},
+        {target: '#nothing-here', title: 'Ghost step', content: 'b'},
+      ],
+    })
+    const harness = renderProvider({tours: [tour]})
+
+    act(() => harness.onboarding.startTour(tour.id))
+
+    expect(screen.getByText('action.done')).toBeTruthy()
+    expect(screen.queryByText('action.next')).toBeNull()
   })
 })
 

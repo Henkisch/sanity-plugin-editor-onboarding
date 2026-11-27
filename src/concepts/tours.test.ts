@@ -4,7 +4,16 @@ import {stepTarget} from '../core/fieldHelp'
 import {docs} from './docs'
 import {coreConcepts, type CoreConceptId} from './tours'
 
-const ALL: CoreConceptId[] = ['essentials', 'publishing', 'collaboration', 'releases', 'media']
+const ALL: CoreConceptId[] = [
+  'essentials',
+  'publishing',
+  'validation',
+  'editing',
+  'removing',
+  'collaboration',
+  'releases',
+  'media',
+]
 
 describe('coreConcepts', () => {
   it('ships every concept by default, so an unconfigured Studio gets the lot', () => {
@@ -69,8 +78,98 @@ describe('the media guide', () => {
     expect(media().steps[0].target).toContain('image-object-input-browse-button')
   })
 
+  // Only present once an image is in the field, which is exactly when an
+  // editor can set what must survive cropping.
+  it('shows where to set the hotspot once an image is in place', () => {
+    expect(media().steps[2].target).toBe('[data-testid="options-menu-edit-details"]')
+  })
+
+  it('explains alt text before cropping, so it is not lost at the end', () => {
+    expect(media().steps[1].target).toContain('.alt"]')
+  })
+
+  it('follows a project whose alt field has another name', () => {
+    const [, alt] = coreConcepts({include: ['media'], altFields: ['bildtext']})[0].steps
+    expect(alt.target).toContain('.bildtext"]')
+  })
+
+  it('ends on the Media tool, the one step that leaves the document', () => {
+    const steps = media().steps
+    expect(steps.at(-1)?.target).toContain('a[href$="/media"]')
+  })
+
   it('says so rather than doing nothing when no image field is open', () => {
     expect(media().unavailableMessage).toBeDefined()
+  })
+})
+
+describe('the validation guide', () => {
+  const validation = () => coreConcepts({include: ['validation']})[0]
+
+  // It exists because an editor could not publish and did not know where
+  // Studio lists the errors. Starting at the button they are stuck on is what
+  // connects the guide to the question they are asking.
+  it('starts at the publish button, where the editor is already stuck', () => {
+    expect(validation().steps[0].target).toContain('[data-testid^="action-"]')
+  })
+
+  it('matches the error list and field markers by shape, since their labels are translated', () => {
+    for (const step of validation().steps) {
+      expect(step.target ?? '').not.toMatch(/aria-label|title=/)
+    }
+  })
+
+  it('says so rather than doing nothing when no document is open', () => {
+    expect(validation().unavailableMessage).toBeDefined()
+  })
+
+  // The publish button's slot holds Unpublish while the Published chip is
+  // selected, and a guide about why publishing is blocked rang it.
+  it('rings Publish only, never the Unpublish button in the same slot', () => {
+    expect(validation().steps[0].target).toContain('[data-sanity-icon="publish"]')
+  })
+
+  // The tab row is `field-group-tabs` and carries its own error icons, so a
+  // plain `field-` prefix rang the tabs instead of the field to fix.
+  it('does not mistake the field-group tab row for a field', () => {
+    expect(validation().steps[2].target).toContain(':not([data-testid^="field-group"])')
+  })
+
+  it('points at a closed tab with an error, where the field itself is out of sight', () => {
+    expect(validation().steps[3].target).toContain('group-tab-')
+  })
+})
+
+describe('the editing guide', () => {
+  const editing = () => coreConcepts({include: ['editing']})[0]
+
+  // Each chip's test id carries its translated label, so the Draft chip is
+  // found by its position, which Studio fixes as second after Published.
+  it('finds the Draft chip by position, never by its translated label', () => {
+    expect(editing().steps[0].target).toContain(':nth-child(2)')
+    expect(editing().steps[0].target).not.toMatch(/Draft|Utkast/)
+  })
+
+  // The chips and the navbar menu are one setting. Fixing it in a document
+  // without knowing that leaves the next document locked as well.
+  it('shows that the setting is Studio-wide, not per document', () => {
+    expect(editing().steps[1].target).toContain('global-perspective-menu-button')
+  })
+})
+
+describe('the removing guide', () => {
+  const removing = () => coreConcepts({include: ['removing']})[0]
+
+  // Unpublish is only offered on the Published chip, so the guide has to send
+  // the editor there before it can point at it.
+  it('sends the editor to the Published chip before pointing at Unpublish', () => {
+    const [chip, unpublish] = removing().steps
+    expect(chip.target).toContain(':nth-child(1)')
+    expect(unpublish.target).toContain('[data-sanity-icon="unpublish"]')
+  })
+
+  it('points at the footer menu that holds Delete, not the header one', () => {
+    expect(removing().steps[2].target).toContain('action-menu-button')
   })
 })
 

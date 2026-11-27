@@ -11,6 +11,7 @@ import {type OnboardingResourceKey} from './en-US'
 const svSE: Record<OnboardingResourceKey, string> = {
   // — Tour chrome —
   'action.next': 'Nästa',
+  'action.back': 'Bakåt',
   'action.done': 'Klar',
   'action.skip': 'Hoppa över',
   'action.close': 'Stäng',
@@ -37,7 +38,7 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'tour.essentials.description': 'Utkast, publicerat innehåll och hur du hittar runt',
   'tour.essentials.intro.title': 'Hitta runt i Sanity Studio',
   'tour.essentials.intro.content':
-    'Fyra snabba steg, och du kan avsluta när du vill. Allt ligger kvar under bok-ikonen ' +
+    'Några snabba steg, och du kan avsluta när du vill. Allt ligger kvar under bok-ikonen ' +
     'uppe i menyraden.',
   'tour.essentials.drafts.title': 'Utkast och publicerat innehåll',
   'tour.essentials.drafts.content':
@@ -50,7 +51,7 @@ const svSE: Record<OnboardingResourceKey, string> = {
     'Sök i alla dokumenttyper samtidigt — användbart när du minns rubriken men inte var den ligger.',
   'tour.essentials.guides.title': 'Fler guider finns här',
   'tour.essentials.guides.content':
-    'Korta guider om publicering, kommentarer och uppgifter, releaser och bilder finns i den här menyn. Öppna den när du vill — även för att köra den här guiden igen.',
+    'Korta guider om publicering, vad som hindrar den, kommentarer och uppgifter, releaser och bilder finns i den här menyn. Öppna den när du vill — även för att köra den här guiden igen.',
 
   // — Core concepts: publishing —
   'tour.publishing.title': 'Redigera och publicera',
@@ -71,6 +72,51 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'tour.publishing.history.title': 'Alla ändringar sparas',
   'tour.publishing.history.content':
     'Den här menyn innehåller dokumentets historik. Jämför en tidigare version sida vid sida med den nuvarande och återställ den om något blev fel.',
+
+  // — Core concepts: validation —
+  'tour.validation.title': 'Varför kan jag inte publicera?',
+  'tour.validation.description': 'Hitta och rätta det som hindrar ett dokument från att publiceras',
+  'tour.validation.unavailable':
+    'Den här guiden pekar på dokumentredigeraren. Öppna dokumentet du inte kan publicera och starta den igen.',
+  'tour.validation.publish.title': 'Två skäl till att Publicera är grå',
+  'tour.validation.publish.content':
+    'Antingen är allt redan publicerat, eller så har dokumentet fel som måste rättas först, oftast ett obligatoriskt fält som är tomt. Håll muspekaren över knappen så säger Studion vilket.',
+  'tour.validation.list.title': 'Alla fel i en lista',
+  'tour.validation.list.content':
+    'Den röda knappen listar allt som är fel. Klicka på ett fel så hoppar Studion direkt till fältet. Gula varningar är råd och hindrar dig inte från att publicera.',
+  'tour.validation.field.title': 'Det här fältet behöver rättas',
+  'tour.validation.field.content':
+    'Fält med fel har en röd ikon vid rubriken. Håll muspekaren över ikonen för att se vad som är fel. Rätta det, så går det att publicera igen.',
+  'tour.validation.tab.title': 'Fel kan gömma sig på en annan flik',
+  'tour.validation.tab.content':
+    'Dokumentet är uppdelat i flikar, och en flik med röd ikon har ett fält som behöver rättas. Öppna fliken för att hitta fältet.',
+
+  // — Core concepts: editing —
+  'tour.editing.title': 'Varför kan jag inte skriva?',
+  'tour.editing.description': 'När fälten inte tar emot det du skriver',
+  'tour.editing.unavailable':
+    'Den här guiden pekar på dokumentredigeraren. Öppna dokumentet du inte kan redigera och starta den igen.',
+  'tour.editing.versions.title': 'Du kanske tittar på den publicerade versionen',
+  'tour.editing.versions.content':
+    'Publicerad visar det som ligger ute på webbplatsen och går bara att läsa. Är den vald tar fälten inte emot det du skriver. Klicka på Utkast för att redigera igen.',
+  'tour.editing.perspective.title': 'Valet gäller hela Studion',
+  'tour.editing.perspective.content':
+    'Står det Publicerad här är alla dokument låsta, inte bara det här. Byt tillbaka till Utkast för att fortsätta arbeta.',
+
+  // — Core concepts: removing —
+  'tour.removing.title': 'Hur tar jag bort en sida?',
+  'tour.removing.description': 'Skillnaden mellan att avpublicera och radera',
+  'tour.removing.unavailable':
+    'Den här guiden pekar på dokumentredigeraren. Öppna dokumentet du vill ta bort och starta den igen.',
+  'tour.removing.published.title': 'Avpublicera finns i den publicerade versionen',
+  'tour.removing.published.content':
+    'Vill du ta bort sidan från webbplatsen men behålla den här, börja med att klicka på Publicerad. Klicka sedan på Nästa.',
+  'tour.removing.unpublish.title': 'Avpublicera tar bort den från webbplatsen',
+  'tour.removing.unpublish.content':
+    'Sidan försvinner från webbplatsen men finns kvar här som utkast, så att du kan publicera den igen senare. Det är oftast det du vill.',
+  'tour.removing.delete.title': 'Radera tar bort den för gott',
+  'tour.removing.delete.content':
+    'Radera finns i den här menyn. Det tar bort både utkastet och den publicerade versionen. Studion kollar först om andra dokument länkar hit och visar i så fall vilka.',
 
   // — Core concepts: collaboration —
   'tour.collaboration.title': 'Arbeta tillsammans',
@@ -104,7 +150,16 @@ const svSE: Record<OnboardingResourceKey, string> = {
     'Den här guiden pekar på ett bildfält. Öppna ett dokument som har ett och försök igen.',
   'tour.media.assets.title': 'Ladda upp en gång, använd överallt',
   'tour.media.assets.content':
-    'Bilder och filer ligger i ett gemensamt bibliotek i stället för inuti dokumentet du laddade upp dem i, så att samma fil kan återanvändas på hela webbplatsen utan en extra kopia.',
+    'Bilder och filer ligger i ett gemensamt bibliotek i stället för inuti dokumentet du laddade upp dem i, så att samma fil kan återanvändas på hela webbplatsen utan en extra kopia. Med Välj hämtar du en som redan finns. Har fältet redan en bild ligger Välj i menyn …',
+  'tour.media.alt.title': 'Beskriv bilden med ord',
+  'tour.media.alt.content':
+    'Alt-texten läses upp för den som inte kan se bilden, visas om bilden inte laddas och läses av sökmotorer. Skriv vad bilden visar och varför den finns där. Lämnas den tom säger bilden ingenting till dem.',
+  'tour.media.crop.title': 'Välj vad som alltid ska synas',
+  'tour.media.crop.content':
+    'Webbplatsen beskär bilder olika beroende på var de visas. Klicka här och markera det viktigaste i bilden, till exempel ett ansikte, så hålls det med när bilden beskärs.',
+  'tour.media.library.title': 'Alla bilder på ett ställe',
+  'tour.media.library.content':
+    'Under Media ser du alla bilder och filer i projektet. Där kan du söka och tagga dem, och se vilka dokument som använder en bild innan du byter ut eller raderar den.',
 
   // — Förslag på fältguider (för utvecklare, i Onboarding-verktyget) —
   'conventions.heading': 'Föreslå fler',
