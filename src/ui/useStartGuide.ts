@@ -10,6 +10,16 @@ import {query} from '../core/useTargetElement'
 import {documentTypesFor, LATEST_DOCUMENT_QUERY, targetsOf, waitForElement} from './tourDocument'
 
 /**
+ * Increments on every start request, from any caller.
+ *
+ * Module-level because the navbar menu and the Onboarding tool each hold their
+ * own instance of this hook. A start that is still opening a document must not
+ * fire after the editor has picked another guide: found in a live Studio, it
+ * replaced the newer guide about ten seconds later, as if on its own.
+ */
+let latestRequest = 0
+
+/**
  * Start a guide where it can run, opening a document first if it needs one.
  *
  * Used by the guides menu and the Onboarding tool alike. Before this, starting
@@ -37,6 +47,7 @@ export function useStartGuide(): {start: (tour: OnboardingTour) => void; startin
 
   const start = useCallback(
     async (tour: OnboardingTour) => {
+      const request = ++latestRequest
       const targets = targetsOf(tour)
       const candidates = documentTypesFor(tour, types)
 
@@ -63,7 +74,7 @@ export function useStartGuide(): {start: (tour: OnboardingTour) => void; startin
         )
       } finally {
         setStarting(null)
-        onboarding?.startTour(tour.id)
+        if (request === latestRequest) onboarding?.startTour(tour.id)
       }
     },
     [client, onboarding, router, types],

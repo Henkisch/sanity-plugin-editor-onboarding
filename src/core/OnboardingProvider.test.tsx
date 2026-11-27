@@ -173,6 +173,33 @@ describe('running a tour', () => {
     expect(getTourStatus('u1', tour.id)).toBe('skipped')
   })
 
+  it('starting a second tour shows it and records the replaced one as skipped, not lost', () => {
+    const first = makeTour({id: 'first'})
+    const second = makeTour({
+      id: 'second',
+      steps: [{target: targetNavbar(), title: 'Second tour step', content: 'Other content'}],
+    })
+    // Not destructured: `onboarding` is a live getter, and the second start
+    // must see the context the first one produced, not a snapshot of it.
+    const harness = renderProvider({tours: [first, second]})
+
+    act(() => harness.onboarding.startTour(first.id))
+    act(() => harness.onboarding.startTour(second.id))
+
+    expect(screen.getByText('Second tour step')).toBeTruthy()
+    expect(getTourStatus('u1', first.id)).toBe('skipped')
+  })
+
+  it('restarting the tour that is already running records nothing', () => {
+    const tour = makeTour()
+    const harness = renderProvider({tours: [tour]})
+
+    act(() => harness.onboarding.startTour(tour.id))
+    act(() => harness.onboarding.startTour(tour.id))
+
+    expect(getTourStatus('u1', tour.id)).toBeNull()
+  })
+
   it('"don\'t show again" records a permanent dismissal', () => {
     const tour = makeTour()
     const {onboarding} = renderProvider({tours: [tour]})

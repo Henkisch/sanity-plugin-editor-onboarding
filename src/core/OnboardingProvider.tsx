@@ -348,16 +348,30 @@ export function OnboardingProvider(props: {
     if (fallback instanceof HTMLElement) fallback.focus({preventScroll: true})
   }, [])
 
-  const beginTour = useCallback((tourId: string) => {
-    rememberFocus(focusBeforeTour)
-    offeredThisSession.current.add(tourId)
-    handledSkip.current = null
-    setShownSteps([])
-    setUnavailableTour(null)
-    setActiveTourId(tourId)
-    setStepIndex(0)
-    setSkippedCount(0)
-  }, [])
+  const beginTour = useCallback(
+    (tourId: string) => {
+      // Picking another guide mid-tour is "not now", the same as closing it:
+      // without this the replaced guide leaves no trace, and the editor is
+      // never offered it again. Not `dismissed`, since moving on to something
+      // else is not an opt-out. Restarting the guide already running records
+      // nothing, because nothing was left.
+      if (activeTourId && activeTourId !== tourId) {
+        setTourStatus(userId, activeTourId, 'skipped', stepIndex)
+        if (syncProgress && userId) void saveProgress(client, userId, getUserProgress(userId))
+        setStatusVersion((version) => version + 1)
+      }
+
+      rememberFocus(focusBeforeTour)
+      offeredThisSession.current.add(tourId)
+      handledSkip.current = null
+      setShownSteps([])
+      setUnavailableTour(null)
+      setActiveTourId(tourId)
+      setStepIndex(0)
+      setSkippedCount(0)
+    },
+    [activeTourId, stepIndex, userId, syncProgress, client],
+  )
 
   /**
    * Public entry point, used by the help menu and `useStartTour`. Unlike
