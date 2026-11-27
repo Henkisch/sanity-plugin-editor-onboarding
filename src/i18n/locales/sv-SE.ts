@@ -78,9 +78,9 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'tour.validation.description': 'Hitta och rätta det som hindrar ett dokument från att publiceras',
   'tour.validation.unavailable':
     'Den här guiden pekar på dokumentredigeraren. Öppna dokumentet du inte kan publicera och starta den igen.',
-  'tour.validation.publish.title': 'Något behöver rättas först',
+  'tour.validation.publish.title': 'Två skäl till att Publicera är grå',
   'tour.validation.publish.content':
-    'Är Publicera gråmarkerad har dokumentet fel — oftast ett obligatoriskt fält som är tomt eller ett värde som bryter mot en regel. Håll muspekaren över knappen för att se varför.',
+    'Antingen är allt redan publicerat, eller så har dokumentet fel som måste rättas först, oftast ett obligatoriskt fält som är tomt. Håll muspekaren över knappen så säger Studion vilket.',
   'tour.validation.list.title': 'Alla fel i en lista',
   'tour.validation.list.content':
     'Den röda knappen listar allt som är fel. Klicka på ett fel så hoppar Studion direkt till fältet. Gula varningar är råd och hindrar dig inte från att publicera.',

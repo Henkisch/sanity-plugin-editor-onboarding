@@ -76,9 +76,9 @@ const enUS = {
   'tour.validation.description': 'Finding and fixing what stops a document from publishing',
   'tour.validation.unavailable':
     'This guide points at the document editor. Open the document you can’t publish, then start it again.',
-  'tour.validation.publish.title': 'Something needs fixing first',
+  'tour.validation.publish.title': 'Two reasons Publish is greyed out',
   'tour.validation.publish.content':
-    'If Publish is greyed out, the document has errors — usually a required field that is empty or a value that breaks a rule. Hover the button to see why.',
+    'Either everything is already published, or the document has errors to fix first, usually a required field left empty. Hover the button and the Studio tells you which.',
   'tour.validation.list.title': 'Every error, in one list',
   'tour.validation.list.content':
     'This red button lists everything that is wrong. Click an error and the Studio jumps straight to the field. Yellow warnings are advice; they do not stop you publishing.',
