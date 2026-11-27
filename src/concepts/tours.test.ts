@@ -93,6 +93,11 @@ describe('the media guide', () => {
     expect(alt.target).toContain('.bildtext"]')
   })
 
+  it('ends on the Media tool, the one step that leaves the document', () => {
+    const steps = media().steps
+    expect(steps.at(-1)?.target).toContain('a[href$="/media"]')
+  })
+
   it('says so rather than doing nothing when no image field is open', () => {
     expect(media().unavailableMessage).toBeDefined()
   })

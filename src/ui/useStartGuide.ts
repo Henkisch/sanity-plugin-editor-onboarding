@@ -51,10 +51,19 @@ export function useStartGuide(): {start: (tour: OnboardingTour) => void; startin
       const targets = targetsOf(tour)
       const candidates = documentTypesFor(tour, types)
 
-      if (candidates.length === 0 || targets.length === 0 || targets.some((t) => query(t))) {
+      // A guide that needs a document can run here only if one of its steps is
+      // on screen *inside* a document. A step on Studio chrome, like the navbar
+      // Media tool, is on screen everywhere, and counting it started the images
+      // guide on a document list with nothing but that one step to show.
+      const inDocument = (target: string) =>
+        Boolean(query(target)?.closest('[data-testid="document-pane"]'))
+      if (candidates.length === 0 || targets.length === 0 || targets.some(inDocument)) {
         onboarding?.startTour(tour.id)
         return
       }
+      // Wait only for what is not on screen yet: a navbar target already
+      // present would end the wait before the document had rendered.
+      const awaited = targets.filter((target) => !query(target))
 
       setStarting(tour.id)
       try {
@@ -64,7 +73,7 @@ export function useStartGuide(): {start: (tour: OnboardingTour) => void; startin
         )
         if (found) {
           router.navigateIntent('edit', {id: getPublishedId(found._id), type: found._type})
-          await waitForElement(targets.join(', '))
+          if (awaited.length > 0) await waitForElement(awaited.join(', '))
         }
       } catch (error) {
         console.warn(

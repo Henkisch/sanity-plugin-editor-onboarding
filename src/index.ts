@@ -14,6 +14,7 @@ export {
   targetGuidesButton,
   targetImageAltText,
   targetImageCrop,
+  targetMediaTool,
   targetNavbar,
   targetNewDocument,
   targetPerspectiveMenu,

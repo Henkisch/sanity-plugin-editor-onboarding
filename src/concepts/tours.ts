@@ -20,6 +20,7 @@ import {
   targetGuidesButton,
   targetImageAltText,
   targetImageCrop,
+  targetMediaTool,
   targetNewDocument,
   targetPerspectiveMenu,
   targetPublishButton,
@@ -363,6 +364,13 @@ function buildTours(options: CoreConceptsOptions): Record<CoreConceptId, Onboard
         title: k('tour.media.crop.title'),
         placement: 'top',
         content: k('tour.media.crop.content'),
+      },
+      {
+        // Only on Studios with `sanity-plugin-media`. Last, because it leaves
+        // the document: the steps above are about the image in front of them.
+        target: targetMediaTool(),
+        title: k('tour.media.library.title'),
+        content: k('tour.media.library.content'),
       },
     ],
   },

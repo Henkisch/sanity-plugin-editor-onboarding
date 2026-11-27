@@ -351,6 +351,20 @@ export const targetImageAltText = (names: string[] = DEFAULT_ALT_FIELDS): string
     .join(',')
 
 /**
+ * The Media tool's link in the navbar, added by the community plugin
+ * `sanity-plugin-media`: one place to browse, search and tag every asset.
+ *
+ * Matched by the tool's route, `/media`, because Studio gives tool links no
+ * test id and their label is whatever the plugin calls itself. Absent on a
+ * Studio without that plugin, and the step drops out. Sanity's own Media
+ * Library is not a Studio tool, so this does not cover it; in the image field
+ * it appears as another asset source, which {@link targetAssetBrowse} handles.
+ *
+ * @public
+ */
+export const targetMediaTool = (): string => '[data-testid="studio-navbar"] a[href$="/media"]'
+
+/**
  * A document type's entry in the structure tool's list.
  *
  * Note that Studio keys these by the type's **title**, not its schema name — so

@@ -154,6 +154,10 @@ const enUS = {
   'tour.media.crop.content':
     'The site crops images differently depending on where they appear. Click here and mark the part that matters, such as a face, and it stays in view whenever the image is cropped.',
 
+  'tour.media.library.title': 'Every image in one place',
+  'tour.media.library.content':
+    'Media shows every image and file in the project. Search and tag them there, and see which documents use an image before you replace or delete it.',
+
   // — Field guide suggestions (developer-only, in the Onboarding tool) —
   'conventions.heading': 'Suggest more',
   'conventions.intro':

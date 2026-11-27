@@ -157,6 +157,9 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'tour.media.crop.title': 'Välj vad som alltid ska synas',
   'tour.media.crop.content':
     'Webbplatsen beskär bilder olika beroende på var de visas. Klicka här och markera det viktigaste i bilden, till exempel ett ansikte, så hålls det med när bilden beskärs.',
+  'tour.media.library.title': 'Alla bilder på ett ställe',
+  'tour.media.library.content':
+    'Under Media ser du alla bilder och filer i projektet. Där kan du söka och tagga dem, och se vilka dokument som använder en bild innan du byter ut eller raderar den.',
 
   // — Förslag på fältguider (för utvecklare, i Onboarding-verktyget) —
   'conventions.heading': 'Föreslå fler',

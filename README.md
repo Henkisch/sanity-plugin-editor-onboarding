@@ -62,7 +62,7 @@ the rest wait in the help menu.
 | `removing` | "How do I take a page down?": Unpublish on the Published chip, and Delete |
 | `collaboration` | Presence, comments and tasks |
 | `releases` | Bundling and scheduling content releases |
-| `media` | How assets are stored and reused, why alt text matters, and setting what survives cropping |
+| `media` | How assets are stored and reused, why alt text matters, setting what survives cropping, and the Media tool when `sanity-plugin-media` is installed |
 
 Pick a subset if you want:
 
@@ -219,6 +219,7 @@ internals:
 | `targetDocumentActionsMenu()` | The footer's "…" menu, with Delete |
 | `targetDocumentHistory()` | The open document's context menu |
 | `targetImageAltText(names?)` | The alt-text field inside an image field |
+| `targetMediaTool()` | The Media tool from `sanity-plugin-media`, in the navbar |
 | `targetImageCrop()` | The crop / hotspot button on a filled image field |
 | `targetDocumentType(title)` | A type in the structure list — by **title**, not schema name |
 | `targetField(name)` | A field in the open document, by schema name |
