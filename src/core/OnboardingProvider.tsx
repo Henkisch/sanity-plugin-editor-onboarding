@@ -133,11 +133,14 @@ function StepRunner(props: {
   stepIndex: number
   skippedCount: number
   onAdvance: () => void
+  /** Absent on the first step shown, where there is nothing to go back to. */
+  onBack?: () => void
   onSkipStep: (stepIndex: number) => void
   onSkip: () => void
   onDismissForever: () => void
 }): React.JSX.Element | null {
-  const {tour, stepIndex, skippedCount, onAdvance, onSkipStep, onSkip, onDismissForever} = props
+  const {tour, stepIndex, skippedCount, onAdvance, onBack, onSkipStep, onSkip, onDismissForever} =
+    props
   const step = tour.steps[stepIndex]
 
   const {state, element, rect} = useTargetElement(step && stepTarget(step), {
@@ -173,6 +176,7 @@ function StepRunner(props: {
       {rect && <Spotlight rect={rect} />}
       <StepPopover
         index={index}
+        onBack={onBack}
         onDismissForever={onDismissForever}
         onNext={onAdvance}
         onSkip={onSkip}
@@ -275,6 +279,15 @@ export function OnboardingProvider(props: {
   const offeredThisSession = useRef<Set<string>>(new Set())
   /** Guards against a step being skipped more than once. See `skipStep`. */
   const handledSkip = useRef<string | null>(null)
+  /**
+   * The steps already shown in the running tour, in order, for Back.
+   *
+   * Holds only steps the editor actually saw, so Back never lands on one that
+   * was skipped for a missing target. Going forward again re-resolves the
+   * steps in between: a step skipped because the editor had not yet done what
+   * the step before asked for gets a second chance once they have.
+   */
+  const [shownSteps, setShownSteps] = useState<number[]>([])
   /** The last health report printed, so an unchanged one is not repeated. */
   const lastHealthReport = useRef<string | null>(null)
   // Bumped whenever a tour ends, to re-read statuses for the help menu.
@@ -339,6 +352,7 @@ export function OnboardingProvider(props: {
     rememberFocus(focusBeforeTour)
     offeredThisSession.current.add(tourId)
     handledSkip.current = null
+    setShownSteps([])
     setUnavailableTour(null)
     setActiveTourId(tourId)
     setStepIndex(0)
@@ -371,6 +385,7 @@ export function OnboardingProvider(props: {
         if (syncProgress && userId) void saveProgress(client, userId, getUserProgress(userId))
       }
       restoreFocus(focusBeforeTour)
+      setShownSteps([])
       setActiveTourId(null)
       setStepIndex(0)
       setSkippedCount(0)
@@ -387,8 +402,22 @@ export function OnboardingProvider(props: {
       endTour('completed')
       return
     }
+    setShownSteps((shown) => [...shown, stepIndex])
     setStepIndex((index) => index + 1)
   }, [activeTour, stepIndex, endTour])
+
+  const goBack = useCallback(() => {
+    const previous = shownSteps.at(-1)
+    if (previous === undefined) return
+    const remaining = shownSteps.slice(0, -1)
+    // Cleared so a step skipped on the way forward can be skipped again, if
+    // its target is still missing the second time round.
+    handledSkip.current = null
+    setShownSteps(remaining)
+    // Every step before `previous` that is not in the history was skipped.
+    setSkippedCount(previous - remaining.length)
+    setStepIndex(previous)
+  }, [shownSteps])
 
   // A step whose target never appeared. Same movement as `advance`, but it also
   // shrinks the visible step count so the counter doesn't jump.
@@ -408,6 +437,7 @@ export function OnboardingProvider(props: {
 
       if (index >= activeTour.steps.length - 1) {
         // Every remaining step was missing, so don't record this as a completion.
+        setShownSteps([])
         setActiveTourId(null)
         setStepIndex(0)
         setSkippedCount(0)
@@ -638,6 +668,7 @@ export function OnboardingProvider(props: {
           <StepRunner
             key={`${activeTour.id}:${stepIndex}`}
             onAdvance={advance}
+            onBack={shownSteps.length > 0 ? goBack : undefined}
             onDismissForever={() => endTour('dismissed')}
             onSkip={stopTour}
             onSkipStep={skipStep}

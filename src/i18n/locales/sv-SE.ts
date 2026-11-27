@@ -11,6 +11,7 @@ import {type OnboardingResourceKey} from './en-US'
 const svSE: Record<OnboardingResourceKey, string> = {
   // — Tour chrome —
   'action.next': 'Nästa',
+  'action.back': 'Bakåt',
   'action.done': 'Klar',
   'action.skip': 'Hoppa över',
   'action.close': 'Stäng',

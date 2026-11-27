@@ -9,6 +9,7 @@
 const enUS = {
   // — Tour chrome —
   'action.next': 'Next',
+  'action.back': 'Back',
   'action.done': 'Done',
   'action.skip': 'Skip',
   'action.close': 'Close',

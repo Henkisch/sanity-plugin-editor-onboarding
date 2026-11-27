@@ -347,6 +347,38 @@ describe('steps that cannot find their target', () => {
     expect(screen.getByText('action.done')).toBeTruthy()
   })
 
+  it('offers no Back on the first step, where there is nothing behind it', () => {
+    const tour = makeThreeStepTour()
+    const {onboarding} = renderProvider({tours: [tour]})
+
+    act(() => onboarding.startTour(tour.id))
+
+    expect(screen.queryByText('action.back')).toBeNull()
+  })
+
+  // The removing guide asks the editor to click Published before Next. One who
+  // clicks Next first loses the Unpublish step, and must be able to go back,
+  // do it, and see that step this time rather than restart the guide.
+  it('goes back past a dropped step, and tries it again on the way forward', () => {
+    const tour = makeThreeStepTour()
+    const {onboarding} = renderProvider({tours: [tour]})
+
+    act(() => onboarding.startTour(tour.id))
+    fireEvent.click(screen.getByText('action.next'))
+    act(() => void vi.advanceTimersByTime(2500))
+    fireEvent.click(screen.getByText('action.back'))
+
+    expect(screen.getByText('Step one')).toBeTruthy()
+    expect(screen.getByText('progress:{"current":1,"total":3}')).toBeTruthy()
+
+    setFixture('<div data-testid="studio-navbar">navbar</div><div id="nothing-here">now here</div>')
+    fireEvent.click(screen.getByText('action.next'))
+    act(() => void vi.advanceTimersByTime(300))
+
+    expect(screen.getByText('Ghost step')).toBeTruthy()
+    expect(screen.getByText('progress:{"current":2,"total":3}')).toBeTruthy()
+  })
+
   // A tour that never actually shows its last step must not be recorded as if
   // the user went through it.
   it('does not record a completion when the last step is missing throughout', () => {
