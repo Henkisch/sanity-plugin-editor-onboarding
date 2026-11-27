@@ -38,7 +38,7 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'tour.essentials.description': 'Utkast, publicerat innehåll och hur du hittar runt',
   'tour.essentials.intro.title': 'Hitta runt i Sanity Studio',
   'tour.essentials.intro.content':
-    'Fyra snabba steg, och du kan avsluta när du vill. Allt ligger kvar under bok-ikonen ' +
+    'Några snabba steg, och du kan avsluta när du vill. Allt ligger kvar under bok-ikonen ' +
     'uppe i menyraden.',
   'tour.essentials.drafts.title': 'Utkast och publicerat innehåll',
   'tour.essentials.drafts.content':

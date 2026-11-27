@@ -36,7 +36,7 @@ const enUS = {
   'tour.essentials.description': 'Drafts, published content, and finding your way around',
   'tour.essentials.intro.title': 'Getting around Sanity Studio',
   'tour.essentials.intro.content':
-    'Four quick steps, and you can leave whenever you like. Everything here stays available ' +
+    'A few quick steps, and you can leave whenever you like. Everything here stays available ' +
     'under the book icon in the top bar.',
   'tour.essentials.drafts.title': 'Drafts and published content',
   'tour.essentials.drafts.content':
