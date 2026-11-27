@@ -15,6 +15,7 @@
     "react-dom": "^19.2.8",
     "sanity": "^6.16.0",
     "sanity-plugin-editor-onboarding": "file:..",
+    "sanity-plugin-media": "^6.6.5",
     "styled-components": "^6.5.3"
   }
 }

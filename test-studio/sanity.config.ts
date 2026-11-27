@@ -1,5 +1,6 @@
 import {svSELocale} from '@sanity/locale-sv-se'
 import {visionTool} from '@sanity/vision'
+import {media} from 'sanity-plugin-media'
 import {defineConfig} from 'sanity'
 import {
   coreConcepts,
@@ -89,6 +90,9 @@ export default defineConfig({
     structureTool(),
     visionTool(),
     svSELocale(),
+    // A second asset source and a Media tool, as a popular community plugin
+    // adds them, so the images guide is checked against both.
+    media(),
     // Phase 1's zero-config library, plus a Phase 2 tour of local components.
     // Progress is synced here so the dataset-backed path gets exercised, not
     // just the localStorage one.
