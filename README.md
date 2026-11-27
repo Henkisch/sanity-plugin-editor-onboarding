@@ -62,7 +62,7 @@ the rest wait in the help menu.
 | `removing` | "How do I take a page down?": Unpublish on the Published chip, and Delete |
 | `collaboration` | Presence, comments and tasks |
 | `releases` | Bundling and scheduling content releases |
-| `media` | How assets are stored and reused |
+| `media` | How assets are stored and reused, and setting what survives cropping |
 
 Pick a subset if you want:
 
@@ -210,6 +210,7 @@ internals:
 | `targetUnpublishButton()` | Unpublish, while the Published chip is selected |
 | `targetDocumentActionsMenu()` | The footer's "…" menu, with Delete |
 | `targetDocumentHistory()` | The open document's context menu |
+| `targetImageCrop()` | The crop / hotspot button on a filled image field |
 | `targetDocumentType(title)` | A type in the structure list — by **title**, not schema name |
 | `targetField(name)` | A field in the open document, by schema name |
 

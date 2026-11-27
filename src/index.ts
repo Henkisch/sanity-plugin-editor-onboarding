@@ -12,6 +12,7 @@ export {
   targetFieldGroupWithError,
   targetFieldValidationError,
   targetGuidesButton,
+  targetImageCrop,
   targetNavbar,
   targetNewDocument,
   targetPerspectiveMenu,

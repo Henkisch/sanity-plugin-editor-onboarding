@@ -78,6 +78,12 @@ describe('the media guide', () => {
     expect(media().steps[0].target).toContain('image-object-input-browse-button')
   })
 
+  // Only present once an image is in the field, which is exactly when an
+  // editor can set what must survive cropping.
+  it('shows where to set the hotspot once an image is in place', () => {
+    expect(media().steps[1].target).toBe('[data-testid="options-menu-edit-details"]')
+  })
+
   it('says so rather than doing nothing when no image field is open', () => {
     expect(media().unavailableMessage).toBeDefined()
   })

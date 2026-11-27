@@ -18,6 +18,7 @@ import {
   targetPresence,
   targetTasks,
   targetGuidesButton,
+  targetImageCrop,
   targetNewDocument,
   targetPerspectiveMenu,
   targetPublishButton,
@@ -341,6 +342,15 @@ function buildTours(options: CoreConceptsOptions): Record<CoreConceptId, Onboard
         placement: 'top',
         content: k('tour.media.assets.content'),
         learnMoreUrl: docs.mediaLibrary,
+      },
+      {
+        // Editors upload a photo, see it cropped badly on the site, and do not
+        // know the Studio decides that. Only present once the field holds an
+        // image with hotspot enabled, which is exactly when it can be set.
+        target: targetImageCrop(),
+        title: k('tour.media.crop.title'),
+        placement: 'top',
+        content: k('tour.media.crop.content'),
       },
     ],
   },

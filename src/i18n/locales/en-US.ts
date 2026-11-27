@@ -146,6 +146,9 @@ const enUS = {
   'tour.media.assets.title': 'Upload once, use anywhere',
   'tour.media.assets.content':
     'Images and files live in a shared library rather than inside the document you uploaded them to, so the same asset can be reused across the site without a second copy.',
+  'tour.media.crop.title': 'Choose what must always show',
+  'tour.media.crop.content':
+    'The site crops images differently depending on where they appear. Click here and mark the part that matters, such as a face, and it stays in view whenever the image is cropped.',
 
   // — Field guide suggestions (developer-only, in the Onboarding tool) —
   'conventions.heading': 'Suggest more',

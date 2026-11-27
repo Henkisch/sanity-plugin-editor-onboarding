@@ -300,6 +300,19 @@ export const targetAssetBrowse = (): string =>
   '[data-testid="image-object-input-multi-browse-button"]'
 
 /**
+ * The crop button on an image field that already holds an image — where an
+ * editor sets the hotspot and crop.
+ *
+ * Present only when the field has an image and its schema enables
+ * `options.hotspot`, so on an empty field this step drops out and
+ * {@link targetAssetBrowse} has something to show instead. Studio names it by
+ * purpose rather than label, so it is the same in every language.
+ *
+ * @public
+ */
+export const targetImageCrop = (): string => '[data-testid="options-menu-edit-details"]'
+
+/**
  * A document type's entry in the structure tool's list.
  *
  * Note that Studio keys these by the type's **title**, not its schema name — so
