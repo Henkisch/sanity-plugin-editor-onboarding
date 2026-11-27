@@ -107,9 +107,9 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'tour.removing.description': 'Skillnaden mellan att avpublicera och radera',
   'tour.removing.unavailable':
     'Den här guiden pekar på dokumentredigeraren. Öppna dokumentet du vill ta bort och starta den igen.',
-  'tour.removing.published.title': 'Börja i den publicerade versionen',
+  'tour.removing.published.title': 'Avpublicera finns i den publicerade versionen',
   'tour.removing.published.content':
-    'En sida tas bort från webbplatsen via sin publicerade version. Klicka på Publicerad och sedan på Nästa.',
+    'Vill du ta bort sidan från webbplatsen men behålla den här, börja med att klicka på Publicerad. Klicka sedan på Nästa.',
   'tour.removing.unpublish.title': 'Avpublicera tar bort den från webbplatsen',
   'tour.removing.unpublish.content':
     'Sidan försvinner från webbplatsen men finns kvar här som utkast, så att du kan publicera den igen senare. Det är oftast det du vill.',

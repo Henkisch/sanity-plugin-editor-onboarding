@@ -105,9 +105,9 @@ const enUS = {
   'tour.removing.description': 'Unpublishing versus deleting',
   'tour.removing.unavailable':
     'This guide points at the document editor. Open the document you want to take down, then start it again.',
-  'tour.removing.published.title': 'Start from the live version',
+  'tour.removing.published.title': 'Unpublish lives on the published version',
   'tour.removing.published.content':
-    'Taking a page off the site is done from its published version. Click Published, then Next.',
+    'To take the page off the site but keep it here, start by clicking Published. Then click Next.',
   'tour.removing.unpublish.title': 'Unpublish takes it off the site',
   'tour.removing.unpublish.content':
     'The page disappears from the site but stays here as a draft, so you can publish it again later. This is usually what you want.',

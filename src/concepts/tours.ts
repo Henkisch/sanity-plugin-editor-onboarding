@@ -240,7 +240,9 @@ function buildTours(options: CoreConceptsOptions): Record<CoreConceptId, Onboard
     // "Delete" is what an editor reaches for, and usually not what they want:
     // taking a page off the site while keeping it is Unpublish. That action
     // only exists on the Published chip, which nothing on the Draft chip
-    // hints at, so the guide starts by sending them there.
+    // hints at, so the guide starts by sending them there. Delete itself is
+    // offered on both chips and removes every version either way, so the
+    // copy must not imply the Published chip is needed to take a page down.
     id: 'removing',
     title: k('tour.removing.title'),
     sourceUrl: docs.contentOperations,
