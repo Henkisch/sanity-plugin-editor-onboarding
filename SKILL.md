@@ -21,9 +21,22 @@ export default defineConfig({
 })
 ```
 
-That alone gives five tours covering drafts, publishing, collaboration,
-releases and assets, in every language the plugin ships. Add nothing else until
-there is a real gap.
+That alone gives eight tours, in every language the plugin ships: drafts,
+publishing, collaboration, releases and assets, plus three titled by the
+question an editor asks when stuck — "Why can't I publish?" (validation),
+"Why can't I edit?" (the Published perspective is read-only) and "How do I take
+a page down?" (Unpublish versus Delete). Add nothing else until there is a real
+gap.
+
+Two options, only when the schema differs from the common names. Wrong values
+make the step drop out with a console warning, not break:
+
+```ts
+coreConcepts({
+  slugField: 'permalink',     // default 'slug'
+  altFields: ['caption'],     // default ['alt', 'altText', 'alternativeText'], inside image fields
+})
+```
 
 ## The two things you can add
 
@@ -144,6 +157,10 @@ any string by registering a bundle with the same namespace.
 
 - **Only one tour should auto-start.** More than one competing for a new
   editor's attention is worse than none.
+- **Point a step at UI that is on screen when the editor presses Next.** Next
+  jumps to the next step whose target exists at that moment; a target that
+  appears a beat later (an animating panel) is skipped. If a step depends on an
+  action, ask for it in the step before, as the built-in removing guide does.
 - **Do not add an unanchored step to a tour of anchored ones.** A tour whose
   steps are all unanchored can never report itself unavailable.
 - **Scope field guides by `documentType`** when the same field name means

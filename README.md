@@ -50,8 +50,10 @@ That's the whole setup. Start your Studio and you get:
 
 ## What's included
 
-`coreConcepts()` ships five short tours. Only `essentials` starts on its own;
-the rest wait in the help menu.
+`coreConcepts()` ships eight short tours. Only `essentials` starts on its own;
+the rest wait in the help menu. Three of them are titled by the question an
+editor asks when the Studio stops them, not by the concept behind it, because
+that question is what they will be looking for.
 
 | Tour | Covers |
 | --- | --- |
