@@ -4,11 +4,10 @@ import {useRouter} from 'sanity/router'
 
 import {serializeSchema} from '../ai/serializeSchema'
 import {QUERY_API_VERSION} from '../core/apiVersion'
-import {stepTarget} from '../core/fieldHelp'
 import {useOnboardingOptional} from '../core/OnboardingProvider'
 import {type OnboardingTour} from '../core/types'
 import {query} from '../core/useTargetElement'
-import {documentTypesFor, LATEST_DOCUMENT_QUERY, waitForElement} from './tourDocument'
+import {documentTypesFor, LATEST_DOCUMENT_QUERY, targetsOf, waitForElement} from './tourDocument'
 
 /**
  * Start a guide where it can run, opening a document first if it needs one.
@@ -18,7 +17,11 @@ import {documentTypesFor, LATEST_DOCUMENT_QUERY, waitForElement} from './tourDoc
  * it again" — accurate, and one more thing to do for someone who asked for help.
  *
  * Opens nothing when the guide can already run here: an editor inside a blog
- * post who starts the SEO guide stays in that post, not the latest one.
+ * post who starts the SEO guide stays in that post, not the latest one. "Can run
+ * here" means any step pointing at something on screen, not only the first: a
+ * guide whose first step is conditional, such as the image picker that
+ * disappears once an image is set, otherwise opened a different document and
+ * waited 10 seconds for a button that never appears.
  * Falls back to starting in place whenever no fitting document is found, so
  * the guide's own "unavailable" notice still explains what is missing.
  *
@@ -34,10 +37,10 @@ export function useStartGuide(): {start: (tour: OnboardingTour) => void; startin
 
   const start = useCallback(
     async (tour: OnboardingTour) => {
-      const first = tour.steps.map(stepTarget).find((target) => target !== undefined)
+      const targets = targetsOf(tour)
       const candidates = documentTypesFor(tour, types)
 
-      if (candidates.length === 0 || !first || query(first)) {
+      if (candidates.length === 0 || targets.length === 0 || targets.some((t) => query(t))) {
         onboarding?.startTour(tour.id)
         return
       }
@@ -50,7 +53,7 @@ export function useStartGuide(): {start: (tour: OnboardingTour) => void; startin
         )
         if (found) {
           router.navigateIntent('edit', {id: getPublishedId(found._id), type: found._type})
-          await waitForElement(first)
+          await waitForElement(targets.join(', '))
         }
       } catch (error) {
         console.warn(

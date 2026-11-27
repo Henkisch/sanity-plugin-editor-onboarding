@@ -50,7 +50,7 @@ const DottedButton = styled(Button)<{$hint: boolean}>`
  */
 export function HelpMenuButton(): React.JSX.Element | null {
   const {tours, statuses, showMenuHint, markMenuOpened, resetAll, resetTour} = useOnboarding()
-  const {start} = useStartGuide()
+  const {start, starting} = useStartGuide()
   const {t} = useTranslation(ONBOARDING_NAMESPACE)
   const localize = useLocalizedText()
 
@@ -75,6 +75,9 @@ export function HelpMenuButton(): React.JSX.Element | null {
           $hint={showMenuHint}
           data-testid="onboarding-guides-button"
           icon={BookIcon}
+          // The menu closes on click, so the button is the only place left to show
+          // that a guide is opening a document.
+          loading={starting !== null}
           mode="bleed"
           title={t('menu.button-label')}
           tone="default"
