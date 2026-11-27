@@ -4,10 +4,12 @@ import {ErrorOutlineIcon} from '@sanity/icons/ErrorOutline'
 import {ImagesIcon} from '@sanity/icons/Images'
 import {PublishIcon} from '@sanity/icons/Publish'
 import {RocketIcon} from '@sanity/icons/Rocket'
+import {TrashIcon} from '@sanity/icons/Trash'
 import {UsersIcon} from '@sanity/icons/Users'
 
 import {
   targetAssetBrowse,
+  targetDocumentActionsMenu,
   targetDocumentHistory,
   targetDocumentStatus,
   targetDraftChip,
@@ -19,8 +21,10 @@ import {
   targetNewDocument,
   targetPerspectiveMenu,
   targetPublishButton,
+  targetPublishedChip,
   targetReleases,
   targetSearch,
+  targetUnpublishButton,
   targetValidationErrors,
 } from '../core/targeting'
 
@@ -46,6 +50,7 @@ export type CoreConceptId =
   | 'publishing'
   | 'validation'
   | 'editing'
+  | 'removing'
   | 'collaboration'
   | 'releases'
   | 'media'
@@ -68,6 +73,7 @@ const ALL_CONCEPTS: CoreConceptId[] = [
   'publishing',
   'validation',
   'editing',
+  'removing',
   'collaboration',
   'releases',
   'media',
@@ -225,6 +231,41 @@ function buildTours(options: CoreConceptsOptions): Record<CoreConceptId, Onboard
         title: k('tour.editing.perspective.title'),
         content: k('tour.editing.perspective.content'),
         learnMoreUrl: docs.contentOperations,
+      },
+    ],
+  },
+
+  removing: {
+    // "Delete" is what an editor reaches for, and usually not what they want:
+    // taking a page off the site while keeping it is Unpublish. That action
+    // only exists on the Published chip, which nothing on the Draft chip
+    // hints at, so the guide starts by sending them there.
+    id: 'removing',
+    title: k('tour.removing.title'),
+    sourceUrl: docs.contentOperations,
+    description: k('tour.removing.description'),
+    icon: TrashIcon,
+    unavailableMessage: k('tour.removing.unavailable'),
+    steps: [
+      {
+        target: targetPublishedChip(),
+        title: k('tour.removing.published.title'),
+        content: k('tour.removing.published.content'),
+      },
+      {
+        // Resolves only once the editor has clicked Published in the step
+        // before. If they did not, it drops out and the guide moves on to
+        // Delete, which is still true on its own.
+        target: targetUnpublishButton(),
+        title: k('tour.removing.unpublish.title'),
+        content: k('tour.removing.unpublish.content'),
+        placement: 'top',
+      },
+      {
+        target: targetDocumentActionsMenu(),
+        title: k('tour.removing.delete.title'),
+        content: k('tour.removing.delete.content'),
+        placement: 'top',
       },
     ],
   },

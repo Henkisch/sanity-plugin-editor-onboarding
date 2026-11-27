@@ -3,6 +3,7 @@ export {OnboardingTarget, type OnboardingTargetProps} from './core/OnboardingTar
 export {
   targetAssetBrowse,
   targetCustom,
+  targetDocumentActionsMenu,
   targetDocumentHistory,
   targetDocumentStatus,
   targetDocumentType,
@@ -15,10 +16,12 @@ export {
   targetNewDocument,
   targetPerspectiveMenu,
   targetPublishButton,
+  targetPublishedChip,
   targetReleases,
   targetSearch,
   targetPresence,
   targetTasks,
+  targetUnpublishButton,
   targetToolMenu,
   targetValidationErrors,
 } from './core/targeting'

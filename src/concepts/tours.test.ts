@@ -9,6 +9,7 @@ const ALL: CoreConceptId[] = [
   'publishing',
   'validation',
   'editing',
+  'removing',
   'collaboration',
   'releases',
   'media',
@@ -133,6 +134,22 @@ describe('the editing guide', () => {
   // without knowing that leaves the next document locked as well.
   it('shows that the setting is Studio-wide, not per document', () => {
     expect(editing().steps[1].target).toContain('global-perspective-menu-button')
+  })
+})
+
+describe('the removing guide', () => {
+  const removing = () => coreConcepts({include: ['removing']})[0]
+
+  // Unpublish is only offered on the Published chip, so the guide has to send
+  // the editor there before it can point at it.
+  it('sends the editor to the Published chip before pointing at Unpublish', () => {
+    const [chip, unpublish] = removing().steps
+    expect(chip.target).toContain(':nth-child(1)')
+    expect(unpublish.target).toContain('[data-sanity-icon="unpublish"]')
+  })
+
+  it('points at the footer menu that holds Delete, not the header one', () => {
+    expect(removing().steps[2].target).toContain('action-menu-button')
   })
 })
 

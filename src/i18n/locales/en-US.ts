@@ -100,6 +100,21 @@ const enUS = {
   'tour.editing.perspective.content':
     'If this says Published, every document is read-only, not just this one. Switch it back to Drafts to keep working.',
 
+  // — Core concepts: removing —
+  'tour.removing.title': 'How do I take a page down?',
+  'tour.removing.description': 'Unpublishing versus deleting',
+  'tour.removing.unavailable':
+    'This guide points at the document editor. Open the document you want to take down, then start it again.',
+  'tour.removing.published.title': 'Start from the live version',
+  'tour.removing.published.content':
+    'Taking a page off the site is done from its published version. Click Published, then Next.',
+  'tour.removing.unpublish.title': 'Unpublish takes it off the site',
+  'tour.removing.unpublish.content':
+    'The page disappears from the site but stays here as a draft, so you can publish it again later. This is usually what you want.',
+  'tour.removing.delete.title': 'Delete removes it for good',
+  'tour.removing.delete.content':
+    'Delete is in this menu. It removes both the draft and the published version. The Studio first checks whether other documents link here, and shows you which.',
+
   // — Core concepts: collaboration —
   'tour.collaboration.title': 'Working with your team',
   'tour.collaboration.description': 'Presence, comments, and tasks',

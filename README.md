@@ -59,6 +59,7 @@ the rest wait in the help menu.
 | `publishing` | Autosave, what a slug is, publishing, document history |
 | `validation` | "Why can't I publish?": where errors are listed, the field to fix, errors on another tab |
 | `editing` | "Why can't I edit?": the Draft chip and the Studio-wide perspective switch |
+| `removing` | "How do I take a page down?": Unpublish on the Published chip, and Delete |
 | `collaboration` | Presence, comments and tasks |
 | `releases` | Bundling and scheduling content releases |
 | `media` | How assets are stored and reused |
@@ -205,6 +206,9 @@ internals:
 | `targetFieldGroupWithError()` | A closed field-group tab holding an error |
 | `targetDocumentStatus()` | The Draft / Published chips |
 | `targetDraftChip()` | The Draft chip, the way out of read-only |
+| `targetPublishedChip()` | The Published chip, the way to Unpublish |
+| `targetUnpublishButton()` | Unpublish, while the Published chip is selected |
+| `targetDocumentActionsMenu()` | The footer's "…" menu, with Delete |
 | `targetDocumentHistory()` | The open document's context menu |
 | `targetDocumentType(title)` | A type in the structure list — by **title**, not schema name |
 | `targetField(name)` | A field in the open document, by schema name |

@@ -102,6 +102,21 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'tour.editing.perspective.content':
     'Står det Publicerad här är alla dokument låsta, inte bara det här. Byt tillbaka till Utkast för att fortsätta arbeta.',
 
+  // — Core concepts: removing —
+  'tour.removing.title': 'Hur tar jag bort en sida?',
+  'tour.removing.description': 'Skillnaden mellan att avpublicera och radera',
+  'tour.removing.unavailable':
+    'Den här guiden pekar på dokumentredigeraren. Öppna dokumentet du vill ta bort och starta den igen.',
+  'tour.removing.published.title': 'Börja i den publicerade versionen',
+  'tour.removing.published.content':
+    'En sida tas bort från webbplatsen via sin publicerade version. Klicka på Publicerad och sedan på Nästa.',
+  'tour.removing.unpublish.title': 'Avpublicera tar bort den från webbplatsen',
+  'tour.removing.unpublish.content':
+    'Sidan försvinner från webbplatsen men finns kvar här som utkast, så att du kan publicera den igen senare. Det är oftast det du vill.',
+  'tour.removing.delete.title': 'Radera tar bort den för gott',
+  'tour.removing.delete.content':
+    'Radera finns i den här menyn. Det tar bort både utkastet och den publicerade versionen. Studion kollar först om andra dokument länkar hit och visar i så fall vilka.',
+
   // — Core concepts: collaboration —
   'tour.collaboration.title': 'Arbeta tillsammans',
   'tour.collaboration.description': 'Närvaro, kommentarer och uppgifter',

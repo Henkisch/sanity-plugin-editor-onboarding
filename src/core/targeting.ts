@@ -227,6 +227,44 @@ export const targetDraftChip = (): string =>
   '[data-testid^="document-header-"][data-testid$="-chip"]'
 
 /**
+ * The Published chip at the top of an open document. Selecting it is the
+ * only way to reach Unpublish: on the Draft chip that action is not offered.
+ *
+ * Matched by position for the same reason as {@link targetDraftChip}: its test
+ * id carries the translated label. Studio always renders Published first.
+ *
+ * @public
+ */
+export const targetPublishedChip = (): string =>
+  '[data-testid="document-perspective-list"] > :nth-child(1) ' +
+  '[data-testid^="document-header-"][data-testid$="-chip"]'
+
+/**
+ * Unpublish, in an open document's footer. Present only while the Published
+ * chip is selected, where it takes Publish's place.
+ *
+ * Its test id is the translated label (`action-avpublicera` in Swedish), so it
+ * is found by its icon, the way {@link targetPublishButton} tells the two apart.
+ *
+ * @public
+ */
+export const targetUnpublishButton = (): string =>
+  '[data-testid="document-pane"] [data-testid^="action-"][data-ui="Button"]' +
+  ':has([data-sanity-icon="unpublish"])'
+
+/**
+ * The "…" menu beside Publish in an open document's footer, which holds
+ * Delete, Duplicate and Discard changes.
+ *
+ * Not the same as {@link targetDocumentHistory}, the "…" in the document's
+ * header, which holds history and inspectors.
+ *
+ * @public
+ */
+export const targetDocumentActionsMenu = (): string =>
+  '[data-testid="document-pane"] [data-testid="action-menu-button"]'
+
+/**
  * The open document's context menu, which holds version history and
  * "compare versions".
  *
