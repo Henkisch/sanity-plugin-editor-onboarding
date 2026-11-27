@@ -8,6 +8,7 @@ const ALL: CoreConceptId[] = [
   'essentials',
   'publishing',
   'validation',
+  'editing',
   'collaboration',
   'releases',
   'media',
@@ -115,6 +116,23 @@ describe('the validation guide', () => {
 
   it('points at a closed tab with an error, where the field itself is out of sight', () => {
     expect(validation().steps[3].target).toContain('group-tab-')
+  })
+})
+
+describe('the editing guide', () => {
+  const editing = () => coreConcepts({include: ['editing']})[0]
+
+  // Each chip's test id carries its translated label, so the Draft chip is
+  // found by its position, which Studio fixes as second after Published.
+  it('finds the Draft chip by position, never by its translated label', () => {
+    expect(editing().steps[0].target).toContain(':nth-child(2)')
+    expect(editing().steps[0].target).not.toMatch(/Draft|Utkast/)
+  })
+
+  // The chips and the navbar menu are one setting. Fixing it in a document
+  // without knowing that leaves the next document locked as well.
+  it('shows that the setting is Studio-wide, not per document', () => {
+    expect(editing().steps[1].target).toContain('global-perspective-menu-button')
   })
 })
 

@@ -6,6 +6,7 @@ export {
   targetDocumentHistory,
   targetDocumentStatus,
   targetDocumentType,
+  targetDraftChip,
   targetField,
   targetFieldGroupWithError,
   targetFieldValidationError,

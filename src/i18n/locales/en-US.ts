@@ -88,6 +88,18 @@ const enUS = {
   'tour.validation.tab.content':
     'This document is split into tabs, and a tab with a red icon has a field that needs fixing. Open it to find the field.',
 
+  // — Core concepts: editing —
+  'tour.editing.title': 'Why can’t I edit?',
+  'tour.editing.description': 'When fields ignore your typing',
+  'tour.editing.unavailable':
+    'This guide points at the document editor. Open the document you can’t edit, then start it again.',
+  'tour.editing.versions.title': 'You may be looking at the live version',
+  'tour.editing.versions.content':
+    'Published shows what is live on the site, and it can only be read. If it is selected, the fields ignore your typing. Click Draft to edit again.',
+  'tour.editing.perspective.title': 'This applies to the whole Studio',
+  'tour.editing.perspective.content':
+    'If this says Published, every document is read-only, not just this one. Switch it back to Drafts to keep working.',
+
   // — Core concepts: collaboration —
   'tour.collaboration.title': 'Working with your team',
   'tour.collaboration.description': 'Presence, comments, and tasks',

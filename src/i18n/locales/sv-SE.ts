@@ -90,6 +90,18 @@ const svSE: Record<OnboardingResourceKey, string> = {
   'tour.validation.tab.content':
     'Dokumentet är uppdelat i flikar, och en flik med röd ikon har ett fält som behöver rättas. Öppna fliken för att hitta fältet.',
 
+  // — Core concepts: editing —
+  'tour.editing.title': 'Varför kan jag inte skriva?',
+  'tour.editing.description': 'När fälten inte tar emot det du skriver',
+  'tour.editing.unavailable':
+    'Den här guiden pekar på dokumentredigeraren. Öppna dokumentet du inte kan redigera och starta den igen.',
+  'tour.editing.versions.title': 'Du kanske tittar på den publicerade versionen',
+  'tour.editing.versions.content':
+    'Publicerad visar det som ligger ute på webbplatsen och går bara att läsa. Är den vald tar fälten inte emot det du skriver. Klicka på Utkast för att redigera igen.',
+  'tour.editing.perspective.title': 'Valet gäller hela Studion',
+  'tour.editing.perspective.content':
+    'Står det Publicerad här är alla dokument låsta, inte bara det här. Byt tillbaka till Utkast för att fortsätta arbeta.',
+
   // — Core concepts: collaboration —
   'tour.collaboration.title': 'Arbeta tillsammans',
   'tour.collaboration.description': 'Närvaro, kommentarer och uppgifter',

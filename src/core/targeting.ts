@@ -90,8 +90,18 @@ export const targetPresence = (): string => '#global-presence-menu'
 /** The global search button. @public */
 export const targetSearch = (): string => '[data-testid="studio-search"]'
 
-/** The perspective (draft / published / release) switcher. @public */
-export const targetPerspectiveMenu = (): string => '[data-testid="global-perspective-menu-button"]'
+/**
+ * The perspective (draft / published / release) switcher in the navbar.
+ *
+ * Rings the whole pill, label included. The test id sits on its dropdown
+ * arrow alone, so pointing at that rang a 25px chevron next to the word the
+ * step was talking about. The pill is the `ReleasesNav` component that holds
+ * that button, matched by component name rather than by its translated label.
+ *
+ * @public
+ */
+export const targetPerspectiveMenu = (): string =>
+  '[data-ui="ReleasesNav"]:has([data-testid="global-perspective-menu-button"])'
 
 /** The link to the Content Releases tool. Absent on Studios without it. @public */
 export const targetReleases = (): string => '[data-testid="releases-tool-link"]'
@@ -197,6 +207,24 @@ export const targetFieldGroupWithError = (): string =>
  */
 const FIELD = '[data-testid^="field-"]:not([data-testid^="field-group"])'
 const ERROR_ICON = '[data-testid="input-validation-icon-error"]'
+
+/**
+ * The Draft chip at the top of an open document — the one to click when the
+ * Studio is showing the published version and every field is read-only.
+ *
+ * Each chip's test id carries its **translated** label (`Draft-chip`,
+ * `Utkast-chip`), so this matches by position instead: Studio always renders
+ * Published first and Draft second, then any releases. Ringing the whole row
+ * was tried and rejected — it stretches across the full header, mostly empty.
+ * A workspace with the draft model turned off has no Draft chip, and the
+ * second position is then a release; such Studios have nothing to switch back
+ * to, so the editing guide does not apply to them anyway.
+ *
+ * @public
+ */
+export const targetDraftChip = (): string =>
+  '[data-testid="document-perspective-list"] > :nth-child(2) ' +
+  '[data-testid^="document-header-"][data-testid$="-chip"]'
 
 /**
  * The open document's context menu, which holds version history and

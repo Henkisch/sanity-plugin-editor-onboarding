@@ -58,6 +58,7 @@ the rest wait in the help menu.
 | `essentials` | Drafts vs. published, creating documents, search |
 | `publishing` | Autosave, what a slug is, publishing, document history |
 | `validation` | "Why can't I publish?": where errors are listed, the field to fix, errors on another tab |
+| `editing` | "Why can't I edit?": the Draft chip and the Studio-wide perspective switch |
 | `collaboration` | Presence, comments and tasks |
 | `releases` | Bundling and scheduling content releases |
 | `media` | How assets are stored and reused |
@@ -203,6 +204,7 @@ internals:
 | `targetFieldValidationError()` | The first field with an error |
 | `targetFieldGroupWithError()` | A closed field-group tab holding an error |
 | `targetDocumentStatus()` | The Draft / Published chips |
+| `targetDraftChip()` | The Draft chip, the way out of read-only |
 | `targetDocumentHistory()` | The open document's context menu |
 | `targetDocumentType(title)` | A type in the structure list — by **title**, not schema name |
 | `targetField(name)` | A field in the open document, by schema name |

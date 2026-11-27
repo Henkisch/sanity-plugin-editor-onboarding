@@ -1,4 +1,5 @@
 import {CalendarIcon} from '@sanity/icons/Calendar'
+import {EditIcon} from '@sanity/icons/Edit'
 import {ErrorOutlineIcon} from '@sanity/icons/ErrorOutline'
 import {ImagesIcon} from '@sanity/icons/Images'
 import {PublishIcon} from '@sanity/icons/Publish'
@@ -9,6 +10,7 @@ import {
   targetAssetBrowse,
   targetDocumentHistory,
   targetDocumentStatus,
+  targetDraftChip,
   targetFieldGroupWithError,
   targetFieldValidationError,
   targetPresence,
@@ -43,6 +45,7 @@ export type CoreConceptId =
   | 'essentials'
   | 'publishing'
   | 'validation'
+  | 'editing'
   | 'collaboration'
   | 'releases'
   | 'media'
@@ -64,6 +67,7 @@ const ALL_CONCEPTS: CoreConceptId[] = [
   'essentials',
   'publishing',
   'validation',
+  'editing',
   'collaboration',
   'releases',
   'media',
@@ -194,6 +198,33 @@ function buildTours(options: CoreConceptsOptions): Record<CoreConceptId, Onboard
         target: targetFieldGroupWithError(),
         title: k('tour.validation.tab.title'),
         content: k('tour.validation.tab.content'),
+      },
+    ],
+  },
+
+  editing: {
+    // Studio's read-only state has no banner: the fields just go slightly
+    // grey. An editor who clicked Published once, to check what is live, is
+    // left with a Studio that silently ignores their typing.
+    id: 'editing',
+    title: k('tour.editing.title'),
+    sourceUrl: docs.contentOperations,
+    description: k('tour.editing.description'),
+    icon: EditIcon,
+    unavailableMessage: k('tour.editing.unavailable'),
+    steps: [
+      {
+        target: targetDraftChip(),
+        title: k('tour.editing.versions.title'),
+        content: k('tour.editing.versions.content'),
+      },
+      {
+        // The same state as the chips, seen from the navbar. Without this
+        // step an editor fixes one document and finds the next one locked too.
+        target: targetPerspectiveMenu(),
+        title: k('tour.editing.perspective.title'),
+        content: k('tour.editing.perspective.content'),
+        learnMoreUrl: docs.contentOperations,
       },
     ],
   },
